@@ -1,0 +1,3 @@
+This folder handle the scripts used transition data from one database source to
+another. For instance, we uses redux as a component cache for persistent data,
+instead of reopening the realm database whenever required.

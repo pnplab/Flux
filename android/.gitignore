@@ -1,0 +1,4 @@
+# Prevent key/cryptographic files from being published
+gradle.properties
+app/flux-release-key.keystore
+app/google-services.json

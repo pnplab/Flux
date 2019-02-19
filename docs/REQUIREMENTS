@@ -1,0 +1,42 @@
+List of development installation instruction for OSX.
+
+-g
+node@10.15.1 through `n`
+npm@6.7.0 through `npm i -g npm`
+react-native-cli@2.0.1 through `npm ...`
+yarn@1.13.0 through `brew upgrade yarn`
+java@8 through `brew cask install homebrew/cask-versions/java8` (required for android-sdk)
+# android-sdk@4333796 through `brew tap caskroom/cask; brew cask install android-sdk; export ANDROID_HOME=/usr/local/share/android-sdk; export ANDROID_SDK_ROOT="/usr/local/share/android-sdk"; sdkmanager --licenses` (required for `react-n
+ative run-android` ! @warning add the export commands to your `~/.*_profile` filo)
+# android-emulator@? through `https://gist.github.com/spilth/e7385e7f5153f76cca40a192be35f4ba` (required otherwise `react-native run-android` will say no device is available !)
+android-studio@ through `brew cask install android-studio`
+gradle@4.7 through `react-native run-android`
+react-native-debugger@0.9.4 brew cask install react-native-debugger
+
+@warning
+if you install both android (emulators, ...) from brew and android-studio, you'll ends up with conflicting version (brew doesn't take precedence !)
+
+make sure your `$ANDROID_HOME/tools` is present before `/usr/bin` in your PATH to avoid issue with not found c++11 dylib when runing the android `emulator` shell command. (but other issue will be present as well, we recommend installing
+tools through android-studio default config - done at app launch time - instead). Make sure to restore your ANDROID_HOME & ANDROID_SDK_ROOT path to non-brew values !
+
+anyway!, from cli, emulator has to be launch with full path instead of shortcut to avoid `Qt library not found` (see `https://issuetracker.google.com/issues/37137213`).
+-> `$(which emulator) -avd "Nexus_5X_API_27"`
+
+@warning
+make sure to remove `DYLD_FALLBACK_LIBRARY_PATH` automatically set up by MUSE installation in your bash profile. It breaks android emulator.
+
+@warning
+realm doesn't support node 11 (& probably wont) ! https://github.com/realm/realm-js/issues/2149
+use node 10 instead !
+
+@warning
+We use Genymotion instead of the free Android Studio Emulator (paid 100USD/y). It is faster.
+
+To disable verification issues:
+
+```
+$ adb shell settings put global verifier_verify_adb_installs 0
+$ adb shell settings put global package_verifier_enable 0
+```
+
+

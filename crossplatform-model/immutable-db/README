@@ -1,0 +1,3 @@
+This folder handles crossplatform immuable data. These data never changes, 
+except carefully when the app is updated. These data are handled by the
+`Immutable` library.

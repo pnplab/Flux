@@ -1,0 +1,6 @@
+This folder is copied & edited from native-base-theme library. It has been
+modified to force iOS style theme on android.
+
+The `pnplab-components/` folder uses components developed outside of the
+native-base-theme library scope (would be nice to adapt them to the underlying
+api though).

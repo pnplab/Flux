@@ -1,0 +1,131 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.pnplab.flux">
+
+    <permission
+        android:name="com.aware.READ_CONTEXT_DATA"
+        android:description="@string/read_permission"
+        android:icon="@drawable/ic_launcher_settings"
+        android:label="Read AWARE&apos;s Context data"
+        android:protectionLevel="signature" />
+    <permission
+        android:name="com.aware.WRITE_CONTEXT_DATA"
+        android:description="@string/write_permission"
+        android:icon="@drawable/ic_launcher_settings"
+        android:label="Write to AWARE&apos;s Context data"
+        android:protectionLevel="signature" />
+
+    <uses-feature
+        android:name="android.hardware.telephony"
+        android:required="false" />
+
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="false" />
+
+    <!-- Pasted from aware-phone !-->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <!-- <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" /> -->
+    <!-- <uses-permission android:name="android.permission.VIBRATE" /> -->
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <!-- <uses-permission android:name="android.permission.CAMERA" /> -->
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="com.aware.READ_CONTEXT_DATA" />
+    <uses-permission android:name="com.aware.WRITE_CONTEXT_DATA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+
+    <!--
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+
+    <!- bluetooth-required permissions
+       - @warning android.permission.ACCESS_COARSE_LOCATION also has to be set at runtime in
+       -    javascript code since it's a *dangerous* permission.
+      ->
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!- @note Can be replaced with FINE, which is broader but less battery-friendly ->
+
+    <!- Use this permission to retrieve smartphone's mac address in order to manually identify it into aware
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <! - - @note Can be replaced with FINE, which is broader but less battery-friendly - - >
+    <uses-permission android:name="android.permission.INTERNET" />
+     ->
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
+    <!- Aware // https://zhannina.github.io/aware-standalone/  ->
+    <!-
+    <permission android:name="com.aware.READ_CONTEXT_DATA" android:description="@string/read_permission" android:icon="@drawable/ic_launcher_settings" android:label="Read AWARE's Context data" android:protectionLevel="normal" />
+    <permission android:name="com.aware.WRITE_CONTEXT_DATA" android:description="@string/write_permission" android:icon="@drawable/ic_launcher_settings" android:label="Write to AWARE's Context data" android:protectionLevel="normal" />
+     ->
+
+    -->
+
+    <application
+        android:name=".MainApplication"
+        android:label="@string/app_name"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:allowBackup="false"
+        android:theme="@style/AppTheme"
+    >
+        <service android:name="io.invertase.firebase.messaging.RNFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <service android:name="io.invertase.firebase.messaging.RNFirebaseBackgroundMessagingService" />
+
+        <!-- @note not set in aware-phone
+        <service
+            android:name="com.aware.Applications"
+            android:enabled="true" android:exported="true"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
+            tools:replace="android:enabled">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+                <category android:name="android.accessibilityservice.category.FEEDBACK_GENERIC" />
+            </intent-filter>
+            <meta-data android:name="android.accessibilityservice" android:resource="@xml/aware_accessibility_config" />
+        </service>
+        -->
+
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTop"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize"
+        >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
+    </application>
+
+</manifest>

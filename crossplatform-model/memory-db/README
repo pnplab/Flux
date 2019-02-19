@@ -1,0 +1,2 @@
+This folder handles in-memory crossplatform app states. These are managed by 
+the `Redux` library.

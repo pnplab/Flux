@@ -1,0 +1,96 @@
+{
+  "name": "Flux",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@respond-framework/rudy": "0.1.1-test.0",
+    "immutable": "4.0.0-rc.12",
+    "lottie-react-native": "2.5.11",
+    "memoize-one": "5.0.0",
+    "native-base": "2.11.0",
+    "react": "16.6.3",
+    "react-native": "0.58.3",
+    "react-native-dev-menu": "2.0.2",
+    "react-native-device-info": "0.26.4",
+    "react-native-firebase": "5.2.3",
+    "react-native-fluidic-slider": "0.0.3",
+    "react-native-linear-gradient": "2.5.3",
+    "react-native-snap-carousel": "3.7.5",
+    "react-native-svg": "9.2.4",
+    "react-native-vector-icons": "6.3.0",
+    "react-native-video": "4.4.0",
+    "react-redux": "6.0.0",
+    "realm": "2.23.0",
+    "redux": "4.0.1",
+    "rxjs": "6.4.0",
+    "styled-components": "4.1.3",
+    "victory-native": "31.0.0"
+  },
+  "devDependencies": {
+    "babel-core": "7.0.0-bridge.0",
+    "babel-eslint": "10.0.1",
+    "babel-jest": "24.0.0",
+    "eslint": "5.14.1",
+    "eslint-plugin-flowtype": "3.4.2",
+    "eslint-plugin-react": "7.12.4",
+    "flow-bin": "0.93.0",
+    "jest": "24.0.0",
+    "react-test-renderer": "16.6.3",
+    "wd": "1.11.1"
+  },
+  "jest": {
+    "preset": "react-native",
+    "setupFilesAfterEnv": [
+      "<rootDir>/__mocks__/mockFirebase",
+      "<rootDir>/__mocks__/mockDevMenu"
+    ],
+    "automock": false,
+    "transformIgnorePatterns": [
+      "node_modules/(?!react-native|native-base|native-base-shoutem-theme|@shoutem/animation|@shoutem/ui|tcomb-form-native|styled-components|victory-.*)"
+    ],
+    "moduleNameMapper": {
+      "styled-components": "<rootDir>/node_modules/styled-components/native/dist/styled-components.native.cjs.js"
+    },
+    "haste": {
+      "defaultPlatform": "android",
+      "platforms": [
+        "android",
+        "ios",
+        "native"
+      ],
+      "hasteImplModulePath": "<rootDir>/node_modules/react-native/jest/hasteImpl.js",
+      "providesModuleNodeModules": [
+        "react-native"
+      ]
+    },
+    "timers": "fake"
+  },
+  "bundledDependencies": [
+    "@respond-framework/rudy",
+    "immutable",
+    "lottie-react-native",
+    "memoize-one",
+    "native-base",
+    "react",
+    "react-native",
+    "react-native-dev-menu",
+    "react-native-device-info",
+    "react-native-firebase",
+    "react-native-fluidic-slider",
+    "react-native-linear-gradient",
+    "react-native-snap-carousel",
+    "react-native-svg",
+    "react-native-vector-icons",
+    "react-native-video",
+    "react-redux",
+    "realm",
+    "redux",
+    "rxjs",
+    "styled-components",
+    "victory-native"
+  ]
+}

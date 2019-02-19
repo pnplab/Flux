@@ -1,0 +1,2 @@
+This folder handles crossplatform stateful data that must persist once the app
+closes. These data are handled by the `Realm` library.

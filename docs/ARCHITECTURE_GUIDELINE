@@ -1,0 +1,41 @@
+# Architecture guidelines
+
+## General
+
+- Use latest library versions,
+  as these are pretty unstable (ie. react-native).
+
+- A single entry point,
+  the entrypoint is in Javascript ReactNative. The UI events are propagated to native when needed.
+  The native-only events are retrieved and listened from js when needed.
+  The JS *always* trigger the native actions (ie. AWARE startup, notification setup, permission request, etc.) !
+
+- One store per platform,
+  the models stores aren't synchronized between platforms, instead, native platforms acts as a server,
+  synchronization between native code & javascript redux is handled as a realtime client-server.
+  The synchronization is done when needed and stores doesn't have to have the same structure.
+  
+- One single source of truth per data type,
+  Multiple source of thruth should not emerge from multiple-store architecture. Thus, only one single source 
+  of thruth shall be considered by type of data. Ie, native is the source of thruth for AWARE data, javascript/redux
+  is the source of thruth for UI state. Thus, the source of thruth can sometimes be in the javascript side,
+  sometimes in the native side, depending on constraints (performances, available technologies, ...).
+
+- Developer-friendly first,
+  most up-to-date debugging tools are used.
+
+- Pristine setup first,
+  everything is installed manually, no boilerplate used so we use latest versions which we expect to be more reliable.
+  We have tried relying on boilerplate matching our requirements (ei. with Muse configurated) but this has proven
+  little avantage over time as these aren't actively updated.
+
+## React-Native
+
+- Folder structure is UI-based,
+  as javascript is primarily used for user interface.
+
+- No routing libraries, instead,
+  we use Redux to route between screen, so to ensure a single source of thruth for UI state. Indeed synchronization
+  between redux and react-native router libs appeares to be fusy, even when the routing library are designed to do 
+  so. We also have specific constraint, such as enforcing certain user flow without allowing the user to go back (ie. 
+  when the user performs an experiment).
