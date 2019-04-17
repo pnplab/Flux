@@ -66,8 +66,7 @@
       "providesModuleNodeModules": [
         "react-native"
       ]
-    },
-    "timers": "fake"
+    }
   },
   "bundledDependencies": [
     "@respond-framework/rudy",

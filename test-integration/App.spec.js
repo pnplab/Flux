@@ -12,7 +12,6 @@ describe('SomeComponent', () => {
   beforeAll(async () => {
     try {
       await driver.init(capabilities);
-      // await driver.sleep(2000); // wait for app to load
     } catch(err) {
       console.log(err);
     }
@@ -30,6 +29,7 @@ describe('SomeComponent', () => {
   test('renders some use case', async () => {
       // our test actions and expectations.
       // expect(await driver.hasElementByAccessibilityId('testview')).toBe(true);
+      await driver.sleep(2000);
       expect(true);
   });    
 
