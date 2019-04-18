@@ -1,0 +1,52 @@
+.job_template: &job_build
+    stage: build
+    before_script:
+        - yarn
+    tags:
+        - docker
+    after_script:
+        - cp $OUTPUT_PATH.$FILE_TYPE $CI_PROJECT_NAME-$CI_COMMIT_REF_NAME.$FILE_TYPE
+    artifacts:
+        name: "$CI_PROJECT_NAME-$PLATFORM-$CI_COMMIT_REF_NAME"
+        paths:
+            - $CI_PROJECT_NAME-$CI_COMMIT_REF_NAME.$FILE_TYPE
+        expire_in: 7 days
+    when: manual
+
+build:android:
+    variables:
+        PLATFORM: android
+        FILE_TYPE: apk
+        OUTPUT_PATH: android/app/build/outputs/apk/app-release
+    <<: *job_build
+    # another way: https://about.gitlab.com/2018/10/24/setting-up-gitlab-ci-for-android-projects/
+    image: pnplab/ci.gitlab.react-native-android
+    cache:
+        key: ${CI_PROJECT_ID}
+        paths:
+            - android/.gradle/
+    script:
+        - cd android && ./gradlew assembleRelease -PFLUX_RELEASE_STORE_PASSWORD=$FLUX_RELEASE_STORE_PASSWORD -PFLUX_RELEASE_KEY_PASSWORD=$FLUX_RELEASE_KEY_PASSWORD && cd ..
+
+# build:ios:
+#     variables:
+#         PLATFORM: ios
+#         FILE_TYPE: ipa
+#         OUTPUT_PATH: ./$CI_PROJECT_NAME
+#     <<: *job_build
+#     script:
+#         - export PACKAGE_NAME=$(node -p -e "require('./package.json').name")
+#         - cd ios
+#         - xcodebuild -scheme $PACKAGE_NAME archive -archivePath $PACKAGE_NAME.xcarchive -allowProvisioningUpdates
+#         - xcodebuild -exportArchive -archivePath ./$PACKAGE_NAME.xcarchive -exportPath . -exportOptionsPlist $PACKAGE_NAME/Info.plist
+#         - mv $PACKAGE_NAME.ipa ../$PACKAGE_NAME.ipa
+
+# test:android:
+#     stage: test
+#     image: # @todo needs aws, npm-bundle & stuffs
+#     tag: docker
+#     script:
+#         - ./scripts/tests/upload_app.sh
+#         - ./scripts/tests/package_tests.sh
+#         - ./scripts/tests/upload_tests.sh
+#         - ./scripts/tests/run.sh
