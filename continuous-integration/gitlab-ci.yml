@@ -1,30 +1,30 @@
-.job_template: &job_build
-    stage: build
-    before_script:
-        - yarn
-    tags:
-        - docker
-    after_script:
-        - cp ${OUTPUT_PATH}.${FILE_TYPE} ${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}.${FILE_TYPE}
-    artifacts:
-        name: "${CI_PROJECT_NAME}-${PLATFORM}-${CI_COMMIT_REF_NAME}"
-        paths:
-            - ${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}.${FILE_TYPE}
-        expire_in: 7 days
-    when: manual
+stages:
+    - build
+    - test
+
 
 build:android:
-    variables:
-        PLATFORM: android
-        FILE_TYPE: apk
-        OUTPUT_PATH: android/app/build/outputs/apk/release/app-universal-release
-    <<: *job_build
-    # another way: https://about.gitlab.com/2018/10/24/setting-up-gitlab-ci-for-android-projects/
+    stage: build
+    when: manual
+    allow_failure: false
+    tags:
+        - docker
     image: registry.gitlab.com/pnplab/flux/android-builder:latest
+    variables:
+        GRADLE_OUTPUT_PATH: android/app/build/outputs/apk/release/app-universal-release.apk
+        OUTPUT_APK: ${CI_PROJECT_NAME}.${CI_COMMIT_REF_SLUG}.${CI_COMMIT_SHORT_SHA}.apk
+    artifacts:
+        name: ${OUTPUT_APK}
+        paths:
+            - ${OUTPUT_APK}
+        expire_in: 7 days
     cache:
-        key: ${CI_PROJECT_ID}
+        key: build.${CI_PROJECT_ID}
         paths:
             - android/.gradle/
+            - node_modules/
+    before_script:
+        - yarn
     script:
         # Those variables have to be set in gitlab ci/cd environment variables
         # @note we need to add `-e` to expand `\n` into new lines in gitlab! 
@@ -33,6 +33,30 @@ build:android:
         - echo ${FLUX_RELEASE_KEY_KEYSTORE_B64} | base64 -d > android/app/flux-release-key.keystore
         - echo ${GOOGLE_SERVICES_JSON} > android/app/google-services.json
         - cd android && ./gradlew assembleRelease -PFLUX_RELEASE_STORE_PASSWORD=${FLUX_RELEASE_STORE_PASSWORD} -PFLUX_RELEASE_KEY_PASSWORD=${FLUX_RELEASE_KEY_PASSWORD} && cd ..
+    after_script:
+        - cp ${GRADLE_OUTPUT_PATH} ${OUTPUT_APK}
+
+
+test:android:
+    stage: test
+    dependencies:
+        - build:android
+    # when: manual
+    variables:
+        APK_FILE: ${CI_PROJECT_NAME}.${CI_COMMIT_REF_SLUG}.${CI_COMMIT_SHORT_SHA}.apk
+    tags:
+        - docker
+    image: registry.gitlab.com/pnplab/flux/test-farm-runner:latest
+    script:
+        - aws configure set default.region ${AWS_REGION}
+        - aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}
+        - aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}
+        - ./scripts/tests/package_tests.sh && ./scripts/tests/upload_tests.sh &
+        - ./scripts/tests/upload_yaml.sh &
+        - ./scripts/tests/upload_app.sh "${APK_FILE}" &
+        - wait
+        - export RUN_ARN=$(./scripts/tests/run.sh -q)
+        - ./scripts/tests/poll_run_results.sh -a ${RUN_ARN} -q
 
 # build:ios:
 #     variables:
@@ -46,13 +70,3 @@ build:android:
 #         - xcodebuild -scheme $PACKAGE_NAME archive -archivePath $PACKAGE_NAME.xcarchive -allowProvisioningUpdates
 #         - xcodebuild -exportArchive -archivePath ./$PACKAGE_NAME.xcarchive -exportPath . -exportOptionsPlist $PACKAGE_NAME/Info.plist
 #         - mv $PACKAGE_NAME.ipa ../$PACKAGE_NAME.ipa
-
-# test:android:
-#     stage: test
-#     image: # @todo needs aws, npm-bundle & stuffs
-#     tag: docker
-#     script:
-#         - ./scripts/tests/upload_app.sh
-#         - ./scripts/tests/package_tests.sh
-#         - ./scripts/tests/upload_tests.sh
-#         - ./scripts/tests/run.sh
