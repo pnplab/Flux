@@ -5,11 +5,11 @@
     tags:
         - docker
     after_script:
-        - cp $OUTPUT_PATH.$FILE_TYPE $CI_PROJECT_NAME-$CI_COMMIT_REF_NAME.$FILE_TYPE
-    artifacts:
-        name: "$CI_PROJECT_NAME-$PLATFORM-$CI_COMMIT_REF_NAME"
+        - cp ${OUTPUT_PATH}.${FILE_TYPE} ${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}.${FILE_TYPE}
+        artifacts:
+        name: "${CI_PROJECT_NAME}-${PLATFORM}-${CI_COMMIT_REF_NAME}"
         paths:
-            - $CI_PROJECT_NAME-$CI_COMMIT_REF_NAME.$FILE_TYPE
+            - ${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}.${FILE_TYPE}
         expire_in: 7 days
     when: manual
 
@@ -26,7 +26,12 @@ build:android:
         paths:
             - android/.gradle/
     script:
-        - cd android && ./gradlew assembleRelease -PFLUX_RELEASE_STORE_PASSWORD=$FLUX_RELEASE_STORE_PASSWORD -PFLUX_RELEASE_KEY_PASSWORD=$FLUX_RELEASE_KEY_PASSWORD && cd ..
+        # Those variables have to be set in gitlab ci/cd environment variables
+        - echo "FLUX_RELEASE_STORE_FILE=flux-release-key.keystore\nFLUX_RELEASE_KEY_ALIAS=${FLUX_RELEASE_KEY_ALIAS}\nFLUX_RELEASE_STORE_PASSWORD=${FLUX_RELEASE_STORE_PASSWORD}\nFLUX_RELEASE_KEY_PASSWORD=${FLUX_RELEASE_KEY_PASSWORD}" > android/gradle.properties
+        # Generated through `base64 -i android/app/flux-release-key.keystore -o <outfile>`
+        - echo ${FLUX_RELEASE_KEY_KEYSTORE_B64} | base64 -d > android/app/flux-release-key.keystore
+        - echo ${GOOGLE_SERVICES_JSON} > android/app/google-services.json
+        - cd android && ./gradlew assembleRelease -PFLUX_RELEASE_STORE_PASSWORD=${FLUX_RELEASE_STORE_PASSWORD} -PFLUX_RELEASE_KEY_PASSWORD=${FLUX_RELEASE_KEY_PASSWORD} && cd ..
 
 # build:ios:
 #     variables:
