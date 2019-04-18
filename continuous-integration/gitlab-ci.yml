@@ -6,7 +6,7 @@
         - docker
     after_script:
         - cp ${OUTPUT_PATH}.${FILE_TYPE} ${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}.${FILE_TYPE}
-        artifacts:
+    artifacts:
         name: "${CI_PROJECT_NAME}-${PLATFORM}-${CI_COMMIT_REF_NAME}"
         paths:
             - ${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}.${FILE_TYPE}
