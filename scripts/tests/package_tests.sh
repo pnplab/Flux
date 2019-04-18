@@ -2,10 +2,10 @@
 #
 # @note aws doc `https://docs.aws.amazon.com/devicefarm/latest/developerguide/how-to-create-test-run.html`
 
-set -ex
+set -e
 
 echo "@warning make sure you have npm-bundle installed"
-echo "\t`npm install -g npm-bundle`"
+echo -e "\t\`npm install -g npm-bundle\`"
 
 # Copy minimal amount of file to run integration tests (so copy to aws device farm doesn't take too long)
 mkdir test-package/
