@@ -72,28 +72,17 @@
       ]
     }
   },
-  "bundledDependencies": [
-    "@respond-framework/rudy",
-    "immutable",
-    "lottie-react-native",
-    "memoize-one",
-    "native-base",
-    "react",
-    "react-native",
-    "react-native-dev-menu",
-    "react-native-device-info",
-    "react-native-firebase",
-    "react-native-fluidic-slider",
-    "react-native-linear-gradient",
-    "react-native-snap-carousel",
-    "react-native-svg",
-    "react-native-vector-icons",
-    "react-native-video",
-    "react-redux",
-    "realm",
-    "redux",
-    "rxjs",
-    "styled-components",
-    "victory-native"
-  ]
+  "release": {
+    "branch": "master",
+    "repositoryUrl": "https://github.com/pnplab/Flux.git",
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      ["@semantic-release/github", {
+          "assets": [
+              {"path": "flux.apk", "label": "Android APK"}
+          ]
+      }]
+    ]
+  }
 }

@@ -1,6 +1,7 @@
 stages:
     - build
     - test
+    - release
 
 
 build:android:
@@ -41,7 +42,7 @@ test:android:
     stage: test
     dependencies:
         - build:android
-    # when: manual
+    allow_failure: false
     variables:
         APK_FILE: ${CI_PROJECT_NAME}.${CI_COMMIT_REF_SLUG}.${CI_COMMIT_SHORT_SHA}.apk
     tags:
@@ -57,6 +58,25 @@ test:android:
         - wait
         - export RUN_ARN=$(./scripts/tests/run.sh -q)
         - ./scripts/tests/poll_run_results.sh -a ${RUN_ARN} -q
+
+
+release:
+    stage: release
+    dependencies:
+        - build:android
+    tags:
+        - docker
+    image: node:10-alpine
+    variables:
+        APK_FILE: ${CI_PROJECT_NAME}.${CI_COMMIT_REF_SLUG}.${CI_COMMIT_SHORT_SHA}.apk
+    before_script:
+        # Rename apk file so it can be found as in package.json#release config.
+        - mv ${APK_FILE} flux.apk
+    script:
+        - npx semantic-release@15
+    after_script:
+        - mv flux.apk ${APK_FILE}
+
 
 # build:ios:
 #     variables:
