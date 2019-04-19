@@ -31,6 +31,10 @@
     "victory-native": "31.0.0"
   },
   "devDependencies": {
+    "semantic-release": "15.13.3",
+    "@semantic-release/commit-analyzer": "6.1.0",
+    "@semantic-release/github": "5.2.10",
+    "@semantic-release/release-notes-generator": "7.1.4",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "10.0.1",
     "babel-jest": "24.0.0",
