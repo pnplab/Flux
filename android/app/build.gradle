@@ -189,7 +189,6 @@ android {
     }
 }
 
-
 // Prevent caching AWARE's master branch (which should be updated in case of new commit!)
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
