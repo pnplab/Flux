@@ -23,6 +23,7 @@ cat package.json | jq '
         "react-native": .dependencies["react-native"],
         "babel-core": .devDependencies["babel-core"],
         "babel-jest": .devDependencies["babel-jest"],
+        "babel-plugin-transform-inline-environment-variables": .devDependencies["babel-plugin-transform-inline-environment-variables"],
         "jest": .devDependencies["jest"],
         "react-test-renderer": .devDependencies["react-test-renderer"],
         "wd": .devDependencies["wd"]
