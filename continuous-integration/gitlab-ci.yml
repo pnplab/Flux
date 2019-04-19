@@ -68,7 +68,7 @@ release:
         - build:android
     tags:
         - docker
-    image: node:10-alpine
+    image: tarampampam/node:10.15-alpine # node + git
     variables:
         APK_FILE: ${CI_PROJECT_NAME}.${CI_COMMIT_REF_SLUG}.${CI_COMMIT_SHORT_SHA}.apk
     before_script:
