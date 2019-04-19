@@ -31,9 +31,9 @@
     "victory-native": "31.0.0"
   },
   "devDependencies": {
-    "semantic-release": "15.13.3",
     "@semantic-release/commit-analyzer": "6.1.0",
     "@semantic-release/github": "5.2.10",
+    "@semantic-release/npm": "^5.1.4",
     "@semantic-release/release-notes-generator": "7.1.4",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "10.0.1",
@@ -44,6 +44,7 @@
     "flow-bin": "0.93.0",
     "jest": "24.0.0",
     "react-test-renderer": "16.6.3",
+    "semantic-release": "15.13.3",
     "wd": "1.11.1"
   },
   "jest": {
@@ -73,16 +74,25 @@
     }
   },
   "release": {
-    "branch": "master",
+    "branch": "dev",
     "repositoryUrl": "https://github.com/pnplab/Flux.git",
     "plugins": [
       "@semantic-release/commit-analyzer",
       "@semantic-release/release-notes-generator",
-      ["@semantic-release/github", {
+      ["@semantic-release/npm", {
+        "npmPublish": false
+      }],
+      [
+        "@semantic-release/github",
+        {
           "assets": [
-              {"path": "flux.apk", "label": "Android APK"}
+            {
+              "path": "flux.apk",
+              "label": "Android APK"
+            }
           ]
-      }]
+        }
+      ]
     ]
   }
 }
