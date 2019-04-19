@@ -46,8 +46,8 @@ public class MainApplication extends Application implements ReactApplication {
         protected List<ReactPackage> getPackages() {
             List<ReactPackage> list = new ArrayList<>(Arrays.asList(
                 new MainReactPackage(),
-            new RNFSPackage(),
-            new RNAppUpdatePackage(),
+                new RNFSPackage(),
+                new RNAppUpdatePackage(),
                 new RNDevMenuPackage(),
                 new LottiePackage(),
                 new RNFirebasePackage(),
