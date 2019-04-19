@@ -30,6 +30,20 @@ buildscript {
     }
 }
 
+// Fix `Execution failed for task ':react-native-appupdate:verifyReleaseResources'`
+subprojects {
+    afterEvaluate {project ->
+        if (project.hasProperty("android")) {
+            android {
+                //compileSdkVersion ${buildscript.ext.compileSdkVersion}
+                //buildToolsVersion "${buildscript.ext.buildToolsVersion}"
+                compileSdkVersion 28
+                buildToolsVersion "28.0.3"
+            }
+        }
+    }
+}
+
 allprojects {
     repositories {
         // Add jitpack repository (added by react-native-spinkit)
@@ -43,14 +57,15 @@ allprojects {
         }
 
         // Fix lottie-react-native build issue.
+        // Fix `Execution failed for task ':react-native-appupdate:verifyReleaseResources'`
         configurations.all {
             resolutionStrategy {
                 force "com.android.support:appcompat-v7:$supportLibVersion"
+                force "com.android.support:support-v7:$supportLibVersion"
             }
         }
     }
 }
-
 
 task wrapper(type: Wrapper) {
     gradleVersion = '4.7'
