@@ -3,6 +3,8 @@ stages:
     - test
     - release
 
+variables:
+    APK_FILE: ${CI_PROJECT_NAME}.${CI_COMMIT_REF_SLUG}.${CI_COMMIT_SHORT_SHA}.apk
 
 build:android:
     stage: build
@@ -13,11 +15,11 @@ build:android:
     image: registry.gitlab.com/pnplab/flux/android-builder:latest
     variables:
         GRADLE_OUTPUT_PATH: android/app/build/outputs/apk/release/app-universal-release.apk
-        OUTPUT_APK: ${CI_PROJECT_NAME}.${CI_COMMIT_REF_SLUG}.${CI_COMMIT_SHORT_SHA}.apk
+        FLUX_AUTO_UPDATE: "true"
     artifacts:
-        name: ${OUTPUT_APK}
+        name: ${APK_FILE}
         paths:
-            - ${OUTPUT_APK}
+            - ${APK_FILE}
         expire_in: 7 days
     cache:
         key: build.${CI_PROJECT_ID}
@@ -35,7 +37,7 @@ build:android:
         - echo ${GOOGLE_SERVICES_JSON} > android/app/google-services.json
         - cd android && ./gradlew assembleRelease -PFLUX_RELEASE_STORE_PASSWORD=${FLUX_RELEASE_STORE_PASSWORD} -PFLUX_RELEASE_KEY_PASSWORD=${FLUX_RELEASE_KEY_PASSWORD} && cd ..
     after_script:
-        - cp ${GRADLE_OUTPUT_PATH} ${OUTPUT_APK}
+        - cp ${GRADLE_OUTPUT_PATH} ${APK_FILE}
 
 
 test:android:
@@ -43,8 +45,6 @@ test:android:
     dependencies:
         - build:android
     allow_failure: false
-    variables:
-        APK_FILE: ${CI_PROJECT_NAME}.${CI_COMMIT_REF_SLUG}.${CI_COMMIT_SHORT_SHA}.apk
     tags:
         - docker
     image: registry.gitlab.com/pnplab/flux/test-farm-runner:latest
@@ -69,15 +69,13 @@ release:
     tags:
         - docker
     image: tarampampam/node:10.15-alpine # node + git
-    variables:
-        APK_FILE: ${CI_PROJECT_NAME}.${CI_COMMIT_REF_SLUG}.${CI_COMMIT_SHORT_SHA}.apk
     before_script:
         # Rename apk file so it can be found as in package.json#release config.
-        - mv ${APK_FILE} flux.apk
+        - mv ${APK_FILE} Flux.apk
     script:
         - npx semantic-release@15
     after_script:
-        - mv flux.apk ${APK_FILE}
+        - mv Flux.apk ${APK_FILE}
 
 
 # build:ios:

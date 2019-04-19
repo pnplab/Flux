@@ -17,6 +17,7 @@ import { store } from './crossplatform-model/memory-db';
 import { getTheme } from './crossplatform-theme/';
 
 import Router from './crossplatform-components/Router';
+import { triggerUpdateIfNeeded } from './Updater.js';
 
 // -- About routing
 //
@@ -60,6 +61,7 @@ export default class App extends Component<Props> {
 // @note `AwareManager.startAware()` is set in the StudySchemaAdapter
 // @todo rename StudySchemaAdapter to InitAppSchemaAdapter.
 
+// Add aware-related debugging tools to dev menu
 if (__DEV__ || !__DEV__) {
     const DevMenu = require('react-native-dev-menu');
 
@@ -77,4 +79,9 @@ if (__DEV__ || !__DEV__) {
     });
 
     DevMenu.addItem('aware: sync', () => AwareManager.syncData());
+}
+
+// Automatically update the app when released
+if (typeof process.env.FLUX_AUTO_UPDATE !== 'undefined' && process.env.FLUX_AUTO_UPDATE == true) {
+    triggerUpdateIfNeeded();
 }

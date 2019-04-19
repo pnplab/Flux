@@ -11,6 +11,8 @@ import android.util.Log;
 import com.aware.Aware;
 import com.aware.utils.SSLManager;
 import com.facebook.react.ReactApplication;
+import com.rnfs.RNFSPackage;
+import com.parryworld.rnappupdate.RNAppUpdatePackage;
 import com.zoontek.rndevmenu.RNDevMenuPackage;
 import com.airbnb.android.react.lottie.LottiePackage;
 import io.invertase.firebase.RNFirebasePackage;
@@ -44,6 +46,8 @@ public class MainApplication extends Application implements ReactApplication {
         protected List<ReactPackage> getPackages() {
             List<ReactPackage> list = new ArrayList<>(Arrays.asList(
                 new MainReactPackage(),
+            new RNFSPackage(),
+            new RNAppUpdatePackage(),
                 new RNDevMenuPackage(),
                 new LottiePackage(),
                 new RNFirebasePackage(),

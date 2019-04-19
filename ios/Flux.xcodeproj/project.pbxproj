@@ -89,6 +89,8 @@
 		AA7C9723E6BD43C39E4604A2 /* Lottie.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E8CB3C5A67B4A2C9D8DC7EF /* Lottie.framework */; };
 		61CFDC7D2F5040C4BFFE543B /* libLottie.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D301D106A784C10A737FE32 /* libLottie.a */; };
 		38004131A60C40BC88DE8386 /* libRNDevMenu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AD6FE1508B354E79AF18ECFD /* libRNDevMenu.a */; };
+		E35348FE2CFD47D6B0E599DE /* libRNAppUpdate.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 10CB9AA7C06C41C6B9473455 /* libRNAppUpdate.a */; };
+		40C6E62873C642C3BE71D85A /* libRNFS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CDFCF9B8D2D4F8B88730F42 /* libRNFS.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -457,6 +459,10 @@
 		4D301D106A784C10A737FE32 /* libLottie.a */ = {isa = PBXFileReference; name = "libLottie.a"; path = "libLottie.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 		314B1E61E9094E13986B896B /* RNDevMenu.xcodeproj */ = {isa = PBXFileReference; name = "RNDevMenu.xcodeproj"; path = "../node_modules/react-native-dev-menu/ios/RNDevMenu.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
 		AD6FE1508B354E79AF18ECFD /* libRNDevMenu.a */ = {isa = PBXFileReference; name = "libRNDevMenu.a"; path = "libRNDevMenu.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		B802C3FAA0014AF6A2355B5A /* RNAppUpdate.xcodeproj */ = {isa = PBXFileReference; name = "RNAppUpdate.xcodeproj"; path = "../node_modules/react-native-appupdate/ios/RNAppUpdate.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		10CB9AA7C06C41C6B9473455 /* libRNAppUpdate.a */ = {isa = PBXFileReference; name = "libRNAppUpdate.a"; path = "libRNAppUpdate.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		7E6A910735C047E18D8D0A50 /* RNFS.xcodeproj */ = {isa = PBXFileReference; name = "RNFS.xcodeproj"; path = "../node_modules/react-native-fs/RNFS.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		5CDFCF9B8D2D4F8B88730F42 /* libRNFS.a */ = {isa = PBXFileReference; name = "libRNFS.a"; path = "libRNFS.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -499,6 +505,8 @@
 				AA7C9723E6BD43C39E4604A2 /* Lottie.framework in Frameworks */,
 				61CFDC7D2F5040C4BFFE543B /* libLottie.a in Frameworks */,
 				38004131A60C40BC88DE8386 /* libRNDevMenu.a in Frameworks */,
+				E35348FE2CFD47D6B0E599DE /* libRNAppUpdate.a in Frameworks */,
+				40C6E62873C642C3BE71D85A /* libRNFS.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -704,6 +712,8 @@
 				52DCED7FEB3D4076A6CFC552 /* LottieReactNative.xcodeproj */,
 				539827805B6C482D97345136 /* Lottie.xcodeproj */,
 				314B1E61E9094E13986B896B /* RNDevMenu.xcodeproj */,
+				B802C3FAA0014AF6A2355B5A /* RNAppUpdate.xcodeproj */,
+				7E6A910735C047E18D8D0A50 /* RNFS.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1408,6 +1418,8 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/$(TARGET_NAME)/System/Library/Frameworks\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1422,6 +1434,8 @@
 					"$(SRCROOT)/../node_modules/lottie-react-native/src/ios/LottieReactNative",
 					"$(SRCROOT)/../node_modules/lottie-ios/lottie-ios/Classes/**",
 					"$(SRCROOT)/../node_modules/react-native-dev-menu/ios",
+					"$(SRCROOT)/../node_modules/react-native-appupdate/ios/RNAppUpdate",
+					"$(SRCROOT)/../node_modules/react-native-fs/**",
 				);
 			};
 			name = Debug;
@@ -1445,6 +1459,8 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/$(TARGET_NAME)/System/Library/Frameworks\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1459,6 +1475,8 @@
 					"$(SRCROOT)/../node_modules/lottie-react-native/src/ios/LottieReactNative",
 					"$(SRCROOT)/../node_modules/lottie-ios/lottie-ios/Classes/**",
 					"$(SRCROOT)/../node_modules/react-native-dev-menu/ios",
+					"$(SRCROOT)/../node_modules/react-native-appupdate/ios/RNAppUpdate",
+					"$(SRCROOT)/../node_modules/react-native-fs/**",
 				);
 			};
 			name = Release;
@@ -1492,6 +1510,8 @@
 					"$(SRCROOT)/../node_modules/lottie-react-native/src/ios/LottieReactNative",
 					"$(SRCROOT)/../node_modules/lottie-ios/lottie-ios/Classes/**",
 					"$(SRCROOT)/../node_modules/react-native-dev-menu/ios",
+					"$(SRCROOT)/../node_modules/react-native-appupdate/ios/RNAppUpdate",
+					"$(SRCROOT)/../node_modules/react-native-fs/**",
 				);
 			};
 			name = Debug;
@@ -1524,6 +1544,8 @@
 					"$(SRCROOT)/../node_modules/lottie-react-native/src/ios/LottieReactNative",
 					"$(SRCROOT)/../node_modules/lottie-ios/lottie-ios/Classes/**",
 					"$(SRCROOT)/../node_modules/react-native-dev-menu/ios",
+					"$(SRCROOT)/../node_modules/react-native-appupdate/ios/RNAppUpdate",
+					"$(SRCROOT)/../node_modules/react-native-fs/**",
 				);
 			};
 			name = Release;
@@ -1555,6 +1577,8 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/$(TARGET_NAME)/System/Library/Frameworks\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1569,6 +1593,8 @@
 					"$(SRCROOT)/../node_modules/lottie-react-native/src/ios/LottieReactNative",
 					"$(SRCROOT)/../node_modules/lottie-ios/lottie-ios/Classes/**",
 					"$(SRCROOT)/../node_modules/react-native-dev-menu/ios",
+					"$(SRCROOT)/../node_modules/react-native-appupdate/ios/RNAppUpdate",
+					"$(SRCROOT)/../node_modules/react-native-fs/**",
 				);
 			};
 			name = Debug;
@@ -1600,6 +1626,8 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/$(TARGET_NAME)/System/Library/Frameworks\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1614,6 +1642,8 @@
 					"$(SRCROOT)/../node_modules/lottie-react-native/src/ios/LottieReactNative",
 					"$(SRCROOT)/../node_modules/lottie-ios/lottie-ios/Classes/**",
 					"$(SRCROOT)/../node_modules/react-native-dev-menu/ios",
+					"$(SRCROOT)/../node_modules/react-native-appupdate/ios/RNAppUpdate",
+					"$(SRCROOT)/../node_modules/react-native-fs/**",
 				);
 			};
 			name = Release;
@@ -1644,6 +1674,8 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/$(TARGET_NAME)/System/Library/Frameworks\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1658,6 +1690,8 @@
 					"$(SRCROOT)/../node_modules/lottie-react-native/src/ios/LottieReactNative",
 					"$(SRCROOT)/../node_modules/lottie-ios/lottie-ios/Classes/**",
 					"$(SRCROOT)/../node_modules/react-native-dev-menu/ios",
+					"$(SRCROOT)/../node_modules/react-native-appupdate/ios/RNAppUpdate",
+					"$(SRCROOT)/../node_modules/react-native-fs/**",
 				);
 			};
 			name = Debug;
@@ -1688,6 +1722,8 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/$(TARGET_NAME)/System/Library/Frameworks\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1702,6 +1738,8 @@
 					"$(SRCROOT)/../node_modules/lottie-react-native/src/ios/LottieReactNative",
 					"$(SRCROOT)/../node_modules/lottie-ios/lottie-ios/Classes/**",
 					"$(SRCROOT)/../node_modules/react-native-dev-menu/ios",
+					"$(SRCROOT)/../node_modules/react-native-appupdate/ios/RNAppUpdate",
+					"$(SRCROOT)/../node_modules/react-native-fs/**",
 				);
 			};
 			name = Release;

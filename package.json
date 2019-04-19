@@ -14,6 +14,7 @@
     "native-base": "2.11.0",
     "react": "16.6.3",
     "react-native": "0.58.3",
+    "react-native-appupdate": "1.1.2",
     "react-native-dev-menu": "2.0.2",
     "react-native-device-info": "0.26.4",
     "react-native-firebase": "5.2.3",
@@ -31,13 +32,16 @@
     "victory-native": "31.0.0"
   },
   "devDependencies": {
+    "@semantic-release/changelog": "3.0.2",
     "@semantic-release/commit-analyzer": "6.1.0",
+    "@semantic-release/exec": "3.3.2",
     "@semantic-release/github": "5.2.10",
-    "@semantic-release/npm": "^5.1.4",
+    "@semantic-release/npm": "5.1.4",
     "@semantic-release/release-notes-generator": "7.1.4",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "10.0.1",
     "babel-jest": "24.0.0",
+    "babel-plugin-transform-inline-environment-variables": "0.4.3",
     "eslint": "5.14.1",
     "eslint-plugin-flowtype": "3.4.2",
     "eslint-plugin-react": "7.12.4",
@@ -74,21 +78,43 @@
     }
   },
   "release": {
-    "branch": "dev",
+    "branch": "master",
     "repositoryUrl": "https://github.com/pnplab/Flux.git",
     "plugins": [
       "@semantic-release/commit-analyzer",
       "@semantic-release/release-notes-generator",
-      ["@semantic-release/npm", {
-        "npmPublish": false
-      }],
+      [
+        "@semantic-release/changelog",
+        {
+          "changelogFile": "docs/CHANGELOG.md"
+        }
+      ],
+      [
+        "@semantic-release/npm",
+        {
+          "npmPublish": false
+        }
+      ],
+      [
+        "@semantic-release/exec",
+        {
+          "prepareCmd": "echo '{ versionName: \"${nextRelease.version}\", forceUpdate: true, \"https://github.com/pnplab/Flux/releases/download/v${nextRelease.version}/Flux.apk\" } > android/version.json'"
+        }
+      ],
       [
         "@semantic-release/github",
         {
           "assets": [
             {
-              "path": "flux.apk",
-              "label": "Android APK"
+              "path": "Flux.apk",
+              "label": "Android Application"
+            },
+            {
+              "path": "docs/CHANGELOG.md"
+            },
+            {
+              "path": "android/version.json",
+              "label": "Continuous delivery package"
             }
           ]
         }
