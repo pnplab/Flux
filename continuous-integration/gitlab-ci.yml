@@ -73,7 +73,7 @@ release:
         # Rename apk file so it can be found as in package.json#release config.
         - mv ${APK_FILE} Flux.apk
     script:
-        - npx semantic-release@15
+        - npx -p @semantic-release/changelog@3 -p @semantic-release/commit-analyzer@6 -p @semantic-release/exec@3 -p @semantic-release/github@5 -p @semantic-release/npm@5 -p @semantic-release/release-notes-generator@7 -p semantic-release@15 semantic-release
     after_script:
         - mv Flux.apk ${APK_FILE}
 
