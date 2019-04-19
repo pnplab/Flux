@@ -62,6 +62,8 @@ test:android:
 
 release:
     stage: release
+    only:
+        - master
     dependencies:
         - build:android
     tags:
