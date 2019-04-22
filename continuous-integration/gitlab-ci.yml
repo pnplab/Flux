@@ -35,9 +35,15 @@ build:android:
         # Generated through `base64 -i android/app/flux-release-key.keystore -o <outfile>`
         - echo ${FLUX_RELEASE_KEY_KEYSTORE_B64} | base64 -d > android/app/flux-release-key.keystore
         - echo ${GOOGLE_SERVICES_JSON} > android/app/google-services.json
+        # Setup encryption key
+        - sed -i -e "s/\/\*@db_encryption_key@\*\//${FLUX_ENCRYPTION_KEY}/g" android/app/src/main/java/org/pnplab/flux/AwareManagerModule.java
+        - ./scripts/setup-encryption.sh ${FLUX_ENCRYPTION_KEY}
         - cd android && ./gradlew assembleRelease -PFLUX_RELEASE_STORE_PASSWORD=${FLUX_RELEASE_STORE_PASSWORD} -PFLUX_RELEASE_KEY_PASSWORD=${FLUX_RELEASE_KEY_PASSWORD} && cd ..
     after_script:
         - cp ${GRADLE_OUTPUT_PATH} ${APK_FILE}
+        # remove encryption data (just in case)
+        - rm android/app/src/main/java/org/pnplab/flux/AwareManagerModule.java
+        - mv android/app/src/main/java/org/pnplab/flux/AwareManagerModule.java-e android/app/src/main/java/org/pnplab/flux/AwareManagerModule.java
 
 
 test:android:
