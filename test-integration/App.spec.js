@@ -40,7 +40,7 @@ describe('SomeComponent', () => {
         await driver.setImplicitWaitTimeout(5000);
 
         let el1 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.widget.EditText");
-        await el1.click();
+        // await el1.click();
         await el1.sendKeys("4wc2uw");
         let el2 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup");
         await el2.click();
@@ -70,14 +70,20 @@ function generateSetup() {
             // Auto accept dialogs
             autoGrantPermissions: true,
 
-            // // Set app path for upload & installation, otherwise use `'bundleId':
-            // // 'org.pnplab.flux'` to prevent reinstall.
-            // app: path.resolve(process.env.DEVICEFARM_APP_PATH),
+            // Set app path for upload & installation, otherwise use `'bundleId':
+            // 'org.pnplab.flux'` to prevent reinstall.
+            app: path.resolve(process.env.DEVICEFARM_APP_PATH),
 
-            // platformName: process.env.DEVICEFARM_DEVICE_PLATFORM_NAME,
+            platformName: process.env.DEVICEFARM_DEVICE_PLATFORM_NAME,
 
-            // // Make sure we reset the permissions
-            // fullReset: true, 
+            deviceName: process.env.DEVICEFARM_DEVICE_NAME,
+            udid: process.env.DEVICEFARM_DEVICE_UDID,
+
+            androidScreenshotPath: process.env.DEVICEFARM_SCREENSHOT_PATH,
+
+            // Make sure we reset the permissions
+            fullReset: true, 
+
             //         # 'deviceName': environ['DEVICEFARM_DEVICE_NAME'],
             //         # 'udid': environ['DEVICEFARM_DEVICE_UDID'],
             //         # 'automationName': 'XCUITest', # fixes "A new session could not be created. Details: Appium's IosDriver does not support Xcode version 10.1. Apple has deprecated UIAutomation. Use the "XCUITest" automationName capability instead."
