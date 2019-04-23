@@ -54,8 +54,8 @@
   "jest": {
     "preset": "react-native",
     "setupFilesAfterEnv": [
-      "<rootDir>/__mocks__/mockFirebase",
-      "<rootDir>/__mocks__/mockDevMenu"
+      "<rootDir>/test-mocks/mockFirebase",
+      "<rootDir>/test-mocks/mockDevMenu"
     ],
     "automock": false,
     "transformIgnorePatterns": [
