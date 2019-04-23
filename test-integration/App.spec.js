@@ -9,30 +9,35 @@ const { driver, capabilities } = generateSetup();
 
 describe('SomeComponent', () => {
                       
-  beforeAll(async () => {
-    try {
-      await driver.init(capabilities);
-    } catch(err) {
-      console.log(err);
-    }
-  });
+    beforeAll(async () => {
+        try {
+            await driver.init(capabilities);
+        } catch(err) {
+            console.log(err);
 
-  afterAll(async () => {
-    try {
-      await driver.quit();
-    }
-    catch(err) {
-      console.error(err);
-    }
-  });
-  
-  test('renders some use case', async () => {
-      // our test actions and expectations.
-      // expect(await driver.hasElementByAccessibilityId('testview')).toBe(true);
-      await driver.sleep(2000);
-      expect(true);
-  });    
+            // Rethrow exception to ensure tests fail in ci.
+            throw err;
+        }
+    });
 
+    afterAll(async () => {
+        try {
+            await driver.quit();
+        }
+        catch(err) {
+            console.error(err);
+
+            // Rethrow exception to ensure tests fail in ci.
+            throw err;
+        }
+    });
+    
+    test('renders some use case', async () => {
+        // our test actions and expectations.
+        // expect(await driver.hasElementByAccessibilityId('testview')).toBe(true);
+        await driver.sleep(2000);
+        expect(true);
+    });
 });
 
 
