@@ -8,6 +8,8 @@ class AwareManager {
 
     _awareManager = NativeModules.AwareManager;
 
+    // @note AwareManager is used from adapter (for now) @todo refactor
+    
     constructor() {
 
     }
@@ -65,9 +67,9 @@ class AwareManager {
         }
     }
 
-    startAware(deviceId: string) {
+    startAware(deviceId: string, encryptionKey: string) {
         // @warning Permissions must be received first before calling !
-        this._awareManager.startAware(deviceId);
+        this._awareManager.startAware(deviceId, encryptionKey);
     }
 
     stopAware() {

@@ -130,10 +130,11 @@ export const syncStudyToRealmMiddleWare = () => (next: Dispatch) => async (actio
             // up your phone.
 
             let deviceId = DeviceInfo.getUniqueID();
+            let encryptionKey = process.env.FLUX_ENCRYPTION_KEY || "passwordChangeMe"; // @note default key is set so it throws exception in aware-core#DatabaseHelper
             console.log('DEVICE_ID', deviceId);
 
             await AwareManager.requestPermissions();
-            AwareManager.startAware(deviceId);
+            AwareManager.startAware(deviceId, encryptionKey);
             AwareManager.joinStudy('https://www.pnplab.ca/index.php/webservice/index/1/AVo5cBt3prkk'); // @todo change url based on study.
 
             // await FirebaseManager.signIn();

@@ -18,7 +18,8 @@ module.exports = {
     plugins: [
         ["transform-inline-environment-variables", {
             "include": [
-                "FLUX_AUTO_UPDATE"
+                "FLUX_AUTO_UPDATE",
+                "FLUX_ENCRYPTION_KEY"
             ]
         }]
     ]
