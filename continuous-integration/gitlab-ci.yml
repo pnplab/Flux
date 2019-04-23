@@ -37,7 +37,7 @@ build:android:
         - echo ${GOOGLE_SERVICES_JSON} > android/app/google-services.json
         # Setup encryption key
         - sed -i -e "s/\/\*@db_encryption_key@\*\//${FLUX_ENCRYPTION_KEY}/g" android/app/src/main/java/org/pnplab/flux/AwareManagerModule.java
-        - ./scripts/setup-encryption.sh ${FLUX_ENCRYPTION_KEY}
+        # - ./scripts/setup-encryption.sh ${FLUX_ENCRYPTION_KEY} # @note we don't use the script as we'll perform the cleanup manually to ensure key is deleted from cache
         - cd android && ./gradlew assembleRelease -PFLUX_RELEASE_STORE_PASSWORD=${FLUX_RELEASE_STORE_PASSWORD} -PFLUX_RELEASE_KEY_PASSWORD=${FLUX_RELEASE_KEY_PASSWORD} && cd ..
     after_script:
         - cp ${GRADLE_OUTPUT_PATH} ${APK_FILE}
