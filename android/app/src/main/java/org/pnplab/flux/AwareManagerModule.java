@@ -24,11 +24,11 @@ public class AwareManagerModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void startAware(String deviceId) {
+    public void startAware(String deviceId, String encryptionKey) {
         ReactApplicationContext context = getReactApplicationContext();
 
         // Set db encryption key (the key can be modified through script).
-        DatabaseHelper.DB_ENCRYPTION_KEY = "/*@db_encryption_key@*/";
+        DatabaseHelper.DB_ENCRYPTION_KEY = encryptionKey;
 
         Aware.DEBUG = BuildConfig.DEBUG;
 
