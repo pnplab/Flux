@@ -15,7 +15,7 @@ build:android:
     image: registry.gitlab.com/pnplab/flux/android-builder:latest
     variables:
         GRADLE_OUTPUT_PATH: android/app/build/outputs/apk/release/app-universal-release.apk
-        FLUX_AUTO_UPDATE: "true"
+        FLUX_AUTO_UPDATE: "false"
     artifacts:
         name: ${APK_FILE}
         paths:
