@@ -35,7 +35,20 @@ describe('SomeComponent', () => {
     test('renders some use case', async () => {
         // our test actions and expectations.
         // expect(await driver.hasElementByAccessibilityId('testview')).toBe(true);
-        await driver.sleep(2000);
+
+        // Seek elements for 5s if not found from start.
+        await driver.setImplicitWaitTimeout(5000);
+
+        let el1 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.widget.EditText");
+        await el1.click();
+        await el1.sendKeys("4wc2uw");
+        let el2 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup");
+        await el2.click();
+
+        // Do not start study yet has it depends on the current time!
+        // let el3 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[2]");
+        // await el3.click();
+
         expect(true);
     });
 });
@@ -54,6 +67,9 @@ function generateSetup() {
         // @note doc http://appium.io/docs/en/writing-running-appium/caps/index.html
         // No need to set up capabilities for device farm CI !
         const CAPABILITIES = {
+            // Auto accept dialogs
+            autoGrantPermissions: true,
+
             // // Set app path for upload & installation, otherwise use `'bundleId':
             // // 'org.pnplab.flux'` to prevent reinstall.
             // app: path.resolve(process.env.DEVICEFARM_APP_PATH),
@@ -103,7 +119,10 @@ function generateSetup() {
             app: app_path,
 
             // Make sure we reset the permissions
-            fullReset: true, 
+            fullReset: true,
+
+            // Auto accept dialogs
+            autoGrantPermissions: true,
 
             // ios @todo convert from python
             //
