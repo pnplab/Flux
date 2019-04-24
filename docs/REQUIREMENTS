@@ -39,4 +39,5 @@ $ adb shell settings put global verifier_verify_adb_installs 0
 $ adb shell settings put global package_verifier_enable 0
 ```
 
-
+@warning 
+@babel/transform-inline-environment-variables requires to use `react-native start --reset-cache` to set the `process.env.*` values.
