@@ -30,7 +30,7 @@ const PrepareRestingStateView = (props: Props) =>
         <Title>Veuillez allumer votre Muse. La connexion s'effectuera automatiquement.</Title>
         <StatusWrapper>
             <NoticeWrapper>
-                <Text italic>
+                <Text>
                     {
                         {
                             [MuseStatus.BLUETOOT_AWAITING]: "En attente du status bluetooth...",

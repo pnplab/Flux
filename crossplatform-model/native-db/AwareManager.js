@@ -78,6 +78,10 @@ class AwareManager {
         this._awareManager.joinStudy(studyUrl);
     }
 
+    addSurveyData(timestamp: number, payload: {| [questionId: string]: number |}) {
+        this._awareManager.addSurveyData(timestamp, payload);
+    }
+
     syncData() {
         this._awareManager.syncData();
     }

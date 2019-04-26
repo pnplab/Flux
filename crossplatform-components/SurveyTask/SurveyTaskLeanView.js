@@ -61,14 +61,12 @@ class SurveyTaskLeanView extends PureComponent<Props, State> {
     }
 
     onSlidingCompleted = (questionId: string, value: number) => {
-        console.log(questionId, value);
         // Store slider value.
         this.props.onValue(questionId, value);
     }
     onValueChanged = (value) => {
-        console.log(value);
+        // @todo?
     }
-
 
     onSubmit = () => {
         this.props.onSubmit();
@@ -77,11 +75,6 @@ class SurveyTaskLeanView extends PureComponent<Props, State> {
     keyExtractor = (item: 'notice' | Question | 'submit', index: number) => typeof item.id !== 'undefined' ? item.id : item;
 
     renderItem = ({ item, separators, index }: { item: 'notice' | Question | 'submit', separators: any }) => (
-        // <Card
-        //     item={item}
-        //     onSlidingCompleted={this.onSlidingCompleted}
-        //     onSubmit={this.onSubmit}
-        // ></Card>
         item === 'notice' && 
             <NoticeCard />
         || item === 'submit' &&
@@ -178,7 +171,7 @@ const QuestionCard = ({ value, onSlidingCompleted, onValueChanged, item, isOdd }
             <Text style={{padding: 5, marginRight: 10, marginTop: 3, justifyContent: 'center'}}>-</Text>
             <Slider
                 value={value}
-                onSlidingComplete={onSlidingCompleted}
+                onSlidingComplete={v => onSlidingCompleted(item.id, v)}
                 onValueChange={onValueChanged}
 
                 style={{flex: 1, height: 60, marginTop: -10}}

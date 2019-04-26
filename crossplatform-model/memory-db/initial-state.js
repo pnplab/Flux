@@ -4,11 +4,13 @@
 
 import type { State } from './types';
 
+// @todo move that to the main entrypoint!!
+
 // Set the default state.
 // @warning This is the default *synchronous* state. Asynchronous
 //    initialization occurs at an higher abstraction level, through adapters.
 const initialState: State = {
-    route: undefined && '/graph/symptoms' && '/graph/symptoms/select' && '/survey',
+    route: undefined && '/graph/symptoms' && '/graph/symptoms/select' && '/resting-state' && '/survey',
     hasStudyBeenInitialized: undefined,
     isSurveyTaskAvailable: undefined,
     isRestingStateTaskAvailable: undefined,

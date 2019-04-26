@@ -11,8 +11,13 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableMap;
+
+import org.pnplab.flux.awareplugin.survey.Survey;
 
 public class AwareManagerModule extends ReactContextBaseJavaModule {
+
+    private Survey _survey;
 
     public AwareManagerModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -50,6 +55,9 @@ public class AwareManagerModule extends ReactContextBaseJavaModule {
         // @warning However, atm, aware permission request appears to be buggy when used with
         //      react-native! permission should be requested before #startAware is called!).
         Aware.startAWARE(context);
+
+        // Create aware plugin interfaces (but don't start them until the study has been joined)
+        _survey = new Survey();
     }
 
     @ReactMethod
@@ -65,6 +73,17 @@ public class AwareManagerModule extends ReactContextBaseJavaModule {
 
         Aware.joinStudy(context, studyUrl);
         // Aware.joinStudy(context, "https://api.awareframework.com/index.php/webservice/index/2310/SYd7YMg0Sgnz");
+
+        // Start survey plugin
+        _survey.start(context);
+
+        // @warning this will cause issue if joinStudy is called more then once!
+        _survey.bind(context);
+    }
+
+    @ReactMethod
+    public void addSurveyData(int timestamp, ReadableMap values) {
+        _survey.addSurveyData(timestamp, values);
     }
 
     @ReactMethod

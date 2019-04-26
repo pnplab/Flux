@@ -7,6 +7,7 @@ import type { Store, Dispatch } from 'redux';
 import { YellowBox } from 'react-native';
 import { OPENING_HOUR as surveyTaskOpeningHour, CLOSING_HOUR as surveyTaskClosingHour } from '../business-rules/SurveyTaskScheduleRules';
 import { enableSurveyTask, disableSurveyTask, disableRestingStateTask, symptomGraph } from '../memory-db/actions';
+import awareManager from '../native-db/AwareManager';
 const { completeLoadSymptoms } = symptomGraph;
 
 import realm from '../persistent-db';
@@ -66,12 +67,13 @@ export const syncSurveyFormToRealmMiddleWare = (store: Store<State, Action>) => 
     {
         const { timestamp, payload } = action; // Prevent flow from crying (rightfully).
 
+        // Push the survey form to local db.
         (async () => {
             try {
-                // Open database.
+                // Open realm database.
                 let db = await realm;
 
-                // Push the survey form!
+                // Write data.
                 db.write(() => {
                     // (action: Action);
 
@@ -90,11 +92,25 @@ export const syncSurveyFormToRealmMiddleWare = (store: Store<State, Action>) => 
                     }
                 });
             }
-            catch(e) {
+            catch (e) {
                 // Display the error on console.
                 console.error(e);
             }
         })();
+
+        // Push the survey form to aware.
+        (async () => {
+            try {
+                // Push the survey form to aware!
+                awareManager.addSurveyData(timestamp, payload);
+            }
+            catch (e) {
+                // Display the error on console.
+                console.error(e);
+ 
+            }
+        })();
+
         break;
     }
 
