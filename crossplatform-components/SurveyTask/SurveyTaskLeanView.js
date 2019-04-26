@@ -6,13 +6,14 @@
  */
 
 import React, { PureComponent } from 'react';
-import { FlatList, View, Slider } from 'react-native';
+import { FlatList, View, StyleSheet } from 'react-native';
 import memoize from 'memoize-one';
 
 import type { Question } from '../../crossplatform-model/immutable-db/QuestionType';
 
 import styled from 'styled-components';
 import { Text, Button, Icon } from '../../crossplatform-theme/pnplab-components';
+import Slider from "react-native-slider";
 
 // import Card from './SurveyTaskLeanCardView';
 
@@ -28,61 +29,22 @@ type Props = {
     +onSubmit: () => void,
 };
 
-const NoticeCard = () => 
-    <Card>
-        <CardTitle>Indiquez la sévérité de vos symptomes pour aujourd'hui uniquement.</CardTitle>
-        <NoticeCardIconWrapper>
-            <NoticeCardIcon type="Entypo" name="chevron-down" />
-        </NoticeCardIconWrapper>
-    </Card>;
-
-const NoticeCardIconWrapper = styled(View)`
-        flex: none;
-
-        /* Align icon to center. */
-        flex-direction: row;
-        justify-content: center;
-    `;
-
-const NoticeCardIcon = styled(Icon).attrs(
-    {
-        fontSize: 35
+const sliderIosStyle = StyleSheet.create({
+    track: {
+        height: 2,
+        borderRadius: 1,
+    },
+    thumb: {
+        width: 30,
+        height: 30,
+        borderRadius: 30 / 2,
+        backgroundColor: 'white',
+        shadowColor: 'black',
+        shadowOffset: {width: 0, height: 2},
+        shadowRadius: 2,
+        shadowOpacity: 0.35,
     }
-    )`
-        margin-top: 15px;
-    `;
-
-const SubmitCard = ({ onSubmit }) => 
-// @todo icon="checkmark-circle"
-    <Button onPress={onSubmit} disabled={false}>
-        VALIDER
-    </Button>;
-
-const Card = styled(View)`
-        /*height: 100%;*/
-        width: 100%;
-        justify-content: center;
-        align-content: center;
-
-        padding: 10px;
-        border-radius: 5px;
-        /*background-color: white;*/
-    `;
-const CardTitle = styled(Text)
-    .attrs({
-        adjustsFontSizeToFit: true,
-        numberOfLines: 4
-    })`
-        font-size: 15;
-        text-align: center;
-        
-        /* for some reason padding alone doesn't work inside styled-components.. */
-        padding-left: 10;
-        padding-right: 10;
-        
-        color: #222;
-    `;
-
+});
 
 class SurveyTaskLeanView extends PureComponent<Props, State> {
 
@@ -99,9 +61,14 @@ class SurveyTaskLeanView extends PureComponent<Props, State> {
     }
 
     onSlidingCompleted = (questionId: string, value: number) => {
+        console.log(questionId, value);
         // Store slider value.
         this.props.onValue(questionId, value);
     }
+    onValueChanged = (value) => {
+        console.log(value);
+    }
+
 
     onSubmit = () => {
         this.props.onSubmit();
@@ -109,7 +76,7 @@ class SurveyTaskLeanView extends PureComponent<Props, State> {
 
     keyExtractor = (item: 'notice' | Question | 'submit', index: number) => typeof item.id !== 'undefined' ? item.id : item;
 
-    renderItem = ({ item, separators }: { item: 'notice' | Question | 'submit', separators: any }) => (
+    renderItem = ({ item, separators, index }: { item: 'notice' | Question | 'submit', separators: any }) => (
         // <Card
         //     item={item}
         //     onSlidingCompleted={this.onSlidingCompleted}
@@ -120,14 +87,14 @@ class SurveyTaskLeanView extends PureComponent<Props, State> {
         || item === 'submit' &&
             <SubmitCard onSubmit={this.onSubmit} />
         || true &&
-            <View style={{flex: 1, alignItems: 'flex-start', justifyContent: 'flex-start', backgroundColor: 'transparent', padding: 15}}>
-                <Text italic style={{textAlign: 'left'}}>{item.text}</Text>
-                <View style={{flexDirection: 'row', justifyContent: 'center', backgroundColor: 'transparent'}}>
-                    <Text style={{padding: 5, justifyContent: 'center'}}>-</Text>
-                    <Slider value={typeof this.state.questionValues[item.id] === 'undefined' ? 0.5 : this.state.questionValues[item.id]} style={{flex: 1}} onSlidingComplete={this.onSlidingCompleted} />
-                    <Text style={{padding: 5, justifyContent: 'center'}}>+</Text>
-                </View>
-            </View>
+            <QuestionCard
+                value={typeof this.state.questionValues[item.id] === 'undefined' ? 0.5 : this.state.questionValues[item.id]}
+                onSlidingCompleted={this.onSlidingCompleted}
+                onValueChanged={this.onValueChanged}
+                item={item}
+
+                isOdd={index % 2 === 0}
+            />
     );
 
     // Helper function to prepend and append placeholder to be able to add
@@ -153,5 +120,87 @@ class SurveyTaskLeanView extends PureComponent<Props, State> {
         );
     }
 }
+
+const Card = styled(View)`
+        /*height: 100%;*/
+        width: 100%;
+        justify-content: center;
+        align-content: center;
+
+        padding: 10px;
+        border-radius: 5px;
+        /*background-color: white;*/
+    `;
+
+const CardTitle = styled(Text)
+    .attrs({
+        adjustsFontSizeToFit: true,
+        numberOfLines: 4
+    })`
+        font-size: 15;
+        text-align: center;
+        
+        /* for some reason padding alone doesn't work inside styled-components.. */
+        padding-left: 10;
+        padding-right: 10;
+        
+        color: #222;
+    `;
+
+const NoticeCard = () => 
+    <Card>
+        <CardTitle>Indiquez la sévérité de vos symptomes pour aujourd'hui uniquement.</CardTitle>
+        <NoticeCardIconWrapper>
+            <NoticeCardIcon type="Entypo" name="chevron-down" />
+        </NoticeCardIconWrapper>
+    </Card>;
+
+const NoticeCardIconWrapper = styled(View)`
+        flex: none;
+
+        /* Align icon to center. */
+        flex-direction: row;
+        justify-content: center;
+    `;
+
+const NoticeCardIcon = styled(Icon).attrs(
+    {
+        fontSize: 35
+    }
+    )`
+        margin-top: 15px;
+    `;
+
+const QuestionCard = ({ value, onSlidingCompleted, onValueChanged, item, isOdd }) =>
+    <View style={{flex: 1, alignItems: 'flex-start', justifyContent: 'flex-start', backgroundColor: isOdd ? 'transparent' : '#EFEFEF', padding: 15, paddingTop:10, paddingBottom: 0}}>
+        <Text style={{textAlign: 'left', fontSize: 13, color: '#333'}}>{item.text}</Text>
+        <View style={{flexDirection: 'row', justifyContent: 'center', backgroundColor: 'transparent'}}>
+            <Text style={{padding: 5, marginRight: 10, marginTop: 3, justifyContent: 'center'}}>-</Text>
+            <Slider
+                value={value}
+                onSlidingComplete={onSlidingCompleted}
+                onValueChange={onValueChanged}
+
+                style={{flex: 1, height: 60, marginTop: -10}}
+                trackStyle={sliderIosStyle.track}
+                thumbStyle={sliderIosStyle.thumb}
+                minimumTrackTintColor='#1073ff'
+                maximumTrackTintColor='#b7b7b7'
+
+                thumbTouchSize={{width: 60, height: 60}}
+            />
+            {/* <Slider value={typeof this.state.questionValues[item.id] === 'undefined' ? 0.5 : this.state.questionValues[item.id]} style={{flex: 1, transform: [{ scaleX: 3 }, { scaleY: 3 }], marginLeft: '30%', marginRight: '30%'}} onSlidingComplete={this.onSlidingCompleted} /> --> */}
+            <Text style={{padding: 5, marginLeft: 10, marginTop: 3, justifyContent: 'center'}}>+</Text>
+        </View>
+    </View>;
+
+const SubmitCard = ({ onSubmit }) => 
+// @todo icon="checkmark-circle"
+    <Card style={{paddingLeft: '20%', paddingRight: '20%', paddingTop: 20, paddingBottom: 30}}>
+        <Button onPress={onSubmit} disabled={false}>
+            VALIDER
+        </Button>
+    </Card>;
+
 
 export default SurveyTaskLeanView;

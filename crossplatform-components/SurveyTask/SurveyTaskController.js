@@ -15,7 +15,7 @@ import type { Question } from '../../crossplatform-model/immutable-db/QuestionTy
 import Questions from '../../crossplatform-model/immutable-db/QuestionData';
 import { submitSurveyTaskForm, enableRestingStateTask, openRestingStateTask } from '../../crossplatform-model/memory-db/actions'
 
-import SurveyTaskView from './SurveyTaskView';
+import SurveyTaskView from './SurveyTaskLeanView';
 
 // Configure types.
 type Props = {
