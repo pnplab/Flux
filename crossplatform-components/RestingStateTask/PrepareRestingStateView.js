@@ -25,20 +25,6 @@ export const MuseStatus = {
     MUSE_DISCONNECTED: 'MUSE_DISCONNECTED',
 };
 
-const dottedLoaderView = 
-    <LottieView
-        style={{ width: '100%', maxHeight: 250 }}
-        source={require('./2856-dotted-loader.json')}
-        autoPlay
-        loop
-    />;
-const progressBarTickView = 
-    <LottieView
-        style={{ width: '100%', maxHeight: 250 }}
-        source={require('./2947-progress-bar-tick.json')}
-        autoPlay
-    />;
-
 const PrepareRestingStateView = (props: Props) => 
     <Wrapper>
         <Title>Veuillez allumer votre Muse. La connexion s'effectuera automatiquement.</Title>
@@ -56,29 +42,13 @@ const PrepareRestingStateView = (props: Props) =>
                         }[props.status]
                     }
                 </Text>
-                {/*
-                <Text>En attente du</Text>
-                <Text>Muse...</Text>
-                */}
             </NoticeWrapper>
-            {
-                [
-                    MuseStatus.BLUETOOT_AWAITING,
-                    MuseStatus.BLUETOOTH_ENABLED,
-                    MuseStatus.BLUETOOTH_DISABLED,
-                ].indexOf(props.status) !== -1 &&
-                dottedLoaderView
-            }
-
-            {/* @warning @todo play/pause lottie animation based on current muse status */}
-            {
-                [
-                    MuseStatus.MUSE_CONNECTING,
-                    MuseStatus.MUSE_CONNECTED,
-                    MuseStatus.MUSE_DISCONNECTED,
-                ].indexOf(props.status) !== -1 &&
-                progressBarTickView
-            }
+            <LottieView
+                style={{ width: '100%', maxHeight: 250 }}
+                source={require('./2856-dotted-loader.json')}
+                autoPlay
+                loop
+            />
         </StatusWrapper>
         <ButtonBox>
             <ButtonWrapper>
