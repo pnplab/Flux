@@ -25,6 +25,7 @@ type Props = {
 };
 type State = {
     currentPassword?: string,
+    currentParticipantId?: string,
     error?: string
 };
 
@@ -40,35 +41,46 @@ class InitialSetupController extends PureComponent<Props, State> {
 
         this.state = {
             currentPassword: '',
+            currentParticipantId: '',
             error: undefined,
         };
-
-        this.onPasswordChanged = this.onPasswordChanged.bind(this);
-        this.onSubmit = this.onSubmit.bind(this);
     }
 
-    onPasswordChanged(password: string) {
+    onPasswordChanged = (password: string) => {
         this.setState({ currentPassword: password });
     }
+
+    onParticipantIdChanged = (participantId: string) => {
+        this.setState({ currentParticipantId: participantId });
+    }
     
-    onSubmit() {
+    onSubmit = () => {
         // Show error on failure.
         if (this.state.currentPassword !== this.props.activationPassword) {
             this.setState({ error: 'Mot de passe erroné.' });
+            return;
         }
+        if (this.state.currentParticipantId === '') {
+            this.setState({ error: 'Numéro d\'identification non défini.' });
+            return;
+        }
+
         // Trigger initialization on success.
-        else {
-            this.setState({ error: undefined });
-            this.props.initializeStudy(this.state.currentPassword);
-        }
+        this.setState({ error: undefined });
+        this.props.initializeStudy(this.state.currentPassword, this.state.currentParticipantId);
     }
 
     render() {
         return (
             <InitialSetupView
                 error={this.state.error}
+                
                 password={this.state.currentPassword}
                 onPasswordChanged={this.onPasswordChanged}
+                
+                participantId={this.state.currentParticipantId}
+                onParticipantIdChanged={this.onParticipantIdChanged}
+
                 onSubmit={this.onSubmit}
             />
         );

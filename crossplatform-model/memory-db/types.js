@@ -6,11 +6,11 @@ export type Action =
     // @pre This action should only be called at launch time.
     | {| +type: 'INIT_STUDY_AS_NOT_INITIALIZED' |}
     // @pre This action should only be called at launch time.
-    | {| +type: 'INIT_STUDY_AS_INITIALIZED' |}
+    | {| +type: 'INIT_STUDY_AS_INITIALIZED', +participantId: string |}
     // @pre This action should only be called following an according user
     //     action. This separate action is used to be able to sync the value in
     //     the local db.
-    | {| +type: 'INITIALIZE_STUDY' |}
+    | {| +type: 'INITIALIZE_STUDY', +studyPassword: string, +participantId: string |}
     // Enable survey, triggered at a specific time of day.
     | {| +type: 'ENABLE_SURVEY_TASK' |}
     // Disable survey, triggered at a specific time of day.

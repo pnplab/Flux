@@ -8,12 +8,15 @@ export const initStudyAsNotInitialized: () => Action = () => ({
     type: 'INIT_STUDY_AS_NOT_INITIALIZED'
 });
 
-export const initStudyAsInitialized: () => Action = () => ({
-    type: 'INIT_STUDY_AS_INITIALIZED'
+export const initStudyAsInitialized: (participantId: string) => Action = (participantId) => ({
+    type: 'INIT_STUDY_AS_INITIALIZED',
+    participantId: participantId
 });
 
-export const initializeStudy: () => Action = () => ({
-    type: 'INITIALIZE_STUDY'
+export const initializeStudy: (studyPassword: string, participantId: string) => Action = (studyPassword, participantId) => ({
+    type: 'INITIALIZE_STUDY',
+    studyPassword: studyPassword,
+    participantId: participantId
 });
 
 export const enableSurveyTask: () => Action = () => ({

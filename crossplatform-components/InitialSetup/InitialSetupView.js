@@ -13,6 +13,8 @@ import { Container, Content, Text, Button } from '../../crossplatform-theme';
 
 type Props = {
     +error?: string,
+    +participantId?: string,
+    +onParticipantIdChanged: (participantId: string) => void,
     +password?: string,
     +onPasswordChanged: (password: string) => void,
     +onSubmit: () => void
@@ -36,6 +38,7 @@ const InitialSetupView = (props: Props) =>
             }
             <InputView>
                 <Form>
+                    <IdInput value={props.participantId} onChangeText={participantId => props.onParticipantIdChanged(participantId)} />
                     <PasswordInput value={props.password} onChangeText={password => props.onPasswordChanged(password)} onSubmitEditing={e => props.onSubmit()} />
                 </Form>
             </InputView>
@@ -57,12 +60,24 @@ const StretchedView = styled(View)`
 
 // Main view, padded & centered.
 const InputView = styled(View)`
-        flex: 1;
+        flex: 2;
         justify-content: center;
         width: 100%;
         padding-left: 25px;
         padding-right: 25px;
         min-height: 100px;
+    `;
+
+// User id input field.
+const IdInput = styled(Input)
+    .attrs({
+        placeholder: 'Numéro d\'identification',
+        autoCorrect: false,
+        secureTextEntry: false
+    }
+    )`
+        border-bottom-color: #AAA;
+        border-bottom-width: 1px;
     `;
 
 // Password input field.

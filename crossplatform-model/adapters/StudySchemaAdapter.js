@@ -37,7 +37,7 @@ export const loadStudySchema: (store: Store) => Promise<void> = async (store: St
             store.dispatch(initStudyAsNotInitialized());
         }
         else {
-            store.dispatch(initStudyAsInitialized());
+            store.dispatch(initStudyAsInitialized(studies[0].participantId));
         }
 
         let surveyForms = db.objects('SurveyForm');
@@ -100,7 +100,7 @@ export const syncStudyToRealmMiddleWare = () => (next: Dispatch) => async (actio
     // @warning async is not handled ! We do not know in our app state when the
     //     database has effectively recorded the value !
 
-    const initStudy = (async () => {
+    const initStudy = (async (participantId: string) => {
         try {
             // Open database.
             let db = await realm;
@@ -112,6 +112,7 @@ export const syncStudyToRealmMiddleWare = () => (next: Dispatch) => async (actio
             // @todo adapt for multiple study.
             db.write(() => {
                 studies[0].hasStudyBeenInitialized = true;
+                studies[0].participantId = participantId;
             });
         }
         catch(e) {
@@ -120,7 +121,7 @@ export const syncStudyToRealmMiddleWare = () => (next: Dispatch) => async (actio
         }
     });
 
-    const initModel = (async () => {
+    const initModel = (async (participantId: string) => {
         try {
             // @warning @todo use better identification method.
             // 
@@ -129,12 +130,16 @@ export const syncStudyToRealmMiddleWare = () => (next: Dispatch) => async (actio
             // Oreo, this id (ANDROID_ID) will always be the same once you set
             // up your phone.
 
-            let deviceId = DeviceInfo.getUniqueID();
-            let encryptionKey = process.env.FLUX_ENCRYPTION_KEY || "passwordChangeMe"; // @note default key is set so it throws exception in aware-core#DatabaseHelper
-            console.log('DEVICE_ID', deviceId);
+            if (typeof process.env.FLUX_ENCRYPTION_KEY === 'undefined') {
+                throw new Error('process.env.FLUX_ENCRYPTION_KEY is undefined!');
+            }
+            let encryptionKey = process.env.FLUX_ENCRYPTION_KEY;
+            
+            // let deviceId = DeviceInfo.getUniqueID();
+            // console.log('DEVICE_ID', deviceId);
 
             await AwareManager.requestPermissions();
-            AwareManager.startAware(deviceId, encryptionKey);
+            AwareManager.startAware(participantId, encryptionKey);
             AwareManager.joinStudy('https://www.pnplab.ca/index.php/webservice/index/1/AVo5cBt3prkk'); // @todo change url based on study.
 
             // await FirebaseManager.signIn();
@@ -149,13 +154,12 @@ export const syncStudyToRealmMiddleWare = () => (next: Dispatch) => async (actio
 
     switch (action.type) {
     case 'INITIALIZE_STUDY':
-        initStudy();
-        initModel();
+        initStudy(action.participantId);
+        initModel(action.participantId);
         break;
 
     case 'INIT_STUDY_AS_INITIALIZED':
-
-        initModel();
+        initModel(action.participantId);
         break;
 
     default:
