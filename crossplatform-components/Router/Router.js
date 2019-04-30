@@ -9,7 +9,7 @@ import React, { Component } from 'react';
 import { View, Text } from "react-native";
 import { connect } from 'react-redux';
 
-import InitialSetup from '../InitialSetup';
+import Onboarding from '../Onboarding';
 import Home from '../Home';
 import Graphs from '../Graphs';
 import SymptomGraph from '../Graphs/SymptomGraphController';
@@ -34,7 +34,7 @@ const Router: StatelessFunctionalComponent<Props> = (props: Props): Node => {
             // @todo Show loading screen instead.
             return <View><Text>Loading...</Text></View>;
         case '/initial-setup':
-            return <InitialSetup />;
+            return <Onboarding />;
         case '/':
             return <Home />;
         case '/survey':
