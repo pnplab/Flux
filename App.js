@@ -81,6 +81,11 @@ if (__DEV__ || !__DEV__) {
     DevMenu.addItem('aware: sync', () => AwareManager.syncData());
 }
 
+// Check environment variables.
+if (typeof process.env.FLUX_ENCRYPTION_KEY === 'undefined') {
+    throw new Error('FLUX_ENCRYPTION_KEY must be set! Don\'t forget to flush cache (`react-native start --reset-cache`)!');
+}
+
 // Automatically update the app when released
 if (typeof process.env.FLUX_AUTO_UPDATE !== 'undefined' && process.env.FLUX_AUTO_UPDATE == true) {
     triggerUpdateIfNeeded();
