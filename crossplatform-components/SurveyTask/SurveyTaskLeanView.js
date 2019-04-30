@@ -13,7 +13,7 @@ import type { Question } from '../../crossplatform-model/immutable-db/QuestionTy
 
 import styled from 'styled-components';
 import { Text, Button, Icon } from '../../crossplatform-theme/pnplab-components';
-import Slider from "react-native-slider";
+import Slider from 'react-native-slider';
 
 // import Card from './SurveyTaskLeanCardView';
 
@@ -165,30 +165,30 @@ const NoticeCardIcon = styled(Icon).attrs(
     `;
 
 const QuestionCard = ({ value, onSlidingCompleted, onValueChanged, item, isOdd }) =>
-    <View style={{flex: 1, alignItems: 'flex-start', justifyContent: 'flex-start', backgroundColor: isOdd ? 'transparent' : '#EFEFEF', padding: 15, paddingTop:10, paddingBottom: 0}}>
+    <View style={{flex: 1, alignItems: 'flex-start', justifyContent: 'flex-start', backgroundColor: isOdd ? 'transparent' : '#EFEFEF', padding: 15, paddingTop: 10, paddingBottom: 10}}>
         <Text style={{textAlign: 'left', fontSize: 13, color: '#333'}}>{item.text}</Text>
-        <View style={{flexDirection: 'row', justifyContent: 'center', backgroundColor: 'transparent'}}>
-            <Text style={{padding: 5, marginRight: 10, marginTop: 3, justifyContent: 'center'}}>-</Text>
-            <Slider
-                value={value}
-                onSlidingComplete={v => onSlidingCompleted(item.id, v)}
-                onValueChange={onValueChanged}
+        <Slider
+            value={value}
+            onSlidingComplete={v => onSlidingCompleted(item.id, v)}
+            onValueChange={onValueChanged}
 
-                style={{flex: 1, height: 60, marginTop: -10}}
-                trackStyle={sliderIosStyle.track}
-                thumbStyle={sliderIosStyle.thumb}
-                minimumTrackTintColor='#1073ff'
-                maximumTrackTintColor='#b7b7b7'
+            style={{width: '100%', height: 60, marginTop: -10, marginBottom: -10}}
+            trackStyle={sliderIosStyle.track}
+            thumbStyle={sliderIosStyle.thumb}
+            minimumTrackTintColor="#1073ff"
+            maximumTrackTintColor="#b7b7b7"
 
-                thumbTouchSize={{width: 60, height: 60}}
-            />
-            {/* <Slider value={typeof this.state.questionValues[item.id] === 'undefined' ? 0.5 : this.state.questionValues[item.id]} style={{flex: 1, transform: [{ scaleX: 3 }, { scaleY: 3 }], marginLeft: '30%', marginRight: '30%'}} onSlidingComplete={this.onSlidingCompleted} /> --> */}
-            <Text style={{padding: 5, marginLeft: 10, marginTop: 3, justifyContent: 'center'}}>+</Text>
+            thumbTouchSize={{width: 60, height: 60}}
+        />
+        {/* <Slider value={typeof this.state.questionValues[item.id] === 'undefined' ? 0.5 : this.state.questionValues[item.id]} style={{flex: 1, transform: [{ scaleX: 3 }, { scaleY: 3 }], marginLeft: '30%', marginRight: '30%'}} onSlidingComplete={this.onSlidingCompleted} /> --> */}
+        <View style={{width: '100%', flexDirection: 'row', backgroundColor: 'transparent', justifyContent: 'space-between', marginTop: -15, zIndex: -1}}>
+            <Text style={{fontVariant: ['small-caps'], fontSize: 11, color: '#333'}}>{item.guideline.left}</Text>
+            <Text style={{fontVariant: ['small-caps'], fontSize: 11, color: '#333'}}>{item.guideline.right}</Text>
         </View>
     </View>;
 
 const SubmitCard = ({ onSubmit }) => 
-// @todo icon="checkmark-circle"
+    // @todo icon="checkmark-circle"
     <Card style={{paddingLeft: '20%', paddingRight: '20%', paddingTop: 20, paddingBottom: 30}}>
         <Button onPress={onSubmit} disabled={false}>
             VALIDER
