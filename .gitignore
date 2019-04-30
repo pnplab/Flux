@@ -66,3 +66,11 @@ default.realm
 default.realm.lock
 default.realm.management
 default.realm.note
+
+# VSC
+.vscode/
+android/.project
+android/.settings/
+android/app/.classpath
+android/app/.project
+android/app/.settings/
