@@ -7,9 +7,7 @@ import { View } from 'react-native';
 
 import styled from 'styled-components';
 
-import { Form, Input } from 'native-base';
-import LinearGradient from 'react-native-linear-gradient';
-import { Container, Content, Text, Button } from '../../crossplatform-theme';
+import { Container, Content, Title, Text, Button, Form, Item, Label, Input, CircleButton } from '../../crossplatform-theme';
 
 type Props = {
     +error?: string,
@@ -23,33 +21,36 @@ type Props = {
 const InitialSetupView = (props: Props) => 
     <Container>
         <EnableCenteredContent>
-            {/* <LinearGradient_> */}
             {/* In android, it works without KeyboardAvoidingView & *doesn't work with it!* */}
             {/*<KeyboardAvoidingView_>*/}
-            <StretchedView></StretchedView>
+            <Title>Flux</Title>
+            {/*
             <StretchedView>
                 <Text>Entrez le mot de passe.</Text>
                 <Text>qui vous a été fourni.</Text>
             </StretchedView>
-            {props.error &&
-                <ErrorView>
-                    <Text color='red'>{props.error}</Text>
-                </ErrorView>
-            }
+            */}
             <InputView>
                 <Form>
-                    <IdInput value={props.participantId} onChangeText={participantId => props.onParticipantIdChanged(participantId)} />
-                    <PasswordInput value={props.password} onChangeText={password => props.onPasswordChanged(password)} onSubmitEditing={e => props.onSubmit()} />
+                    <Item floatingLabel>
+                        <Label>numéro d'identification</Label>
+                        <IdInput value={props.participantId} onChangeText={participantId => props.onParticipantIdChanged(participantId)} />
+                    </Item>
+                    <Item floatingLabel>
+                        <Label>code d'accès</Label>
+                        <PasswordInput value={props.password} onChangeText={password => props.onPasswordChanged(password)} onSubmitEditing={e => props.onSubmit()} />
+                    </Item>
                 </Form>
             </InputView>
+            {props.error &&
+                <ErrorView>
+                    <Text color="red" style={{position: 'absolute', textAlign: 'center', width: '100%'}}>{props.error}</Text>
+                </ErrorView>
+            }
             <ButtonView>
-                <Button icon="arrow-dropright-circle" onPress={e => props.onSubmit()}>
-                    ACTIVATION
-                </Button>
+                <CircleButton type="next" onPress={e => props.onSubmit()} />
             </ButtonView>
-            <StretchedView></StretchedView>
             {/*</KeyboardAvoidingView_>*/}
-            {/* </LinearGradient_> */}
         </EnableCenteredContent>
     </Container>;
 
@@ -63,8 +64,8 @@ const InputView = styled(View)`
         flex: 2;
         justify-content: center;
         width: 100%;
-        padding-left: 25px;
-        padding-right: 25px;
+        padding-left: 64px;
+        padding-right: 64px;
         min-height: 100px;
     `;
 
@@ -94,17 +95,15 @@ const PasswordInput = styled(Input)
 
 // Button's view, 70% button width.
 const ButtonView = styled(View)`
-        flex: 1;
-        justify-content: flex-end;
+        align-items: center;
         width: 100%;
-        padding-left: 80px;
-        padding-right: 80px;
     `;
 
 // Error's view, with negative margin bottom so it doesn't adds up spaces.
 const ErrorView = styled(View)`
         flex: 0;
-        margin-bottom: -21px;
+        position: relative;
+        bottom: 45px;
     `;
 
 // Grayscale gradient.
@@ -135,10 +134,13 @@ const ErrorView = styled(View)`
 const EnableCenteredContent = styled(Content)
     .attrs({
         contentContainerStyle: {
-            flexGrow: 1
+            flexGrow: 1,
+            justifyContent: 'space-around'
         }
     })`
         flex: 1;
+        padding-top: 45px;
+        padding-bottom: 60px;
     `;
 
 export default InitialSetupView;

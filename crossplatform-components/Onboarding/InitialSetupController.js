@@ -56,15 +56,15 @@ class InitialSetupController extends PureComponent<Props, State> {
     
     onSubmit = () => {
         // Show error on failure.
-        if (this.state.currentPassword !== this.props.activationPassword) {
-            this.setState({ error: 'Mot de passe erroné.' });
-            return;
-        }
         if (this.state.currentParticipantId === '') {
-            this.setState({ error: 'Numéro d\'identification non défini.' });
+            this.setState({ error: 'numéro d\'identification non défini' });
             return;
         }
 
+        if (this.state.currentPassword !== this.props.activationPassword) {
+            this.setState({ error: 'code d\'accès erroné' });
+            return;
+        }
         // Trigger initialization on success.
         this.setState({ error: undefined });
         this.props.initializeStudy(this.state.currentPassword, this.state.currentParticipantId);
