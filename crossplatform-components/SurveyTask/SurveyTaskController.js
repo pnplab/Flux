@@ -21,14 +21,16 @@ import SurveyTaskView from './SurveyTaskLeanView';
 type Props = {
     submitSurveyTaskForm: (number, { [questionId: string]: number }) => void,
     enableRestingStateTask: () => void,
-    openRestingStateTask: () => void,
+    goToNextStep: () => void,
 };
 type State = {
     
 };
 
 // Configure component logic.
-class SurveyTaskController extends PureComponent<Props, State> {
+// @note Export the raw controller on top of the connected component so it can
+//     be used & customized in the onboarding process.
+export class SurveyTaskController extends PureComponent<Props, State> {
 
     questions: Array<Question>;
     values: { [questionId: string]: number };
@@ -60,7 +62,7 @@ class SurveyTaskController extends PureComponent<Props, State> {
 
         // Enable & open resting state task!
         this.props.enableRestingStateTask();
-        this.props.openRestingStateTask();
+        this.props.goToNextStep();
     }
 
     render() {
@@ -82,7 +84,7 @@ const mapStateToProps = (state: AppState /*, ownProps*/) => ({
 const mapDispatchToProps = {
     submitSurveyTaskForm,
     enableRestingStateTask,
-    openRestingStateTask,
+    goToNextStep: openRestingStateTask,
 };
 
 export default connect(

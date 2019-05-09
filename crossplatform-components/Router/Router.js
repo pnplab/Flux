@@ -9,7 +9,7 @@ import React, { Component } from 'react';
 import { View, Text } from "react-native";
 import { connect } from 'react-redux';
 
-import Onboarding from '../Onboarding';
+import { Auth, CheckWifi, CheckPermissions, CheckPhenotyping, OnboardingSurveyTask, OnboardingRestingStateTask, CheckDataSync } from '../Onboarding';
 import Home from '../Home';
 import Graphs from '../Graphs';
 import SymptomGraph from '../Graphs/SymptomGraphController';
@@ -33,8 +33,22 @@ const Router: StatelessFunctionalComponent<Props> = (props: Props): Node => {
 
             // @todo Show loading screen instead.
             return <View><Text>Loading...</Text></View>;
-        case '/initial-setup':
-            return <Onboarding />;
+        case '/onboarding/auth':
+            return <Auth />;
+        case '/onboarding/check/wifi':
+            return <CheckWifi />;
+        case '/onboarding/check/permissions':
+            return <CheckPermissions />
+        case '/onboarding/check/phenotyping':
+            return <CheckPhenotyping />;
+        case '/onboarding/task/survey':
+            return <OnboardingSurveyTask />;
+        case '/onboarding/task/resting-state':
+            return <OnboardingRestingStateTask />;
+        case '/onboarding/check/data-sync':
+            return <CheckDataSync />;
+        case '/onboarding/finish':
+            return <OnboardingEnd />;
         case '/':
             return <Home />;
         case '/survey':

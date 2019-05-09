@@ -153,7 +153,7 @@ export const syncStudyToRealmMiddleWare = () => (next: Dispatch) => async (actio
     });
 
     switch (action.type) {
-    case 'INITIALIZE_STUDY':
+    case 'ONBOARDING.INITIALIZE_STUDY':
         initStudy(action.participantId);
         initModel(action.participantId);
         break;

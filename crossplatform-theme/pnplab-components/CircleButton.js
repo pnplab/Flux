@@ -11,40 +11,44 @@ import { Text, Icon } from "native-base";
 
 type Props = {
     +onPress: () => void,
-    +type: string,
-    +disabled?: boolean
+    +type: 'next' | 'validate',
+    +disabled?: boolean,
+    +color?: 'blue' | 'green',
+    +onLongPress?: () => void,
+    +delayLongPress?: number
 };
 
-const CircleButton = ({ onPress, type, disabled = false }: Props) => (
-    <TouchableOpacity_ disabled={disabled} onPress={onPress}>
-        <Icon type="Entypo" name="chevron-small-right" />
-    </TouchableOpacity_>
-);
-
-const TouchableOpacity_ = styled(TouchableOpacity)`
+// Views
+const VTouchableOpacity = styled(TouchableOpacity)`
     /* width: 100%; */
     border-width: 1px;
-    border-color: ${props => !props.disabled ? '#777' : '#CCC'};
+    border-color: ${({ disabled, color }) => disabled ? '#CCC' : color === 'green' ? '#3A3' : color === 'blue' ? '#58F' : '#777'};
     border-radius: 45px;
     width: 45px;
-    background-color: ${props => !props.disabled ? 'transparent' : '#EEE'};
+    background-color: ${({ disabled, color }) => disabled ? '#F5F5F5' : 'transparent'};
     padding: 5px;
     align-items: center;
     /* backgroundColor: #00000002;*/
 `;
 
-const View_ = styled(View)`
-    padding: 15px;
-    width: 100%;
-`;
-
-const Text_ = styled(Text)`
-    text-align: center;
-    font-weight: 400;
-    font-size: 14px;
-    color: #555;
-    font-family: Roboto;
-    /*letterSpacing: ;*/
-`;
+// Components
+const CircleButton = ({ onPress, type, color = undefined, disabled = false, onLongPress = undefined, delayLongPress = undefined}: Props) => (
+    <VTouchableOpacity disabled={disabled} color={color} onPress={onPress} onLongPress={onLongPress} delayLongPress={delayLongPress}>
+        {
+            type === 'next' &&
+                <Icon 
+                    type="Entypo" 
+                    name="chevron-small-right" 
+                    style={{color: disabled ? '#CCC' : color === 'green' ? '#3A3' : color === 'blue' ? '#58F' : undefined}}
+                /> || 
+            type === 'validate' &&
+                <Icon 
+                    type="Ionicons" 
+                    name="ios-checkmark" 
+                    style={{color: disabled ? '#CCC' : color === 'green' ? '#3A3' : color === 'blue' ? '#58F' : undefined}}
+                />
+        }
+    </VTouchableOpacity>
+);
 
 export default CircleButton;

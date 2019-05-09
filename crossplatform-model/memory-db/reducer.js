@@ -8,6 +8,59 @@ import initialState from './initial-state';
 
 export default function reducer(state: State = initialState, action: Action): State {
     switch (action.type) {
+        /* Onboarding */
+        case 'ONBOARDING.AUTH':
+            return {
+                ...state,
+                // Temporarily store onboarding variables required to start
+                // aware in a future step.
+                onboarding: {
+                    ...state.onboarding,
+                    studyPassword: action.studyPassword,
+                    participantId: action.participantId
+                },
+                // Jump to next onboarding step.
+                route: '/onboarding/check/wifi',
+            };
+        case 'ONBOARDING.CONFIRM_NETWORK':
+            return {
+                ...state,
+                // Jump to next onboarding step.
+                route: '/onboarding/check/permissions',
+            };
+        case 'ONBOARDING.CONFIRM_PERMISSIONS':
+            return {
+                ...state,
+                // Jump to next onboarding step.
+                route: '/onboarding/check/phenotyping',
+            };
+        case 'ONBOARDING.INITIALIZE_STUDY':
+            // @note This event is hooked in adapters so study initialization
+            // data is recorded in the local database !
+            return {
+                ...state,
+                // Set the study as initialized.
+                hasStudyBeenInitialized: true
+            };
+        case 'ONBOARDING.CONFIRM_PHENOTYPING':
+            return {
+                ...state,
+                // Jump to the next onboarding step.
+                route: '/onboarding/task/survey',
+            };
+        case 'ONBOARDING.SUBMIT_SURVEY':
+            return {
+                ...state,
+                // @note This will be hooked by SurveyTaskAdapter so it's
+                // registered in db!
+                // @todo refactor adapter names to something better!
+            };
+        case 'ONBOARDING.BYPASS_RESTING_STATE':
+            return {
+                ...state,
+                // Jump to next onboarding step.
+                route: '/onboarding/check/data-sync',
+            };
         /* Initial Setup */
         case 'INIT_STUDY_AS_NOT_INITIALIZED':
             if (typeof state.hasStudyBeenInitialized !== 'undefined') {
@@ -20,7 +73,7 @@ export default function reducer(state: State = initialState, action: Action): St
                 // @note The route checkup is only done to allow developer to
                 //     set another initial route in debug mode in order to 
                 //     speed up development time.
-                route: typeof state.route === 'undefined' ? '/initial-setup' : state.route,
+                route: typeof state.route === 'undefined' ? '/onboarding/auth' : state.route,
                 hasStudyBeenInitialized: false
             };
 
@@ -33,15 +86,6 @@ export default function reducer(state: State = initialState, action: Action): St
                 //     set another initial route in debug mode in order to 
                 //     speed up development time.
                 route: typeof state.route === 'undefined' ? '/' : state.route,
-                // Set the study as initialized.
-                hasStudyBeenInitialized: true
-            };
-        case 'INITIALIZE_STUDY':
-            return {
-                ...state,
-                // Redirect the user to home page once study has been
-                // initialized!
-                route: '/',
                 // Set the study as initialized.
                 hasStudyBeenInitialized: true
             };

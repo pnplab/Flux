@@ -18,11 +18,10 @@ type Props = {
     +onSubmit: () => void
 };
 
-const InitialSetupView = (props: Props) => 
+const AuthView = (props: Props) => 
     <Container>
+        {/* @note native-base `Content` replaces KeyboardAvoidingView! */}
         <EnableCenteredContent>
-            {/* In android, it works without KeyboardAvoidingView & *doesn't work with it!* */}
-            {/*<KeyboardAvoidingView_>*/}
             <Title>Flux</Title>
             {/*
             <StretchedView>
@@ -34,11 +33,11 @@ const InitialSetupView = (props: Props) =>
                 <Form>
                     <Item floatingLabel>
                         <Label>numéro d'identification</Label>
-                        <IdInput value={props.participantId} onChangeText={participantId => props.onParticipantIdChanged(participantId)} />
+                        <Input value={props.participantId} onChangeText={participantId => console.log('t', participantId) || props.onParticipantIdChanged(participantId)} />
                     </Item>
                     <Item floatingLabel>
                         <Label>code d'accès</Label>
-                        <PasswordInput value={props.password} onChangeText={password => props.onPasswordChanged(password)} onSubmitEditing={e => props.onSubmit()} />
+                        <Input value={props.password} onChangeText={password => props.onPasswordChanged(password)} onSubmitEditing={e => props.onSubmit()} />
                     </Item>
                 </Form>
             </InputView>
@@ -50,7 +49,6 @@ const InitialSetupView = (props: Props) =>
             <ButtonView>
                 <CircleButton type="next" onPress={e => props.onSubmit()} />
             </ButtonView>
-            {/*</KeyboardAvoidingView_>*/}
         </EnableCenteredContent>
     </Container>;
 
@@ -143,4 +141,4 @@ const EnableCenteredContent = styled(Content)
         padding-bottom: 60px;
     `;
 
-export default InitialSetupView;
+export default AuthView;
