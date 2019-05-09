@@ -108,6 +108,13 @@ public class AwareSyncAdapter extends AbstractThreadedSyncAdapter {
 
         //Fixed: not part of a study, do nothing
         if (web_server.length() == 0 || web_server.equalsIgnoreCase("https://api.awareframework.com/index.php")) {
+            // Broadcast sync failed event.
+            Intent syncDataServerError = new Intent();
+            syncDataServerError.setAction(Aware.ACTION_AWARE_SYNC_DATA_FAILED);
+            syncDataServerError.putExtra("TABLE", database_table);
+            syncDataServerError.putExtra("ERROR", "NO_STUDY_SET");
+            context.sendBroadcast(syncDataServerError);
+
             return;
         }
 
@@ -144,6 +151,14 @@ public class AwareSyncAdapter extends AbstractThreadedSyncAdapter {
         int MAX_POST_SIZE = getBatchSize();
         if (MAX_POST_SIZE == 0) {
             Log.d(Aware.TAG, "Device without available memory left for sync.");
+
+            // Broadcast sync failed event.
+            Intent syncDataServerError = new Intent();
+            syncDataServerError.setAction(Aware.ACTION_AWARE_SYNC_DATA_FAILED);
+            syncDataServerError.putExtra("TABLE", database_table);
+            syncDataServerError.putExtra("ERROR", "OUT_OF_MEMORY");
+            context.sendBroadcast(syncDataServerError);
+
             return;
         }
 
@@ -176,6 +191,14 @@ public class AwareSyncAdapter extends AbstractThreadedSyncAdapter {
                 if (Aware.DEBUG) {
                     if (latest == null) {
                         Log.d(Aware.TAG, "Unable to reach the server to retrieve latest... Will try again later.");
+                        
+                        // Broadcast sync failed event.
+                        Intent syncDataServerError = new Intent();
+                        syncDataServerError.setAction(Aware.ACTION_AWARE_SYNC_DATA_FAILED);
+                        syncDataServerError.putExtra("TABLE", database_table);
+                        syncDataServerError.putExtra("ERROR", "SERVER_UNREACHABLE");
+                        context.sendBroadcast(syncDataServerError);
+
                         return;
                     }
 
@@ -184,6 +207,13 @@ public class AwareSyncAdapter extends AbstractThreadedSyncAdapter {
                     Log.d(Aware.TAG, "Joined study since: " + study_condition);
                     Log.d(Aware.TAG, "Rows remaining to sync: " + total_records);
                 }
+
+                // Broadcast sync started event.
+                Intent syncDataStarted = new Intent();
+                syncDataStarted.setAction(Aware.ACTION_AWARE_SYNC_DATA_STARTED);
+                syncDataStarted.putExtra("TABLE", database_table);
+                syncDataStarted.putExtra("ROW_COUNT", total_records);
+                context.sendBroadcast(syncDataStarted);
 
                 // If we have records to sync
                 if (total_records > 0) {
@@ -196,6 +226,14 @@ public class AwareSyncAdapter extends AbstractThreadedSyncAdapter {
                     Long lastSynced;
 
                     do {
+                        // Broadcast sync new batch event.
+                        Intent syncDataBatchStarted = new Intent();
+                        syncDataBatchStarted.setAction(Aware.ACTION_AWARE_SYNC_DATA_BATCH_STARTED);
+                        syncDataBatchStarted.putExtra("TABLE", database_table);
+                        syncDataBatchStarted.putExtra("ROW_COUNT", total_records);
+                        syncDataBatchStarted.putExtra("LAST_ROW_UPLOADED", (uploaded_records + MAX_POST_SIZE) / MAX_POST_SIZE);
+                        context.sendBroadcast(syncDataBatchStarted);
+
                         if (!Aware.getSetting(context, Aware_Preferences.WEBSERVICE_SILENT).equals("true"))
                             notifyUser(context, "Table: " + database_table + " syncing batch " + (uploaded_records + MAX_POST_SIZE) / MAX_POST_SIZE + " of " + batches, false, true, notificationID);
 
@@ -204,6 +242,14 @@ public class AwareSyncAdapter extends AbstractThreadedSyncAdapter {
                         if (lastSynced == null) {
                             removeFrom = 0;
                             Log.d(Aware.TAG, "Connection to server interrupted. Will try again later.");
+
+                            // Broadcast sync failed event.
+                            Intent syncDataServerError = new Intent();
+                            syncDataServerError.setAction(Aware.ACTION_AWARE_SYNC_DATA_FAILED);
+                            syncDataServerError.putExtra("TABLE", database_table);
+                            syncDataServerError.putExtra("ERROR", "SERVER_CONNECTION_INTERRUPTED");
+                            context.sendBroadcast(syncDataServerError);
+
                             break;
                         } else {
                             removeFrom = lastSynced;
@@ -223,9 +269,31 @@ public class AwareSyncAdapter extends AbstractThreadedSyncAdapter {
                         notifyUser(context, "Finished syncing " + database_table + ". Thanks!", true, false, notificationID);
                     }
                 }
+
+                // Broadcast sync finished event (even if none have had to be done).
+                Intent syncDataFinishedIntent = new Intent();
+                syncDataFinishedIntent.setAction(Aware.ACTION_AWARE_SYNC_DATA_FINISHED);
+                syncDataFinishedIntent.putExtra("TABLE", database_table);
+                context.sendBroadcast(syncDataFinishedIntent);
             } catch (Exception e) {
+                // Broadcast sync failed event.
+                Intent syncDataServerError = new Intent();
+                syncDataServerError.setAction(Aware.ACTION_AWARE_SYNC_DATA_FAILED);
+                syncDataServerError.putExtra("TABLE", database_table);
+                syncDataServerError.putExtra("ERROR", "UNHANDLED_EXCEPTION");
+                syncDataServerError.putExtra("EXCEPTION", e);
+                context.sendBroadcast(syncDataServerError);
+
                 e.printStackTrace();
             }
+        }
+        else {
+            // Broadcast sync failed event.
+            Intent syncDataServerError = new Intent();
+            syncDataServerError.setAction(Aware.ACTION_AWARE_SYNC_DATA_FAILED);
+            syncDataServerError.putExtra("TABLE", database_table);
+            syncDataServerError.putExtra("ERROR", "TABLE_CREATION_FAILED");
+            context.sendBroadcast(syncDataServerError);
         }
     }
 

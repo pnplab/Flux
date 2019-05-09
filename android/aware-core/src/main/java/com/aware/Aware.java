@@ -127,6 +127,34 @@ public class Aware extends Service {
     public static final String ACTION_AWARE_SYNC_DATA = "ACTION_AWARE_SYNC_DATA";
 
     /**
+     * Sent broadcast about data sync status.
+     * These broadcasts are not used by aware itself but are intended to be used when aware is used by external applications as a framework if needed.
+     *
+     * ACTION_AWARE_SYNC_DATA_STARTED
+     *    TABLE: string
+     *    ROW_COUNT: number
+     * ACTION_AWARE_SYNC_DATA_BATCH_STARTED
+     *    TABLE: string
+     *    ROW_COUNT: number
+     *    LAST_ROW_UPLOADED: number
+     * ACTION_AWARE_SYNC_DATA_FINISHED
+     *    TABLE: string
+     * ACTION_AWARE_SYNC_DATA_FAILED
+     *    TABLE: string
+     *    ERROR:
+     *    - NO_STUDY_SET
+     *    - OUT_OF_MEMORY
+     *    - TABLE_CREATION_FAILED
+     *    - SERVER_UNREACHABLE
+     *    - SERVER_CONNECTION_INTERRUPTED
+     *    - UNHANDLED_EXCEPTION
+     */
+    public static final String ACTION_AWARE_SYNC_DATA_STARTED = "ACTION_AWARE_SYNC_DATA_STARTED";
+    public static final String ACTION_AWARE_SYNC_DATA_BATCH_STARTED = "ACTION_AWARE_SYNC_DATA_BATCH_STARTED";
+    public static final String ACTION_AWARE_SYNC_DATA_FINISHED = "ACTION_AWARE_SYNC_DATA_FINISHED";
+    public static final String ACTION_AWARE_SYNC_DATA_FAILED = "ACTION_AWARE_SYNC_DATA_FAILED";
+
+    /**
      * Received broadcast on all modules
      * - Cleans the data collected on the device
      */
