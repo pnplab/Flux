@@ -612,6 +612,15 @@ public class Scheduler extends Aware_Sensor {
     }
 
     @Override
+    protected String getAuthority() {
+        // @warn AUTHORITY wasn't set at all in original aware code. Scheduler direct sync was
+        //     for some reason working well without it though (as it was required because a check
+        //     on AUTHORITY.length > 0 was done in the parent class) . This may implies scheduler
+        //     sync call will be called twice now this code has been added!
+        return Scheduler_Provider.getAuthority(this);
+    }
+
+    @Override
     public void onCreate() {
         super.onCreate();
         if (DEBUG) Log.d(TAG, "Scheduler is created");

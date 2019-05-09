@@ -39,6 +39,7 @@ import org.json.JSONObject;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Hashtable;
 
@@ -63,10 +64,15 @@ public class AwareSyncAdapter extends AbstractThreadedSyncAdapter {
         this.DATABASE_TABLES = DATABASE_TABLES;
         this.TABLES_FIELDS = TABLES_FIELDS;
         this.CONTEXT_URIS = CONTEXT_URIS;
+
+        Log.v("pnplab::AwareSyncAdapter", "#init " + Arrays.toString(DATABASE_TABLES));
     }
 
     public AwareSyncAdapter(Context context, boolean autoInitialize, boolean allowParallelSyncs) {
         super(context, autoInitialize, allowParallelSyncs);
+
+        Log.v("pnplab::AwareSyncAdapter", "#AwareSyncAdapter()");
+
         this.mContext = context;
 
         highFrequencySensors.add("accelerometer");
@@ -93,7 +99,8 @@ public class AwareSyncAdapter extends AbstractThreadedSyncAdapter {
      */
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
-        
+        Log.v("pnplab::AwareSyncAdapter", "#onPerformSync " + Arrays.toString(DATABASE_TABLES));
+
         if (!Aware.getSetting(mContext, Aware_Preferences.WEBSERVICE_SILENT).equals("true"))
             notManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -105,9 +112,19 @@ public class AwareSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     private void offloadData(Context context, String database_table, String web_server, String table_fields, Uri CONTENT_URI) {
+        Log.v("pnplab::AwareSyncAdapter", "#offloadData " + database_table);
 
         //Fixed: not part of a study, do nothing
         if (web_server.length() == 0 || web_server.equalsIgnoreCase("https://api.awareframework.com/index.php")) {
+            Log.v("pnplab::AwareSyncAdapter", "#offloadData " + database_table + " - error: no_study_set");
+
+            // Broadcast sync failed event.
+            Intent syncDataServerError = new Intent();
+            syncDataServerError.setAction(Aware.ACTION_AWARE_SYNC_DATA_FAILED);
+            syncDataServerError.putExtra("TABLE", database_table);
+            syncDataServerError.putExtra("ERROR", "NO_STUDY_SET");
+            context.sendBroadcast(syncDataServerError);
+
             return;
         }
 
@@ -118,6 +135,7 @@ public class AwareSyncAdapter extends AbstractThreadedSyncAdapter {
             boolean isCharging = (plugged == BatteryManager.BATTERY_PLUGGED_AC || plugged == BatteryManager.BATTERY_PLUGGED_USB);
 
             if (!isCharging) {
+                Log.v("pnplab::AwareSyncAdapter", "#offloadData " + database_table + " - error: no charging");
                 if (Aware.DEBUG) Log.d(Aware.TAG, "Only sync data if charging...");
                 return;
             }
@@ -126,6 +144,8 @@ public class AwareSyncAdapter extends AbstractThreadedSyncAdapter {
         //Do we need WiFi?
         if (!isWifiNeededAndConnected()) {
             if (!isForce3G(database_table)) {
+                Log.v("pnplab::AwareSyncAdapter", "#offloadData " + database_table + " - error: no wifi");
+
                 if (Aware.DEBUG)
                     Log.d(Aware.TAG, "Sync data only over Wi-Fi. Will try again later...");
                 return;
@@ -143,7 +163,17 @@ public class AwareSyncAdapter extends AbstractThreadedSyncAdapter {
          */
         int MAX_POST_SIZE = getBatchSize();
         if (MAX_POST_SIZE == 0) {
+            Log.v("pnplab::AwareSyncAdapter", "#offloadData " + database_table + " - error: no_memory");
+
             Log.d(Aware.TAG, "Device without available memory left for sync.");
+
+            // Broadcast sync failed event.
+            Intent syncDataServerError = new Intent();
+            syncDataServerError.setAction(Aware.ACTION_AWARE_SYNC_DATA_FAILED);
+            syncDataServerError.putExtra("TABLE", database_table);
+            syncDataServerError.putExtra("ERROR", "OUT_OF_MEMORY");
+            context.sendBroadcast(syncDataServerError);
+
             return;
         }
 
@@ -159,6 +189,8 @@ public class AwareSyncAdapter extends AbstractThreadedSyncAdapter {
 
         String response = createRemoteTable(device_id, table_fields, web_service_simple, protocol, context, web_server, database_table);
         if (response != null || web_service_simple) {
+            Log.v("pnplab::AwareSyncAdapter", "#offloadData retrieved response from create remote table attempt (always triggered!)");
+
             try {
                 String[] columnsStr = getTableColumnsNames(CONTENT_URI, context);
 
@@ -173,20 +205,39 @@ public class AwareSyncAdapter extends AbstractThreadedSyncAdapter {
                 int total_records = getNumberOfRecordsToSync(CONTENT_URI, columnsStr, latest, study_condition, context);
                 boolean allow_table_maintenance = isTableAllowedForMaintenance(database_table);
 
-                if (Aware.DEBUG) {
-                    if (latest == null) {
-                        Log.d(Aware.TAG, "Unable to reach the server to retrieve latest... Will try again later.");
-                        return;
-                    }
+                if (latest == null) {
+                    Log.d(Aware.TAG, "Unable to reach the server to retrieve latest... Will try again later.");
 
+                    Log.v("pnplab::AwareSyncAdapter", "#offloadData - error: couldn't retrieve latest timestamp in remote db.");
+                    Log.v("pnplab::AwareSyncAdapter", "#offloadData - error: server_unreachable");
+                    
+                    // Broadcast sync failed event.
+                    Intent syncDataServerError = new Intent();
+                    syncDataServerError.setAction(Aware.ACTION_AWARE_SYNC_DATA_FAILED);
+                    syncDataServerError.putExtra("TABLE", database_table);
+                    syncDataServerError.putExtra("ERROR", "SERVER_UNREACHABLE");
+                    context.sendBroadcast(syncDataServerError);
+
+                    return;
+                }
+                else if (Aware.DEBUG) {
                     Log.d(Aware.TAG, "Table: " + database_table + " exists: " + (response != null && response.length() == 0));
                     Log.d(Aware.TAG, "Last synched record in this table: " + latest);
                     Log.d(Aware.TAG, "Joined study since: " + study_condition);
                     Log.d(Aware.TAG, "Rows remaining to sync: " + total_records);
                 }
 
+                // Broadcast sync started event.
+                Intent syncDataStarted = new Intent();
+                syncDataStarted.setAction(Aware.ACTION_AWARE_SYNC_DATA_STARTED);
+                syncDataStarted.putExtra("TABLE", database_table);
+                syncDataStarted.putExtra("ROW_COUNT", total_records);
+                context.sendBroadcast(syncDataStarted);
+
                 // If we have records to sync
                 if (total_records > 0) {
+                    Log.v("pnplab::AwareSyncAdapter", "#offloadData " + database_table + " - sync records");
+
                     JSONArray remoteLatestData = new JSONArray(latest);
                     long start = System.currentTimeMillis();
                     int uploaded_records = 0;
@@ -196,6 +247,14 @@ public class AwareSyncAdapter extends AbstractThreadedSyncAdapter {
                     Long lastSynced;
 
                     do {
+                        // Broadcast sync new batch event.
+                        Intent syncDataBatchStarted = new Intent();
+                        syncDataBatchStarted.setAction(Aware.ACTION_AWARE_SYNC_DATA_BATCH_STARTED);
+                        syncDataBatchStarted.putExtra("TABLE", database_table);
+                        syncDataBatchStarted.putExtra("ROW_COUNT", total_records);
+                        syncDataBatchStarted.putExtra("LAST_ROW_UPLOADED", (uploaded_records + MAX_POST_SIZE) / MAX_POST_SIZE);
+                        context.sendBroadcast(syncDataBatchStarted);
+
                         if (!Aware.getSetting(context, Aware_Preferences.WEBSERVICE_SILENT).equals("true"))
                             notifyUser(context, "Table: " + database_table + " syncing batch " + (uploaded_records + MAX_POST_SIZE) / MAX_POST_SIZE + " of " + batches, false, true, notificationID);
 
@@ -204,6 +263,14 @@ public class AwareSyncAdapter extends AbstractThreadedSyncAdapter {
                         if (lastSynced == null) {
                             removeFrom = 0;
                             Log.d(Aware.TAG, "Connection to server interrupted. Will try again later.");
+
+                            // Broadcast sync failed event.
+                            Intent syncDataServerError = new Intent();
+                            syncDataServerError.setAction(Aware.ACTION_AWARE_SYNC_DATA_FAILED);
+                            syncDataServerError.putExtra("TABLE", database_table);
+                            syncDataServerError.putExtra("ERROR", "SERVER_CONNECTION_INTERRUPTED");
+                            context.sendBroadcast(syncDataServerError);
+
                             break;
                         } else {
                             removeFrom = lastSynced;
@@ -223,9 +290,38 @@ public class AwareSyncAdapter extends AbstractThreadedSyncAdapter {
                         notifyUser(context, "Finished syncing " + database_table + ". Thanks!", true, false, notificationID);
                     }
                 }
+                else {
+                    Log.v("pnplab::AwareSyncAdapter", "#offloadData " + database_table + " - no record to sync");
+                }
+
+                // Broadcast sync finished event (even if none have had to be done).
+                Intent syncDataFinishedIntent = new Intent();
+                syncDataFinishedIntent.setAction(Aware.ACTION_AWARE_SYNC_DATA_FINISHED);
+                syncDataFinishedIntent.putExtra("TABLE", database_table);
+                context.sendBroadcast(syncDataFinishedIntent);
             } catch (Exception e) {
+                Log.v("pnplab::AwareSyncAdapter", "#offloadData " + database_table + " - error: unhandled_exception");
+
+                // Broadcast sync failed event.
+                Intent syncDataServerError = new Intent();
+                syncDataServerError.setAction(Aware.ACTION_AWARE_SYNC_DATA_FAILED);
+                syncDataServerError.putExtra("TABLE", database_table);
+                syncDataServerError.putExtra("ERROR", "UNHANDLED_EXCEPTION");
+                syncDataServerError.putExtra("EXCEPTION", e);
+                context.sendBroadcast(syncDataServerError);
+
                 e.printStackTrace();
             }
+        }
+        else {
+            Log.v("pnplab::AwareSyncAdapter", "#offloadData " + database_table + " - error: table_creation_failed");
+
+            // Broadcast sync failed event.
+            Intent syncDataServerError = new Intent();
+            syncDataServerError.setAction(Aware.ACTION_AWARE_SYNC_DATA_FAILED);
+            syncDataServerError.putExtra("TABLE", database_table);
+            syncDataServerError.putExtra("ERROR", "TABLE_CREATION_FAILED");
+            context.sendBroadcast(syncDataServerError);
         }
     }
 
@@ -452,12 +548,18 @@ public class AwareSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     private int getNumberOfRecordsToSync(Uri CONTENT_URI, String[] columnsStr, String latest, String study_condition, Context mContext) throws JSONException {
+        Log.v("pnplab::AwareSyncAdapter", "#getNumberOfRecordsToSync study_condition (postpanded to in-function cond): " + study_condition);
+        Log.v("pnplab::AwareSyncAdapter", "#getNumberOfRecordsToSync latest: " + latest);
+        Log.v("pnplab::AwareSyncAdapter", "#getNumberOfRecordsToSync columnsStr: " + Arrays.toString(columnsStr));
+
         if (latest == null) return 0;
 
         JSONArray remoteData = new JSONArray(latest);
 
         int TOTAL_RECORDS = 0;
         if (remoteData.length() == 0) {
+            Log.v("pnplab::AwareSyncAdapter", "#getNumberOfRecordsToSync empty latest");
+
             if (exists(columnsStr, "double_end_timestamp")) {
                 Cursor counter = mContext.getContentResolver().query(CONTENT_URI, null, "double_end_timestamp != 0" + study_condition, null, "_id ASC");
                 if (counter != null && counter.moveToFirst()) {
@@ -473,15 +575,28 @@ public class AwareSyncAdapter extends AbstractThreadedSyncAdapter {
                 }
                 if (counter != null && !counter.isClosed()) counter.close();
             } else {
+                Log.v("pnplab::AwareSyncAdapter", "#getNumberOfRecordsToSync remoteData.length() == 0 -> else condition");
+
                 Cursor counter = mContext.getContentResolver().query(CONTENT_URI, null, "1" + study_condition, null, "_id ASC");
+
+                if (counter != null) {
+                    Log.v("pnplab::AwareSyncAdapter", "#getNumberOfRecordsToSync counter != null / no error / getCount: " + counter.getCount());
+                }
                 if (counter != null && counter.moveToFirst()) {
+                    Log.v("pnplab::AwareSyncAdapter", "#getNumberOfRecordsToSync counter != null && counter.moveToFirst()");
+
                     TOTAL_RECORDS = counter.getCount();
+
+                    Log.v("pnplab::AwareSyncAdapter", "#getNumberOfRecordsToSync TOTAL_RECORDS:" + TOTAL_RECORDS);
+
                     counter.close();
                 }
                 if (counter != null && !counter.isClosed()) counter.close();
 
             }
         } else {
+            Log.v("pnplab::AwareSyncAdapter", "#getNumberOfRecordsToSync latest entry exists");
+
             long last;
             if (exists(columnsStr, "double_end_timestamp")) {
                 if (remoteData.getJSONObject(0).has("double_end_timestamp")) {

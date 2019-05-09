@@ -20,10 +20,14 @@ public class Keyboard extends Aware_Sensor {
     public static final String ACTION_AWARE_KEYBOARD = "ACTION_AWARE_KEYBOARD";
 
     @Override
+    protected String getAuthority() {
+        // This allows plugin data to be synced on demand from broadcast. Aware#ACTION_AWARE_SYNC_DATA
+        return Keyboard_Provider.getAuthority(this);
+    }
+
+    @Override
     public void onCreate() {
         super.onCreate();
-
-        AUTHORITY = Keyboard_Provider.getAuthority(this);
 
         TAG = "AWARE::Keyboard";
 

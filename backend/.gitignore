@@ -1,0 +1,5 @@
+application/logs/*
+docker/letsencrypt/data/*
+docker/letsencrypt/webroot/*
+docker/letsencrypt/dhparam-2048.pem
+docker/mysql/data/*

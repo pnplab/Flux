@@ -26,7 +26,7 @@ import java.util.ArrayList;
  *
  * @author dferreira
  */
-public class Aware_Sensor extends Service {
+public abstract class Aware_Sensor extends Service {
 
     /**
      * Debug tag for this sensor
@@ -50,11 +50,7 @@ public class Aware_Sensor extends Service {
      */
     public boolean PERMISSIONS_OK = true;
 
-
-    /**
-     * Integration with sync adapters
-     */
-    public String AUTHORITY = "";
+    protected abstract String getAuthority();
 
     /**
      * Interface to share context with other applications/addons<br/>
@@ -70,17 +66,22 @@ public class Aware_Sensor extends Service {
     public void onCreate() {
         super.onCreate();
 
+        Log.v("pnplab::Sensor", this.getClass().getName() + "#onCreate");
+
         //Register Context Broadcaster
         IntentFilter filter = new IntentFilter();
         filter.addAction(Aware.ACTION_AWARE_CURRENT_CONTEXT);
         filter.addAction(Aware.ACTION_AWARE_STOP_SENSORS);
         filter.addAction(Aware.ACTION_AWARE_SYNC_DATA);
 
+        Log.v("pnplab::Sensor", this.getClass().getName() + "#onCreate register contextBroadcaster cond");
         if (contextBroadcaster == null) {
-            contextBroadcaster = new ContextBroadcaster(CONTEXT_PRODUCER, TAG, AUTHORITY);
+            Log.v("pnplab::Sensor", this.getClass().getName() + "#onCreate register contextBroadcaster instantiation");
+            contextBroadcaster = new ContextBroadcaster(CONTEXT_PRODUCER, TAG, getAuthority(), this.getClass().getName());
         }
 
-        registerReceiver(contextBroadcaster, filter);
+        getApplicationContext().registerReceiver(contextBroadcaster, filter);
+        Log.v("pnplab::Sensor", this.getClass().getName() + "#onCreate register contextBroadcaster receiver");
 
         REQUIRED_PERMISSIONS.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         REQUIRED_PERMISSIONS.add(Manifest.permission.GET_ACCOUNTS);
@@ -93,6 +94,8 @@ public class Aware_Sensor extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.v("pnplab::Sensor", this.getClass().getName() + "#onStartCommand");
+
         PERMISSIONS_OK = true;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             for (String p : REQUIRED_PERMISSIONS) {
@@ -104,12 +107,14 @@ public class Aware_Sensor extends Service {
         }
 
         if (!PERMISSIONS_OK) {
+            Log.v("pnplab::Sensor", this.getClass().getName() + "#onStartCommand PERMISSIONS_OK=false");
             Intent permissions = new Intent(this, PermissionsHandler.class);
             permissions.putExtra(PermissionsHandler.EXTRA_REQUIRED_PERMISSIONS, REQUIRED_PERMISSIONS);
             permissions.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             permissions.putExtra(PermissionsHandler.EXTRA_REDIRECT_SERVICE, getPackageName() + "/" + getClass().getName()); //restarts plugin once permissions are accepted
             startActivity(permissions);
         } else {
+            Log.v("pnplab::Sensor", this.getClass().getName() + "#onStartCommand PERMISSIONS_OK=true");
             PERMISSIONS_OK = true;
             if (Aware.getSetting(this, Aware_Preferences.STATUS_WEBSERVICE).equals("true")) {
                 downloadCertificate(this);
@@ -123,12 +128,15 @@ public class Aware_Sensor extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        Log.v("pnplab::Sensor", this.getClass().getName() + "#onDestroy");
+
         if (PERMISSIONS_OK) {
             //Aware.debug(this, "destroyed: " + getClass().getName() + " package: " + getPackageName());
         }
 
         //Unregister Context Broadcaster
-        if (contextBroadcaster != null) unregisterReceiver(contextBroadcaster);
+        if (contextBroadcaster != null) getApplicationContext().unregisterReceiver(contextBroadcaster);
     }
 
     /**
@@ -146,15 +154,21 @@ public class Aware_Sensor extends Service {
         private ContextProducer cp;
         private String tag;
         private String provider;
+        private String parentClassName;
 
-        public ContextBroadcaster(ContextProducer contextProducer, String logcatTag, String providerAuthority) {
+        public ContextBroadcaster(ContextProducer contextProducer, String logcatTag, String providerAuthority, String parentClassName) {
+            Log.v("pnplab::Sensor", parentClassName + "#ContextBroadcaster()");
+            
             this.cp = contextProducer;
             this.tag = logcatTag;
             this.provider = providerAuthority;
+            this.parentClassName = parentClassName; // for logging only.
         }
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.v("pnplab::Sensor", this.parentClassName + "#onReceive");
+
             if (intent.getAction().equals(Aware.ACTION_AWARE_CURRENT_CONTEXT)) {
                 if (cp != null) {
                     cp.onContext();
@@ -170,6 +184,7 @@ public class Aware_Sensor extends Service {
                 }
             }
             if (intent.getAction().equals(Aware.ACTION_AWARE_SYNC_DATA) && provider.length() > 0) {
+                Log.v("pnplab::Sensor", this.parentClassName + "#onReceive ACTION_AWARE_SYNC_DATA && authority: " + provider);
                 Bundle sync = new Bundle();
                 sync.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
                 sync.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
@@ -191,7 +206,7 @@ public class Aware_Sensor extends Service {
         }
     }
 
-    private static ContextBroadcaster contextBroadcaster = null;
+    private ContextBroadcaster contextBroadcaster = null;
 
     @Override
     public IBinder onBind(Intent intent) {

@@ -73,10 +73,14 @@ public class WiFi extends Aware_Sensor {
     public static final String ACTION_AWARE_WIFI_REQUEST_SCAN = "ACTION_AWARE_WIFI_REQUEST_SCAN";
 
     @Override
+    protected String getAuthority() {
+        // This allows plugin data to be synced on demand from broadcast. Aware#ACTION_AWARE_SYNC_DATA
+        return WiFi_Provider.getAuthority(this);
+    }
+
+    @Override
     public void onCreate() {
         super.onCreate();
-
-        AUTHORITY = WiFi_Provider.getAuthority(this);
 
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         wifiManager = (WifiManager) this.getApplicationContext().getSystemService(WIFI_SERVICE);

@@ -212,11 +212,13 @@ public class Accelerometer extends Aware_Sensor implements SensorEventListener {
         if (accelInfo != null && !accelInfo.isClosed()) accelInfo.close();
     }
 
+    protected String getAuthority() {
+        return Accelerometer_Provider.getAuthority(this);
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
-
-        AUTHORITY = Accelerometer_Provider.getAuthority(this);
 
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);

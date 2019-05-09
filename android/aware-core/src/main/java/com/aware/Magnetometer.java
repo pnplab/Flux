@@ -202,10 +202,14 @@ public class Magnetometer extends Aware_Sensor implements SensorEventListener {
     }
 
     @Override
+    protected String getAuthority() {
+        // This allows plugin data to be synced on demand from broadcast. Aware#ACTION_AWARE_SYNC_DATA
+        return Magnetometer_Provider.getAuthority(this);
+    }
+
+    @Override
     public void onCreate() {
         super.onCreate();
-
-        AUTHORITY = Magnetometer_Provider.getAuthority(this);
 
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mMagnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);

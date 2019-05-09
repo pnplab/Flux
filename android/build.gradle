@@ -14,7 +14,7 @@ buildscript {
         compileSdkVersion = 28
         targetSdkVersion = 27
         supportLibVersion = "28.0.0"
-        kotlin_version = "1.3.30" // For aware-core
+        kotlin_version = "1.3.30" // For aware-core & Detox
     }
     repositories {
         google()
@@ -28,6 +28,7 @@ buildscript {
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
+
 }
 
 // Fix `Execution failed for task ':react-native-appupdate:verifyReleaseResources'`
@@ -35,10 +36,18 @@ subprojects {
     afterEvaluate {project ->
         if (project.hasProperty("android")) {
             android {
+                // Fix `Execution failed for task ':react-native-appupdate:verifyReleaseResources'`
                 //compileSdkVersion ${buildscript.ext.compileSdkVersion}
                 //buildToolsVersion "${buildscript.ext.buildToolsVersion}"
                 compileSdkVersion 28
                 buildToolsVersion "28.0.3"
+
+                // Fix test compilation for react-native-video using `detox build` cli.
+                compileOptions {
+                    sourceCompatibility JavaVersion.VERSION_1_8
+                    targetCompatibility JavaVersion.VERSION_1_8
+                }
+
             }
         }
     }
@@ -54,6 +63,10 @@ allprojects {
         maven {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
             url "$rootDir/../node_modules/react-native/android"
+        }
+        maven {
+            // All of Detox' artifacts are provided via the npm module
+            url "$rootDir/../node_modules/detox/Detox-android"
         }
 
         // Fix lottie-react-native build issue.

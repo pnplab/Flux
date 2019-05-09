@@ -25,7 +25,7 @@ import java.util.ArrayList;
  *
  * @author denzil
  */
-public class Aware_Plugin extends Service {
+public abstract class Aware_Plugin extends Service {
 
     /**
      * Debug tag for this plugin
@@ -65,7 +65,7 @@ public class Aware_Plugin extends Service {
     /**
      * Integration with sync adapters
      */
-    public String AUTHORITY = "";
+    protected abstract String getAuthority();
 
     @Override
     public void onCreate() {
@@ -78,10 +78,11 @@ public class Aware_Plugin extends Service {
         filter.addAction(Aware.ACTION_AWARE_SYNC_DATA);
 
         if (contextBroadcaster == null) {
-            contextBroadcaster = new ContextBroadcaster(CONTEXT_PRODUCER, TAG, AUTHORITY);
+            contextBroadcaster = new ContextBroadcaster(CONTEXT_PRODUCER, TAG, getAuthority(), this.getClass().getName());
         }
 
         registerReceiver(contextBroadcaster, filter);
+        Log.v("pnplab::Plugin", this.getClass().getName() + "#onCreate register contextBroadcaster");
 
         REQUIRED_PERMISSIONS.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         REQUIRED_PERMISSIONS.add(Manifest.permission.GET_ACCOUNTS);
@@ -111,7 +112,6 @@ public class Aware_Plugin extends Service {
             permissions.putExtra(PermissionsHandler.EXTRA_REDIRECT_SERVICE, getApplicationContext().getPackageName() + "/" + getClass().getName()); //restarts plugin once permissions are accepted
             startActivity(permissions);
         } else {
-
             PERMISSIONS_OK = true;
 
             if (Aware.getSetting(this, Aware_Preferences.STATUS_WEBSERVICE).equals("true")) {
@@ -165,15 +165,18 @@ public class Aware_Plugin extends Service {
         private ContextProducer cp;
         private String tag;
         private String provider;
+        private String parentClassName;
 
-        public ContextBroadcaster(ContextProducer contextProducer, String logcatTag, String providerAuthority) {
+        public ContextBroadcaster(ContextProducer contextProducer, String logcatTag, String providerAuthority, String parentClassName) {
             this.cp = contextProducer;
             this.tag = logcatTag;
             this.provider = providerAuthority;
+            this.parentClassName = parentClassName;
         }
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.v("pnplab::Plugin", this.parentClassName + "#onReceive");
             if (intent.getAction().equals(Aware.ACTION_AWARE_CURRENT_CONTEXT)) {
                 if (cp != null) {
                     cp.onContext();
@@ -189,6 +192,7 @@ public class Aware_Plugin extends Service {
                 }
             }
             if (intent.getAction().equals(Aware.ACTION_AWARE_SYNC_DATA) && provider.length() > 0) {
+                Log.v("pnplab::Plugin", this.parentClassName + "#onReceive ACTION_AWARE_SYNC_DATA && provider.length() > 0");
                 Bundle sync = new Bundle();
                 sync.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
                 sync.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
@@ -197,7 +201,7 @@ public class Aware_Plugin extends Service {
         }
     }
 
-    private static ContextBroadcaster contextBroadcaster = null;
+    private ContextBroadcaster contextBroadcaster = null;
 
     @Override
     public IBinder onBind(Intent arg0) {

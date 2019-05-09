@@ -2,40 +2,126 @@
 
 ## General
 
-- Use latest library versions,
-  as these are pretty unstable (ie. react-native).
+- Use latest library versions, as these are pretty unstable (ie. react-native).
 
-- A single entry point,
-  the entrypoint is in Javascript ReactNative. The UI events are propagated to native when needed.
-  The native-only events are retrieved and listened from js when needed.
-  The JS *always* trigger the native actions (ie. AWARE startup, notification setup, permission request, etc.) !
+- A single entry point, the entrypoint is in Javascript ReactNative. The UI
+  events are propagated to native when needed. The native-only events are
+  retrieved and listened from js when needed. The JS *always* trigger the
+  native actions (ie. AWARE startup, notification setup, permission request,
+  etc.) !
 
-- One store per platform,
-  the models stores aren't synchronized between platforms, instead, native platforms acts as a server,
-  synchronization between native code & javascript redux is handled as a realtime client-server.
-  The synchronization is done when needed and stores doesn't have to have the same structure.
+- One store per platform, the models stores aren't synchronized between
+  platforms, instead, native platforms acts as a server, synchronization
+  between native code & javascript redux is handled as a realtime
+  client-server. The synchronization is done when needed and stores doesn't
+  have to have the same structure.
   
-- One single source of truth per data type,
-  Multiple source of thruth should not emerge from multiple-store architecture. Thus, only one single source 
-  of thruth shall be considered by type of data. Ie, native is the source of thruth for AWARE data, javascript/redux
-  is the source of thruth for UI state. Thus, the source of thruth can sometimes be in the javascript side,
-  sometimes in the native side, depending on constraints (performances, available technologies, ...).
+- One single source of truth per data type, Multiple source of thruth should
+  not emerge from multiple-store architecture. Thus, only one single source of
+  thruth shall be considered by type of data. Ie, native is the source of
+  thruth for AWARE data, javascript/redux is the source of thruth for UI state.
+  Thus, the source of thruth can sometimes be in the javascript side, sometimes
+  in the native side, depending on constraints (performances, available
+  technologies, ...).
 
-- Developer-friendly first,
-  most up-to-date debugging tools are used.
+- Developer-friendly first, most up-to-date debugging tools are used.
 
-- Pristine setup first,
-  everything is installed manually, no boilerplate used so we use latest versions which we expect to be more reliable.
-  We have tried relying on boilerplate matching our requirements (ei. with Muse configurated) but this has proven
-  little avantage over time as these aren't actively updated.
+- Pristine setup first, everything is installed manually, no boilerplate used
+  so we use latest versions which we expect to be more reliable. We have tried
+  relying on boilerplate matching our requirements (ei. with Muse configurated)
+  but this has proven little avantage over time as these aren't actively
+  updated.
 
 ## React-Native
 
-- Folder structure is UI-based,
-  as javascript is primarily used for user interface.
+- Folder structure is UI-based, as javascript is primarily used for user
+  interface.
 
-- No routing libraries, instead,
-  we use Redux to route between screen, so to ensure a single source of thruth for UI state. Indeed synchronization
-  between redux and react-native router libs appeares to be fusy, even when the routing library are designed to do 
-  so. We also have specific constraint, such as enforcing certain user flow without allowing the user to go back (ie. 
-  when the user performs an experiment).
+- No routing libraries, instead, we use Redux to route between screen, so to
+  ensure a single source of thruth for UI state. Indeed synchronization between
+  redux and react-native router libs appeares to be fusy, even when the routing
+  library are designed to do so. We also have specific constraint, such as
+  enforcing certain user flow without allowing the user to go back (ie. when
+  the user performs an experiment).
+
+## Redux
+
+- Redux states & actions have a technical naming-scheme: Redux addresse two-way
+  binding asynchronoucity issues by forcing 1-way databinding, but still
+  decouples dataflow behind multiple technical layers (reducer, actions, state,
+  middlewares, ...). To address this issue and make the dataflow as readable as
+  possible, we choose a technical naming scheme over business-model or
+  UI-driven ones. Thus, redux states & actions are as atomic as possible and
+  accurately reflect what happens. It is generally considered a bad practice,
+  as this brings out the reading of the redux model from the business model and
+  thus require to have a general understanding of the technical intricacies as
+  well as the model to understand what's happening. On the other hand, redux
+  model is already flawful in this regard, as model is hidden aspread through
+  multiple technical side-layers (reducer, actions, middlewares, ...) no matter
+  how you design it, thus making it impossible to read at once. Thus, we
+  provide an simple and accurate dataflow view by relying on the standard MVC
+  pattern on top of redux instead. Using advantages of both patterns by
+  delegating asynchronicity concerns to redux while keeping the technical
+  dataflow understanding MVC brings. Although this is not the motivation, this
+  also eases up debugging by providing exhaustive description of the technical
+  dataflow in tools such as react-native debugger, pointing out potential
+  mistake just by looking at the event records. By naming state through a
+  technical, we also avoid having multiple source of thruth in the store,
+  thus simplifying maintenance.
+  --
+  UPDATE: Low level ontology makes it cluttersome to handle the sequentiality of
+  multiple asynchrone events. Thus, the best natural fit left is full reliance over
+  UI-driven ontology. Mistake previously made is it was half-way done (ie. missing
+  - [...]ButtonClicked type naming-scheme and relying on the domain instead - 
+  ie. TaskFinished). Unfortunately, this delegates all the components' logic to a
+  single place. Proper naming scheme should make the dataflow readable though.
+  Second issue not adressed yet is synchronization between multiple source of 
+  thruth, as Redux can't be the only one since we rely on aware, external db, aso.
+
+- Non-redux application-wide side-effects (such as listeners, shared states,
+  aso.) are handled through redux middleware, no matter if they aim to induce a
+  change in the redux store or not, as redux action & reducer can thus provide
+  an accurate & exhaustive description of application-wide side effects.
+
+## Logging
+
+We've decided to use logging extensively, in place of java debuger, even if it
+requires to change aware source code, for the following reasons:
+
+- Java debugger produce ANR when joining aware study and makes the application
+  crashes, making it unusable.
+- Java debugger breakpoint doesn't seem to be triggered in listener instances 
+  when the listener has already been instanciated, biasing the view we have
+  of what happens.
+- Somehow, while method breakpoints always work, line-specific breakpoints at the
+  begining of the *same* methods doesn't.
+- Background services aren't restarted when the application restart. Breakpoints 
+  related to service starting aren't triggered because the services are already
+  started. This is not an issue related to debugger, but the above points bring
+  additional confusion to where the issue lies. Using logging make it sure that 
+  the issue comes from the code.
+- Logging can used in production code & shared remotely to detect user-specific
+  issues.
+- Cross-platform debugging requires context-switching between a multitude of IDE (I 
+  am switching between 4 IDE at the moment). Not relying on IDE-specific features
+  for debugging removes the need of context switching.
+- React-native remote debugging & hot-reloading bug when they're activated together.
+  This issue is not documented.
+
+From a general standpoint, the mobile development ecosystem is still imature and
+it occurs to be a relevant decision to be conservative by default in regard to the
+tooling we use. Avoiding external dependency for development as much as possible
+ensure we'll always have stable means to develop the solution, and will make it
+faster to source external people into the development process later on.
+Considering the above points, relying back to external tooling to fasten development 
+again would probably be an effective strategy again if langage-specific developer
+join the team as the ratio involved in making sure tools work right regarding to
+the amount of effective work achieved should decrease when context switching is
+reduced.
+
+- Logging tags should be defined by lang then classes:
+    ie. "pnp.java::AwareManager"
+- .verbose / .trace for method-level debugging (as we would use a debugger for).
+- .debug for integration dataflow & side-effect level debugging (ie. writing on a db, 
+   communication between high level components etc.).
+- .info for unverbose events that could be relevent to an end-user for instance.

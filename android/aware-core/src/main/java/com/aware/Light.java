@@ -199,10 +199,14 @@ public class Light extends Aware_Sensor implements SensorEventListener {
     }
 
     @Override
+    protected String getAuthority() {
+        // This allows plugin data to be synced on demand from broadcast. Aware#ACTION_AWARE_SYNC_DATA
+        return Light_Provider.getAuthority(this);
+    }
+
+    @Override
     public void onCreate() {
         super.onCreate();
-
-        AUTHORITY = Light_Provider.getAuthority(this);
 
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mLight = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);

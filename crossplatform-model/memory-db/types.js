@@ -3,14 +3,19 @@
  */
 
 export type Action =
+    | {| +type: 'ONBOARDING.AUTH', studyPassword: string, participantId: string |}
+    | {| +type: 'ONBOARDING.CONFIRM_NETWORK' |}
+    | {| +type: 'ONBOARDING.CONFIRM_PERMISSIONS' |}
+    | {| +type: 'ONBOARDING.INITIALIZE_STUDY', +studyPassword: string, +participantId: string |}
+    | {| +type: 'ONBOARDING.SET_AWARE_STUDY_STATE', +hasBeenSuccessfullyJoined: boolean |}
+    | {| +type: 'ONBOARDING.CONFIRM_PHENOTYPING' |}
+    | {| +type: 'ONBOARDING.SUBMIT_SURVEY', +timestamp: number, +payload: {| [questionId: string]: number |} |}
+    | {| +type: 'ONBOARDING.CONFIRM_SURVEY_TASK' |}
+    | {| +type: 'ONBOARDING.BYPASS_RESTING_STATE' |}
     // @pre This action should only be called at launch time.
     | {| +type: 'INIT_STUDY_AS_NOT_INITIALIZED' |}
     // @pre This action should only be called at launch time.
     | {| +type: 'INIT_STUDY_AS_INITIALIZED', +participantId: string |}
-    // @pre This action should only be called following an according user
-    //     action. This separate action is used to be able to sync the value in
-    //     the local db.
-    | {| +type: 'INITIALIZE_STUDY', +studyPassword: string, +participantId: string |}
     // Enable survey, triggered at a specific time of day.
     | {| +type: 'ENABLE_SURVEY_TASK' |}
     // Disable survey, triggered at a specific time of day.
@@ -35,7 +40,14 @@ export type Action =
 
 export type Route =
     | '/'
-    | '/initial-setup'
+    | '/onboarding/auth'
+    | '/onboarding/check/wifi'
+    | '/onboarding/check/permissions'
+    | '/onboarding/check/phenotyping'
+    | '/onboarding/task/survey'
+    | '/onboarding/task/resting-state'
+    | '/onboarding/check/data-sync'
+    | '/onboarding/finish'
     | '/survey'
     | '/resting-state'
     | '/resting-state/video'

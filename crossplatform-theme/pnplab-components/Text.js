@@ -10,12 +10,14 @@ import styled from 'styled-components';
 
 type Props = {
     +childlen?: React.Node,
-    +props: Array<any>
+    +italic?: boolean,
+    +justify?: boolean, // @warning justify only works on iOS.
+    +left?: boolean
 };
 
-const Text_ = ({children, italic = false, ...props}: Props) => (
+const Text_ = ({children, italic = false, justify = false, left = undefined, ...props}: Props) => (
     <View>
-        <Text__ italic={italic} {...props}>
+        <Text__ italic={italic} justify={justify} left={left} {...props}>
             {children}
         </Text__>
     </View>
@@ -24,7 +26,7 @@ const Text_ = ({children, italic = false, ...props}: Props) => (
 const Text__ = styled(Text)`
     color: ${props => props.color || '#444'};
     font-family: Roboto;
-    text-align: center;
+    text-align: ${props => props.justify ? 'justify' : props.left ? 'left' : 'center'};
     font-weight: 400;
     font-style: ${props => props.italic ? 'italic' : 'normal'};
 `;

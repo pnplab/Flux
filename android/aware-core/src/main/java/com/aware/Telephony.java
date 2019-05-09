@@ -88,10 +88,14 @@ public class Telephony extends Aware_Sensor {
     }
 
     @Override
+    protected String getAuthority() {
+        // This allows plugin data to be synced on demand from broadcast. Aware#ACTION_AWARE_SYNC_DATA
+        return Telephony_Provider.getAuthority(this);
+    }
+
+    @Override
     public void onCreate() {
         super.onCreate();
-
-        AUTHORITY = Telephony_Provider.getAuthority(this);
 
         telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
 

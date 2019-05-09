@@ -265,10 +265,14 @@ public class Locations extends Aware_Sensor implements LocationListener {
     }
 
     @Override
+    protected String getAuthority() {
+        // This allows plugin data to be synced on demand from broadcast. Aware#ACTION_AWARE_SYNC_DATA
+        return Locations_Provider.getAuthority(this);
+    }
+
+    @Override
     public void onCreate() {
         super.onCreate();
-
-        AUTHORITY = Locations_Provider.getAuthority(this);
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 

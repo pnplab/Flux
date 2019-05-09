@@ -243,10 +243,14 @@ public class ESM extends Aware_Sensor {
     private static final ESMMonitor esmMonitor = new ESMMonitor();
 
     @Override
+    protected String getAuthority() {
+        // This allows plugin data to be synced on demand from broadcast. Aware#ACTION_AWARE_SYNC_DATA
+        return ESM_Provider.getAuthority(this);
+    }
+
+    @Override
     public void onCreate() {
         super.onCreate();
-
-        AUTHORITY = ESM_Provider.getAuthority(this);
 
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 

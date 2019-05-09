@@ -29,7 +29,7 @@ type State = {
 };
 
 // Configure component logic.
-class PrepareRestingStateController extends PureComponent<Props, State> {
+export class PrepareRestingStateController extends PureComponent<Props, State> {
 
     static defaultProps = {
 
@@ -41,16 +41,19 @@ class PrepareRestingStateController extends PureComponent<Props, State> {
         super(props);
 
         this.state = {
-            museStatus: MuseManager.getMuseStatus()
+            museStatus: 'BLUETOOT_AWAITING'
         };
 
         this.onStartTaskPushed = this.onStartTaskPushed.bind(this);
         this.onPostponeTaskPushed = this.onPostponeTaskPushed.bind(this);
     }
 
-
     componentDidMount() {
-        if (MuseManager.getMuseStatus() !== MuseStatus.MUSE_CONNECTED) {
+        // Update current muse status state.
+        const currentStatus = MuseManager.getMuseStatus();
+        this.setState({ museStatus: currentStatus });
+
+        if (currentStatus !== MuseStatus.MUSE_CONNECTED) {
             MuseManager.startListening();
         }
         
@@ -111,7 +114,7 @@ class PrepareRestingStateController extends PureComponent<Props, State> {
             <PrepareRestingStateView
                 status={this.state.museStatus}
                 onStartTaskPushed={this.onStartTaskPushed}
-                onPostponeTaskPushed={this.onPostponeTaskPushed}
+                onPostponeTaskPushed={typeof this.props.postponeRestingStateTask === 'undefined' ? undefined : this.onPostponeTaskPushed}
             />
         );
     }

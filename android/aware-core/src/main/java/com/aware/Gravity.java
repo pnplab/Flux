@@ -226,10 +226,14 @@ public class Gravity extends Aware_Sensor implements SensorEventListener {
     }
 
     @Override
+    protected String getAuthority() {
+        // This allows plugin data to be synced on demand from broadcast. Aware#ACTION_AWARE_SYNC_DATA
+        return Gravity_Provider.getAuthority(this);
+    }
+
+    @Override
     public void onCreate() {
         super.onCreate();
-
-        AUTHORITY = Gravity_Provider.getAuthority(this);
 
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mGravity = mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);

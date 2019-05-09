@@ -195,12 +195,16 @@ public class Temperature extends Aware_Sensor implements SensorEventListener {
         if (sensorInfo != null && !sensorInfo.isClosed()) sensorInfo.close();
     }
 
+    @Override
+    protected String getAuthority() {
+        // This allows plugin data to be synced on demand from broadcast. Aware#ACTION_AWARE_SYNC_DATA
+        return Temperature_Provider.getAuthority(this);
+    }
+
     @SuppressWarnings("deprecation")
     @Override
     public void onCreate() {
         super.onCreate();
-
-        AUTHORITY = Temperature_Provider.getAuthority(this);
 
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 

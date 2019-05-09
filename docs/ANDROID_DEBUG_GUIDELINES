@@ -1,0 +1,63 @@
+# Android Studio - Project Structure Issue:
+
+## In case of graddle sync issue unrelated to user defect.
+- close android studio
+- $ rm -r android/.idea android/*.iml
+- open back android studio & reimport project
+
+Can't get the project to work with latest intellij idea (upon which android
+studio is based). This fix wont work. Potential solution would be to upgrade
+project's gradle version to something more recent, as android studio is based
+upon an old version of intellij idea (although google upgrade could be
+forwarded first into android studio).
+
+## In case of debugger crash during app debugging
+Seems to occur due to ARN.
+
+Still to test:
+- use upgraded IDE (intellij Idea instead of android studio) - attempted but couldn't import the project.
+- use minimal study setup with lower sensor service count in order to reduce debugger's overhead impact.
+
+## In case of breakpoint not hitting w/ android studio
+Breakpoint doesn't seem to hit in certain situation:
+- inside listeners who have already been instanciated ? (could be)
+- often, line-based breakpoint.
+=> ! What works, weirdly enough is to set the breakpoint as function entry/exit point rather than line-based bp.
+     In current setting, protractor is deactivated during debugging so wrong source-mapping shouldn't be the issue
+     at hand here. !
+Not sure anymore if those issues appeared with genymotion emulator or standard android studio one (or both).
+=> Could unlikely be related to jdb version or adbd.
+
+# Emulator - Retrieve database
+
+## Standard procedure to retrieve db using root access:
+- to pull database using adb, you need root access to the phone
+- to get root access to the phone, you need userdebug version of android installed
+- userdebug version of android emulator doesn't come with google play
+- (hypothesis) without google play installed on android, you can't use google services thus notification service
+- to use Flux, you need google services installed on the phone!
+
+=> usual procedure with root access doesn't work with Flux.
+
+## Solution without root access
+from https://stackoverflow.com/questions/2078710/android-adb-access-to-application-databases-without-root
+from https://stackoverflow.com/questions/18471780/android-adb-retrieve-database-using-run-as
+
+### Fast way
+$ adb exec-out run-as org.pnplab.flux ls files/
+$ adb exec-out run-as org.pnplab.flux cat files/[...].db > file.db
+
+### Transfer file from app databases directory to external storage
+adb shell
+$ run-as org.pnplab.flux
+$ cp ./databases/dbname.db /sdcard/
+$ exit
+$ exit
+
+### Transfer file from external storage to app databases directory
+adb shell
+$ run-as org.pnplab.flux
+$ cp /sdcard/dbname.db ./databases/
+$ exit
+$ exit
+

@@ -1,0 +1,80 @@
+{
+	"folders":
+	[
+		{
+			"name": "Flux: JS Components",
+			"path": "./crossplatform-components"
+		},
+		{
+			"name": "Flux: JS Model",
+			"path": "./crossplatform-model"
+		},
+		{
+			"name": "Flux: JS Theme",
+			"path": "./crossplatform-theme"
+		},
+		{
+			"name": "Flux: Java Binding",
+			"path": "./android/app/src/main/java/org/pnplab/flux"
+		},
+		{
+			"name": "Aware: Core",
+			"path": "./android/aware-core/src/main/java/com/aware"
+		},
+		{
+			"name": "Aware: BackEnd",
+			"path": "./backend",
+			"folder_exclude_patterns":
+			[
+				"docker/mysql/data",
+				"docker/letsencrypt/data",
+				"docker/letsencrypt/webroot"
+			]
+		},
+		{
+			"name": "Flux...",
+			"path": ".",
+			"folder_exclude_patterns":
+			[
+				".gradle",
+				".idea",
+				".npmbundle",
+				".vscode",
+				"coverage",
+				"flow-typed",
+				"ios",
+				"node_modules",
+				"android/.gradle",
+				"android/.settings",
+				"android/.idea",
+				"android/build",
+				"android/gradle",
+				"android/aware-core/.settings",
+				"android/aware-core/build",
+				"android/aware-core/gradle",
+				"android/app/.settings",
+				"android/app/build",
+				"android/app/gradle",
+				"crossplatform-components",
+				"crossplatform-model",
+				"crossplatform-theme",
+				"android/app/src/main/java/org/pnplab/flux",
+				"android/aware-core/src/main/java/com/aware",
+				"backend",
+				"backend/docker/mysql/data",
+				"backend/docker/letsencrypt/data",
+				"backend/docker/letsencrypt/webroot"
+			]
+		},
+	],
+	"settings":
+	{
+		"LSP":
+		{
+			"idea":
+			{
+				"enabled": true
+			}
+		}
+	}
+}

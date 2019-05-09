@@ -1,0 +1,112 @@
+version: "3.1"
+
+services:
+    # @warning do not change the name `web`! it is used in `docker/letsencrypt/renew-certificate.sh`.
+    web:
+        # image: nginx:alpine
+        build: ./docker/nginx
+        ports:
+            - "80:80"
+            - "443:443"
+            - "8888:8888" # For local debugging without ssl certificate
+        expose:
+            # Expose port required for datadog (probably not required)! Exposed ports aren't accessible outside the local docker network.
+            - "81"
+        volumes:
+            # For source code
+            - .:/code
+            # For nginx config - MODE is either dev or prod. dev creates http://localhost:8888, prod creates http*s*://... w/ proper redirection from port 80.
+            - "./docker/nginx/${NGINX_CONF}.conf:/etc/nginx/conf.d/000_${NGINX_CONF}.conf"
+            # For cert generation & renewal through Certbot
+            - ./docker/letsencrypt/webroot:/letsencrypt/webroot
+            # For cert access
+            - ./docker/letsencrypt/data/etc/letsencrypt/live/pnplab.ca/fullchain.pem:/etc/letsencrypt/live/pnplab.ca/fullchain.pem
+            - ./docker/letsencrypt/data/etc/letsencrypt/live/pnplab.ca/privkey.pem:/etc/letsencrypt/live/pnplab.ca/privkey.pem
+            - ./docker/letsencrypt/dhparam-2048.pem:/etc/ssl/certs/dhparam-2048.pem
+        depends_on:
+            # For fastcgi php-fpm's / docker `php` host
+            - php
+            # For nodejs web scripts
+            - node
+            # For server monitoring
+            # - datadog
+        restart: always
+
+    php:
+        # image: php:7-fpm-alpine
+        build: ./docker/php
+        volumes:
+            - .:/code
+            - ./docker/php/fpm-php.www.log:/var/log/fpm-php.www.log
+            # PHP_CONF either dev or prod. Log php errors to stdout in case of dev.
+            - "./docker/php/log.${PHP_CONF}.conf:/usr/local/etc/php-fpm.d/zz-log.conf"
+        depends_on:
+            - mysql
+        restart: always
+        environment:
+            MYSQL_HOST: mysql
+            MYSQL_PORT: 3306
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+            MYSQL_DB_DEBUG: ${MYSQL_DB_DEBUG}
+            OAUTH_ID: ${OAUTH_ID}
+            OAUTH_SECRET: ${OAUTH_SECRET}
+            ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+            # 0 = Disables logging, Error logging TURNED OFF
+            # 1 = Error Messages (including PHP errors)
+            # 2 = Debug Messages
+            # 3 = Informational Messages
+            # 4 = All Messages
+            LOG_THRESHOLD: ${LOG_THRESHOLD}
+            # Enable codeigniter hooks, used to log all incoming http requests. It can be disabled to reduce size overhead.
+            ENABLE_HOOKS: ${ENABLE_HOOKS}
+
+    mysql:
+        # use of mariadb instead of mysql / see https://stackoverflow.com/questions/43880026/import-data-sql-mysql-docker-container`
+        # image: mariadb:10.3
+        build: ./docker/mysql
+        ports:
+            - "3306:3306"
+        volumes:
+            - ./docker/mysql/data:/var/lib/mysql
+            - ./aware_dashboard.sql:/docker-entrypoint-initdb.d/dump.sql
+        # @warning fixes https://github.com/docker-library/mysql/issues/149
+        command: mysqld --sql_mode=""
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+            MYSQL_DATABASE: aware_dashboard
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+        restart: always
+
+    # Node web scripts used for testing! Mapped from nginx (`web` service on the top of this docker compose file).
+    node:
+        build: ./docker/node
+        environment:
+            MYSQL_HOST: mysql
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            DD_AGENT_HOST: datadog
+        volumes:
+            # @warning Source code is on volume but not node_modules! Rebuild is required in case of dependency change!
+            - ./docker/node/src/:/usr/src/app/src/
+        # depends_on:
+        #     - datadog
+        restart: always
+
+#    datadog:
+#        build: ./docker/datadog
+#        environment:
+#            - DD_API_KEY=${DD_API_KEY}
+#        volumes:
+#            - /var/run/docker.sock:/var/run/docker.sock:ro
+#            - /proc:/host/proc:ro
+#            - /sys/fs/cgroup:/host/sys/fs/cgroup:ro
+#        extra_hosts:
+#            # Server is rerouting pnplab.ca to local ip, thus bypassing
+#            # godaddy dns. It also blocks the external ip address, We
+#            # to have to add wwww. subdomain manually!
+#            - "www.pnplab.ca:10.10.10.29"
+#        restart: always
+

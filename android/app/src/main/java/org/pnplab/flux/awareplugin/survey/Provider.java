@@ -1,7 +1,6 @@
 package org.pnplab.flux.awareplugin.survey;
 
 import android.content.ContentProvider;
-import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
@@ -12,138 +11,94 @@ import net.sqlcipher.database.SQLiteDatabase;
 import net.sqlcipher.database.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.provider.BaseColumns;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.aware.Aware;
 import com.aware.utils.DatabaseHelper;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 public class Provider extends ContentProvider {
 
-    // content://com.aware.plugin.survey.provider.survey/survey
-
-    public static String AUTHORITY = "pnplab.flux.awareplugin.survey.provider.survey"; //change to package.provider.your_plugin_name
-
-    public static final int DATABASE_VERSION = 1; //increase this if you make changes to the database structure, i.e., rename columns, etc.
-    public static final String DATABASE_NAME = "plugin_questionnaire"; //the database filename, use plugin_xxx for plugins.
-
-    //Add here your database table names, as many as you need
-    public static final String DB_TBL_TEMPLATE = "survey";
-
-    //For each table, add two indexes: DIR and ITEM. The index needs to always increment. Next one is 3, and so on.
-    private static final int BIMSQUESTIONNAIRE_DIR = 1;
-    private static final int BIMSQUESTIONNAIRE_ITEM = 2;
-
-    //Put tables names in this array so AWARE knows what you have on the database
-    public static final String[] DATABASE_TABLES = {
-            DB_TBL_TEMPLATE
-    };
-
-    //These are columns that we need to sync data, don't change this!
-    public interface AWAREColumns extends BaseColumns {
-        String _ID = "_id";
-        String TIMESTAMP = "timestamp";
-        String DEVICE_ID = "device_id";
-    }
+    public static final int DATABASE_VERSION = 3;
 
     /**
-     * Create one of these per database table
-     * In this example, we are adding example columns
+     * Authority of Screen content provider
      */
-    public static final class Questionnaire_Data implements AWAREColumns {
-        public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + DB_TBL_TEMPLATE);
-        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/vnd.pnplab.flux.awareplugin.survey.provider.survey"; //modify me
-        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/vnd.pnplab.flux.awareplugin.survey.provider.survey"; //modify me
+    public static String AUTHORITY = "org.pnplab.flux.provider.survey";
 
-        //Note: integers and strings don't need a type prefix_
-        // public static final String NAME = "name";
-        public static final String QUESTIONNAIRE_ID = "questionnaire_id";
+    // ContentProvider query paths
+    private static final int SURVEY = 1;
+    private static final int SURVEY_ID = 2;
+
+    /**
+     * Network content representation
+     *
+     * @author denzil
+     */
+    public static final class Survey_Data implements BaseColumns {
+        private Survey_Data() {
+        }
+
+        public static final Uri CONTENT_URI = Uri.parse("content://" + Provider.AUTHORITY + "/survey");
+        public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.pnplab.survey";
+        public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.pnplab.survey";
+
+        public static final String _ID = "_id";
+        public static final String TIMESTAMP = "timestamp"; // @warning must be the same real format as aware for further time-based sync comparison !
+        public static final String DEVICE_ID = "device_id";
+        public static final String FORM_ID = "form_id";
         public static final String QUESTION_ID = "question_id";
         public static final String VALUE = "double_value"; //a double_ prefix makes a MySQL DOUBLE column
-        //public static final String PICTURE = "blob_picture"; //a blob_ prefix makes a MySQL BLOB column
     }
 
-    //Define each database table fields
-    private static final String DB_TBL_TEMPLATE_FIELDS =
-            Questionnaire_Data._ID + " integer primary key autoincrement," +
-                    Questionnaire_Data.TIMESTAMP + " integer default 0," + // 8bit -- @warning may causes issue on update
-                    Questionnaire_Data.DEVICE_ID + " text default ''," +
-                    // Questionnaire_Data.NAME + " text default ''," +
-                    Questionnaire_Data.QUESTIONNAIRE_ID + " text default 0," +
-                    Questionnaire_Data.QUESTION_ID + " text default 0," +
-                    Questionnaire_Data.VALUE + " real default null" ;
-    // Questionnaire_Data.PICTURE + " blob default null";
+    public static String DATABASE_NAME = "survey.db";
 
-    /**
-     * Share the fields with AWARE so we can replicate the table schema on the server
-     */
+    public static final String[] DATABASE_TABLES = {"survey"};
     public static final String[] TABLES_FIELDS = {
-            DB_TBL_TEMPLATE_FIELDS
+            // survey
+              Survey_Data._ID + " integer primary key autoincrement,"
+            + Survey_Data.TIMESTAMP + " real default 0,"
+            + Survey_Data.DEVICE_ID + " text default '',"
+            + Survey_Data.FORM_ID + " text default '',"
+            + Survey_Data.QUESTION_ID + " text default '',"
+            + Survey_Data.VALUE + " real default 0"
     };
 
-    //Helper variables for ContentProvider - DO NOT CHANGE
-    private UriMatcher sUriMatcher;
+    private UriMatcher sUriMatcher = null;
+    private HashMap<String, String> surveyMap = null;
+
     private DatabaseHelper dbHelper;
     private static SQLiteDatabase database;
+
     private void initialiseDatabase() {
         if (dbHelper == null)
             dbHelper = new DatabaseHelper(getContext(), DATABASE_NAME, null, DATABASE_VERSION, DATABASE_TABLES, TABLES_FIELDS);
         if (database == null)
             database = dbHelper.getWritableDatabase();
     }
-    //--
-
-    //For each table, create a hashmap needed for database queries
-    private HashMap<String, String> questionnaireHash;
 
     /**
-     * Returns the provider authority that is dynamic
-     * @return
+     * Delete entry from the database
      */
-    public static String getAuthority(Context context) {
-        AUTHORITY = context.getPackageName() + ".provider.survey";
-        return AUTHORITY;
-    }
-
     @Override
-    public boolean onCreate() {
-        //This is a hack to allow providers to be reusable in any application/plugin by making the authority dynamic using the package name of the parent app
-        AUTHORITY = getAuthority(getContext());
+    public synchronized int delete(Uri uri, String selection, String[] selectionArgs) {
+        Log.v("pnplab.survey::Provider","#delete");
 
-        sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-
-        //For each table, add indexes DIR and ITEM
-        sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[0], BIMSQUESTIONNAIRE_DIR);
-        sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[0] + "/#", BIMSQUESTIONNAIRE_ITEM);
-
-        //Create each table hashmap so Android knows how to insert data to the database. Put ALL table fields.
-        questionnaireHash = new HashMap<>();
-        questionnaireHash.put(Questionnaire_Data._ID, Questionnaire_Data._ID);
-        questionnaireHash.put(Questionnaire_Data.TIMESTAMP, Questionnaire_Data.TIMESTAMP);
-        questionnaireHash.put(Questionnaire_Data.DEVICE_ID, Questionnaire_Data.DEVICE_ID);
-        questionnaireHash.put(Questionnaire_Data.QUESTIONNAIRE_ID, Questionnaire_Data.QUESTIONNAIRE_ID);
-        questionnaireHash.put(Questionnaire_Data.QUESTION_ID, Questionnaire_Data.QUESTION_ID);
-        questionnaireHash.put(Questionnaire_Data.VALUE, Questionnaire_Data.VALUE);
-
-        return true;
-    }
-
-    @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
         initialiseDatabase();
 
+        //lock database for transaction
         database.beginTransaction();
 
-        int count;
+        int count = 0;
         switch (sUriMatcher.match(uri)) {
-
-            //Add each table DIR case, increasing the index accordingly
-            case BIMSQUESTIONNAIRE_DIR:
-                count = database.delete(DATABASE_TABLES[0], selection, selectionArgs);
+            case SURVEY:
+                count = database.delete(DATABASE_TABLES[0], selection,
+                        selectionArgs);
                 break;
-
             default:
                 database.endTransaction();
                 throw new IllegalArgumentException("Unknown URI " + uri);
@@ -152,13 +107,46 @@ public class Provider extends ContentProvider {
         database.setTransactionSuccessful();
         database.endTransaction();
 
-        getContext().getContentResolver().notifyChange(uri, null);
+        getContext().getContentResolver().notifyChange(uri, null, false);
         return count;
     }
 
-    @Nullable
     @Override
-    public Uri insert(Uri uri, ContentValues initialValues) {
+    public String getType(Uri uri) {
+        switch (sUriMatcher.match(uri)) {
+            case SURVEY:
+                return Survey_Data.CONTENT_TYPE;
+            case SURVEY_ID:
+                return Survey_Data.CONTENT_ITEM_TYPE;
+            default:
+                throw new IllegalArgumentException("Unknown URI " + uri);
+        }
+    }
+
+    private void printContentValues(ContentValues vals)
+    {
+       Set<Map.Entry<String, Object>> s=vals.valueSet();
+       Iterator itr = s.iterator();
+
+       Log.v("pnplab.survey::Provider","#insert ContentValue.Length: " + vals.size());
+
+       while(itr.hasNext())
+       {
+            Map.Entry me = (Map.Entry)itr.next();
+            String key = me.getKey().toString();
+            Object value =  me.getValue();
+
+            Log.v("pnplab.survey::Provider","#insert key: " + key + " values: " + (String)(value == null?null:value.toString()));
+       }
+    }
+    /**
+     * Insert entry to the database
+     */
+    @Override
+    public synchronized Uri insert(Uri uri, ContentValues initialValues) {
+        Log.v("pnplab.survey::Provider","#insert");
+
+        printContentValues(initialValues);
 
         initialiseDatabase();
 
@@ -167,16 +155,16 @@ public class Provider extends ContentProvider {
         database.beginTransaction();
 
         switch (sUriMatcher.match(uri)) {
-
-            //Add each table DIR case
-            case BIMSQUESTIONNAIRE_DIR:
-                long _id = database.insert(DATABASE_TABLES[0], Questionnaire_Data.DEVICE_ID, values);
+            case SURVEY:
+                long survey_id = database.insertWithOnConflict(DATABASE_TABLES[0],
+                        Survey_Data.DEVICE_ID, values, SQLiteDatabase.CONFLICT_IGNORE);
                 database.setTransactionSuccessful();
                 database.endTransaction();
-                if (_id > 0) {
-                    Uri dataUri = ContentUris.withAppendedId(Questionnaire_Data.CONTENT_URI, _id);
-                    getContext().getContentResolver().notifyChange(dataUri, null);
-                    return dataUri;
+                if (survey_id > 0) {
+                    Uri surveyUri = ContentUris.withAppendedId(
+                            Survey_Data.CONTENT_URI, survey_id);
+                    getContext().getContentResolver().notifyChange(surveyUri, null, false);
+                    return surveyUri;
                 }
                 database.endTransaction();
                 throw new SQLException("Failed to insert row into " + uri);
@@ -186,26 +174,58 @@ public class Provider extends ContentProvider {
         }
     }
 
-    @Nullable
+    /**
+     * Returns the provider authority that is dynamic
+     * @return
+     */
+    public static String getAuthority(Context context) {
+        AUTHORITY = "org.pnplab.flux.provider.survey";
+        return AUTHORITY;
+    }
+
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+    public boolean onCreate() {
+        Log.v("pnplab.survey::Provider","#onCreate");
+        
+        AUTHORITY = "org.pnplab.flux.provider.survey";
+
+        sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+        sUriMatcher.addURI(Provider.AUTHORITY, DATABASE_TABLES[0],
+                SURVEY);
+        sUriMatcher.addURI(Provider.AUTHORITY, DATABASE_TABLES[0]
+                + "/#", SURVEY_ID);
+
+        surveyMap = new HashMap<String, String>();
+        surveyMap.put(Survey_Data._ID, Survey_Data._ID);
+        surveyMap.put(Survey_Data.TIMESTAMP, Survey_Data.TIMESTAMP);
+        surveyMap.put(Survey_Data.DEVICE_ID, Survey_Data.DEVICE_ID);
+        surveyMap.put(Survey_Data.FORM_ID, Survey_Data.FORM_ID);
+        surveyMap.put(Survey_Data.QUESTION_ID, Survey_Data.QUESTION_ID);
+        surveyMap.put(Survey_Data.VALUE, Survey_Data.VALUE);
+
+        return true;
+    }
+
+    /**
+     * Query entries from the database
+     */
+    @Override
+    public Cursor query(Uri uri, String[] projection, String selection,
+                        String[] selectionArgs, String sortOrder) {
 
         initialiseDatabase();
 
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+        // qb.setStrict(true);
         switch (sUriMatcher.match(uri)) {
-
-            //Add all tables' DIR entries, with the right table index
-            case BIMSQUESTIONNAIRE_DIR:
+            case SURVEY:
                 qb.setTables(DATABASE_TABLES[0]);
-                qb.setProjectionMap(questionnaireHash); //the hashmap of the table
+                qb.setProjectionMap(surveyMap);
                 break;
-
             default:
+
                 throw new IllegalArgumentException("Unknown URI " + uri);
         }
-
-        //Don't change me
         try {
             Cursor c = qb.query(database, projection, selection, selectionArgs,
                     null, null, sortOrder);
@@ -214,50 +234,37 @@ public class Provider extends ContentProvider {
         } catch (IllegalStateException e) {
             if (Aware.DEBUG)
                 Log.e(Aware.TAG, e.getMessage());
+
             return null;
         }
     }
 
-    @Nullable
+    /**
+     * Update application on the database
+     */
     @Override
-    public String getType(Uri uri) {
-        switch (sUriMatcher.match(uri)) {
-
-            //Add each table indexes DIR and ITEM
-            case BIMSQUESTIONNAIRE_DIR:
-                return Questionnaire_Data.CONTENT_TYPE;
-            case BIMSQUESTIONNAIRE_ITEM:
-                return Questionnaire_Data.CONTENT_ITEM_TYPE;
-
-            default:
-                throw new IllegalArgumentException("Unknown URI " + uri);
-        }
-    }
-
-    @Override
-    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+    public synchronized int update(Uri uri, ContentValues values, String selection,
+                      String[] selectionArgs) {
 
         initialiseDatabase();
 
         database.beginTransaction();
 
-        int count;
+        int count = 0;
         switch (sUriMatcher.match(uri)) {
-
-            //Add each table DIR case
-            case BIMSQUESTIONNAIRE_DIR:
-                count = database.update(DATABASE_TABLES[0], values, selection, selectionArgs);
+            case SURVEY:
+                count = database.update(DATABASE_TABLES[0], values, selection,
+                        selectionArgs);
                 break;
-
             default:
                 database.endTransaction();
                 throw new IllegalArgumentException("Unknown URI " + uri);
         }
+
         database.setTransactionSuccessful();
         database.endTransaction();
 
-        getContext().getContentResolver().notifyChange(uri, null);
-
+        getContext().getContentResolver().notifyChange(uri, null, false);
         return count;
     }
 }

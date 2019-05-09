@@ -16,19 +16,20 @@ import Questions from '../../crossplatform-model/immutable-db/QuestionData';
 import { submitSurveyTaskForm, enableRestingStateTask, openRestingStateTask } from '../../crossplatform-model/memory-db/actions'
 
 import SurveyTaskView from './SurveyTaskLeanView';
+import AwareManager from '../../crossplatform-model/native-db/AwareManager';
 
 // Configure types.
 type Props = {
-    submitSurveyTaskForm: (number, { [questionId: string]: number }) => void,
-    enableRestingStateTask: () => void,
-    openRestingStateTask: () => void,
+    onSubmit: (number, { [questionId: string]: number }) => void,
 };
 type State = {
     
 };
 
 // Configure component logic.
-class SurveyTaskController extends PureComponent<Props, State> {
+// @note Export the raw controller on top of the connected component so it can
+//     be used & customized in the onboarding process.
+export default class SurveyTaskController extends PureComponent<Props, State> {
 
     questions: Array<Question>;
     values: { [questionId: string]: number };
@@ -54,13 +55,7 @@ class SurveyTaskController extends PureComponent<Props, State> {
     }
 
     onSubmit = () => {
-        // Store in realm + Change route through redux' action.
-        let currentTimestamp = new Date().getTime();
-        this.props.submitSurveyTaskForm(currentTimestamp, this.values);
-
-        // Enable & open resting state task!
-        this.props.enableRestingStateTask();
-        this.props.openRestingStateTask();
+        this.props.onSubmit(this.values);
     }
 
     render() {
@@ -73,19 +68,3 @@ class SurveyTaskController extends PureComponent<Props, State> {
         );
     }
 }
-
-// Bind comoponent to redux.
-const mapStateToProps = (state: AppState /*, ownProps*/) => ({
-    
-});
-
-const mapDispatchToProps = {
-    submitSurveyTaskForm,
-    enableRestingStateTask,
-    openRestingStateTask,
-};
-
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(SurveyTaskController);

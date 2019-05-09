@@ -231,10 +231,14 @@ public class Rotation extends Aware_Sensor implements SensorEventListener {
     }
 
     @Override
+    protected String getAuthority() {
+        // This allows plugin data to be synced on demand from broadcast. Aware#ACTION_AWARE_SYNC_DATA
+        return Rotation_Provider.getAuthority(this);
+    }
+
+    @Override
     public void onCreate() {
         super.onCreate();
-
-        AUTHORITY = Rotation_Provider.getAuthority(this);
 
         TAG = "Aware::Rotation";
 

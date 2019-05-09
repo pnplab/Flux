@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.aware.syncadapters.AwareSyncAdapter;
 
@@ -19,14 +20,18 @@ public class SyncAdapter extends Service {
 
     @Override
     public void onCreate() {
+        Log.v("pnplab.survey::SyncAdap", "#onCreate");
+
         super.onCreate();
+
         synchronized (sSyncAdapterLock) {
             if (sSyncAdapter == null) {
                 sSyncAdapter = new AwareSyncAdapter(getApplicationContext(), true, true);
                 sSyncAdapter.init(
-                        Provider.DATABASE_TABLES, Provider.TABLES_FIELDS,
+                        Provider.DATABASE_TABLES,
+                        Provider.TABLES_FIELDS,
                         new Uri[]{
-                                Provider.Questionnaire_Data.CONTENT_URI
+                                Provider.Survey_Data.CONTENT_URI
                         }
                 );
             }

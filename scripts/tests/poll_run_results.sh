@@ -33,7 +33,7 @@ fi
 
 # Poll run result every 30s for 15minutes from aws device farm
 INTERVAL=30 # 30s
-TIMEOUT=60*15 # 15min
+TIMEOUT=60*30 # 30min
 ((END_TIME=${SECONDS}+${TIMEOUT}))
 while ((${SECONDS} < ${END_TIME}))
 do

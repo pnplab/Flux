@@ -272,6 +272,7 @@ public class StudyUtils extends IntentService {
         context.startService(aware);
 
         //Send data to server
+        Log.v("pnplab::StudyUtils", "#applySettings - broadcast AWARE_SYNC_DATA");
         Intent sync = new Intent(Aware.ACTION_AWARE_SYNC_DATA);
         context.sendBroadcast(sync);
     }

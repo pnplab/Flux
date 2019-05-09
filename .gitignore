@@ -1,3 +1,7 @@
+# Debug env
+# @note we put it in .gitignore to avoid mistakly sharing google oauth api credentials.
+dev.env
+
 # OSX
 #
 .DS_Store
@@ -74,3 +78,6 @@ android/.settings/
 android/app/.classpath
 android/app/.project
 android/app/.settings/
+
+# Sublime text
+Flux.sublime-workspace

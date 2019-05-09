@@ -59,10 +59,14 @@ public class Timezone extends Aware_Sensor {
     }
 
     @Override
+    protected String getAuthority() {
+        // This allows plugin data to be synced on demand from broadcast. Aware#ACTION_AWARE_SYNC_DATA
+        return TimeZone_Provider.getAuthority(this);
+    }
+
+    @Override
     public void onCreate() {
         super.onCreate();
-
-        AUTHORITY = TimeZone_Provider.getAuthority(this);
 
         CONTEXT_PRODUCER = new ContextProducer() {
             @Override

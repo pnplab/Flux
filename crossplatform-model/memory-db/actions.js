@@ -4,18 +4,64 @@
 
 import type { State, Action } from './types';
 
+
+export const onboarding: {
+    auth: (string, string) => Action,
+    confirmNetwork: () => Action,
+    confirmPermissions: () => Action,
+    initializeStudy: (studyPassword: string, participantId: string) => Action,
+    confirmPhenotyping: () => Action,
+    submitSurvey: (timestamp: number, values: {| [questionId: string]: number |}) => Action,
+    confirmSurveyTask: () => Action
+} = {
+    auth: (studyPassword: string, participantId: string) => ({
+        type: 'ONBOARDING.AUTH',
+        // Will be used to determine which study to pick!
+        studyPassword: studyPassword,
+        // Will be used to setup AWARE#DEVICE_ID (registered in the remote
+        // database).
+        participantId: participantId
+    }),
+    confirmNetwork: () => ({
+        type: 'ONBOARDING.CONFIRM_NETWORK'
+    }),
+    confirmPermissions: () => ({
+        type: 'ONBOARDING.CONFIRM_PERMISSIONS'
+    }),
+    initializeStudy: (studyPassword: string, participantId: string) => ({
+        type: 'ONBOARDING.INITIALIZE_STUDY',
+        studyPassword: studyPassword,
+        participantId: participantId
+    }),
+    setAwareStudyState: (hasBeenSuccessfullyJoined: boolean) => ({
+        type: 'ONBOARDING.SET_AWARE_STUDY_STATE',
+        hasBeenSuccessfullyJoined: hasBeenSuccessfullyJoined
+    }),
+    confirmPhenotyping: () => ({
+        type: 'ONBOARDING.CONFIRM_PHENOTYPING'
+    }),
+    bypassRestingState: () => ({
+        // Is used in ci case for aws device farm when no muse device is
+        // available.
+        type: 'ONBOARDING.BYPASS_RESTING_STATE'
+    }),
+    submitSurvey: (timestamp: number, values: {| [questionId: string]: number |}) => ({
+        type: 'ONBOARDING.SUBMIT_SURVEY',
+        timestamp: timestamp,
+        payload: values
+    }),
+    confirmSurveyTask: () => ({
+        // Used to go to next onboarding step!
+        type: 'ONBOARDING.CONFIRM_SURVEY_TASK'
+    })
+};
+
 export const initStudyAsNotInitialized: () => Action = () => ({
     type: 'INIT_STUDY_AS_NOT_INITIALIZED'
 });
 
 export const initStudyAsInitialized: (participantId: string) => Action = (participantId) => ({
     type: 'INIT_STUDY_AS_INITIALIZED',
-    participantId: participantId
-});
-
-export const initializeStudy: (studyPassword: string, participantId: string) => Action = (studyPassword, participantId) => ({
-    type: 'INITIALIZE_STUDY',
-    studyPassword: studyPassword,
     participantId: participantId
 });
 

@@ -84,13 +84,15 @@ public class Plugin extends Aware_Plugin {
     private DataListener dataListener;
 
     @Override
+    protected String getAuthority() {
+        return Provider.getAuthority(this);
+    }
+
+    @Override
     public void onCreate() {
         super.onCreate();
 
         Log.i(TAG, "HHELLO Muse?");
-
-        //This allows plugin data to be synced on demand from broadcast Aware#ACTION_AWARE_SYNC_DATA
-        AUTHORITY = Provider.getAuthority(this);
 
         TAG = "AWARE::" + "PNPLab"; // getResources().getString(R.string.app_name) -> PNPLab
 

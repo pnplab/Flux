@@ -523,7 +523,9 @@ public class Applications extends AccessibilityService {
     public class ContextBroadcaster extends WakefulBroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.v("pnplab::Applications", "#onReceive");
             if (intent.getAction().equals(Aware.ACTION_AWARE_SYNC_DATA) && AUTHORITY.length() > 0) {
+                Log.v("pnplab::Applications", "#onReceive ACTION_AWARE_SYNC_DATA && AUTHORITY.length() > 0");
                 Bundle sync = new Bundle();
                 sync.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
                 sync.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);

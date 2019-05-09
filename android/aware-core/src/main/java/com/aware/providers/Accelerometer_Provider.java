@@ -291,6 +291,8 @@ public class Accelerometer_Provider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
+        Log.v("pnplab.accmtr::Provider", "#onCreate");
+
         AUTHORITY = getContext().getPackageName() + ".provider.accelerometer";
 
         sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);

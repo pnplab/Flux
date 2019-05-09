@@ -51,9 +51,11 @@ const PrepareRestingStateView = (props: Props) =>
             />
         </StatusWrapper>
         <ButtonBox>
-            <ButtonWrapper>
-                <Button onPress={props.onPostponeTaskPushed}>PLUS TARD</Button>
-            </ButtonWrapper>
+            {typeof props.onPostponeTaskPushed !== 'undefined' && 
+                <ButtonWrapper>
+                    <Button onPress={props.onPostponeTaskPushed}>PLUS TARD</Button>
+                </ButtonWrapper>
+            }
             <ButtonWrapper>
                 <Button onPress={props.onStartTaskPushed} disabled={props.status !== MuseStatus.MUSE_CONNECTED}>CONTINUER</Button>
             </ButtonWrapper>

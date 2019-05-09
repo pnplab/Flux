@@ -191,10 +191,14 @@ public class Proximity extends Aware_Sensor implements SensorEventListener {
     }
 
     @Override
+    protected String getAuthority() {
+        // This allows plugin data to be synced on demand from broadcast. Aware#ACTION_AWARE_SYNC_DATA
+        return Proximity_Provider.getAuthority(this);
+    }
+
+    @Override
     public void onCreate() {
         super.onCreate();
-
-        AUTHORITY = Proximity_Provider.getAuthority(this);
 
         TAG = "AWARE::Proximity";
 

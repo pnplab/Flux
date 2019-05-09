@@ -13,6 +13,7 @@ import awareManager from '../native-db/AwareManager';
 export const syncRestingStateTaskBusinessRuleMiddleWare = (store: Store<State, Action>) => (next: Dispatch) => async (action: Action) => {
     
     switch (action.type) {
+    case 'ONBOARDING.SUBMIT_SURVEY':
     case 'SUBMIT_SURVEY_TASK_FORM':
         awareManager.addSurveyData(action.timestamp, action.payload);
         break;

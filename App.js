@@ -8,16 +8,19 @@
  */
 
 import React, { Component } from 'react';
-import { StatusBar, Alert } from 'react-native';
-import { Provider } from 'react-redux';
-import { StyleProvider } from 'native-base';
+import { Alert } from 'react-native';
 
 import AwareManager from './crossplatform-model/native-db/AwareManager';
-import { store } from './crossplatform-model/memory-db';
-import { getTheme } from './crossplatform-theme/';
 
-import Router from './crossplatform-components/Router';
+// import Router from './crossplatform-components/Router';
 import { triggerUpdateIfNeeded } from './Updater.js';
+
+import {
+    App,
+    Onboarding, Auth, CheckWifi, CheckPermissions, CheckPhenotyping, SurveyTaskOnboarding, RestingStateTaskOnboarding, CheckDataSync, OnboardingEnd,
+    Home, 
+    SurveyTask
+} from './crossplatform-components';
 
 // -- About routing
 //
@@ -33,7 +36,7 @@ import { triggerUpdateIfNeeded } from './Updater.js';
 //         necessarily rely on browser history, but can rely on mobile native
 //         mechanism for backward/forward navigation instead. See
 //         `https://github.com/respond-framework/rudy/blob/master/packages/rudy/docs/react-native.md`.
-// 
+//  
 // @warning Rudy's documentation (the redux router) is partly out of date.
 
 // -- About theme and components
@@ -42,21 +45,103 @@ import { triggerUpdateIfNeeded } from './Updater.js';
 //         both android & ios. The native-base-theme's theme is located in the
 //         `./crossplatform/theme` folder.
 
+export default () => 
+    <App index={Onboarding}>
+    {
 
-type Props = {};
+        /* * * App * * */
+        ({ 
+            goTo,
 
-export default class App extends Component<Props> {
-    render() {
-        return (
-            <StyleProvider style={getTheme()}>
-                <Provider store={store}>
-                    <StatusBar backgroundColor="#FAFAFA" barStyle="dark-content" />
-                    <Router></Router>
-                </Provider>
-            </StyleProvider>
-        );
+            // Aware setup methods & vars.
+            startAware,
+            joinAwareStudy,
+            hasAwareStudyBeenJoined,
+
+            // Survey methods
+            storeSurvey,
+            setHomeScreenMode,
+        }) => 
+        /* / / App / / */
+
+        <>
+            { (async () => await startAware('test') & await joinAwareStudy() & storeSurvey({ abcd: 0.31 /* empty :D */ }) & AwareManager.disableMandatoryWifiForSync() & AwareManager.disableMandatoryBatteryForSync() & AwareManager.syncData() )() && null }
+
+            <Onboarding index={Auth}>
+            {
+
+                /* * * Onboarding * * */
+                ({
+                    goToStep,
+
+                    // Device id, set at auth, needed to start aware.
+                    setDeviceId,
+                    deviceId, 
+
+                    // Aware data sync events, listened once aware starts, needed at
+                    // data sync checkup step.
+                    listenAwareDataSync,
+                    unlistenAwareDataSync,
+                    awareDataSyncEvents
+                }) =>
+                /* / / Onboarding / / */
+
+                <>
+                    <Auth onStepFinished={ (deviceId, studyId) => setDeviceId(deviceId) & goToStep(CheckWifi) } />
+
+                    <CheckWifi onStepFinished={ () => goToStep(CheckPermissions) } />
+
+                    <CheckPermissions onStepFinished={ () => goToStep(CheckPhenotyping) } />
+
+                    <CheckPhenotyping
+                        hasAwareStudyBeenJoined={ hasAwareStudyBeenJoined }
+                        onStartAwareClicked={ async () => 
+                            await startAware(deviceId || 'byp0auth') &
+                            /* listenAwareDataSync() & */
+                            await joinAwareStudy()
+                        }
+                        onStepFinished={ () => goToStep(SurveyTaskOnboarding) }
+                    />
+
+                    <SurveyTaskOnboarding
+                        onStartTaskClicked={ () => goToStep(SurveyTask) }
+                        onStepBypassed={ () => goToStep(RestingStateTaskOnboarding) }
+                    />
+
+                    <SurveyTask onSubmit={ (values) => storeSurvey(values) & goToStep(RestingStateTaskOnboarding) } />
+
+                    <RestingStateTaskOnboarding onStepFinished={ () => goToStep(OnboardingEnd) } />
+
+                    {/*
+                        <CheckDataSync
+                            dataSyncEvents={awareDataSyncEvents}
+                            onStepFinished={() =>
+                                unlistenAwareDataSync() &
+                                goToStep(OnboardingEnd)
+                            }
+                        />
+                    */}
+
+                    <OnboardingEnd onStepFinished={ () => goTo(Home) } />
+
+                </>
+            }
+            </Onboarding>
+
+            <Home defaultMode={'SurveyTask'} />
+
+            <SurveyTask onSubmit={ (values) => storeSurvey(values) & setHomeScreenMode('RestingStateTask') } />
+
+            {/*
+            <PrepareRestingStateTask />
+            <RestingStateTask />
+            <Graphs menu="symptoms" />
+            <SymptomGraph />
+            */}
+
+        </>
     }
-}
+    </App>;
 
 // @note `AwareManager.startAware()` is set in the StudySchemaAdapter
 // @todo rename StudySchemaAdapter to InitAppSchemaAdapter.
@@ -83,7 +168,7 @@ if (__DEV__ || !__DEV__) {
 
 // Check environment variables.
 if (typeof process.env.FLUX_ENCRYPTION_KEY === 'undefined') {
-    throw new Error('FLUX_ENCRYPTION_KEY must be set! Don\'t forget to flush cache (`react-native start --reset-cache`)!');
+    throw new Error('FLUX_ENCRYPTION_KEY must be set! Don\'t forget to flush cache (`react-native start --reset-cache`)! In case of `./gradlew assembleRelease`, run `./gradlew clean` & use export prior to env-variable-prefixed bash command!');
 }
 
 // Automatically update the app when released

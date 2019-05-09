@@ -139,11 +139,16 @@ public class Traffic extends Aware_Sensor {
         void onIdleTraffic();
     }
 
+
+    @Override
+    protected String getAuthority() {
+        // This allows plugin data to be synced on demand from broadcast. Aware#ACTION_AWARE_SYNC_DATA
+        return Traffic_Provider.getAuthority(this);
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
-
-        AUTHORITY = Traffic_Provider.getAuthority(this);
 
         startTotalRxBytes = TrafficStats.getTotalRxBytes();
         startTotalTxBytes = TrafficStats.getTotalTxBytes();

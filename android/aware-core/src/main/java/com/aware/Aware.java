@@ -127,6 +127,35 @@ public class Aware extends Service {
     public static final String ACTION_AWARE_SYNC_DATA = "ACTION_AWARE_SYNC_DATA";
 
     /**
+     * Sent broadcast about data sync status.
+     * These broadcasts are not used by aware itself but are intended to be used when aware is used by external applications as a framework if needed.
+     *
+     * ACTION_AWARE_SYNC_DATA_STARTED
+     *    TABLE: string
+     *    ROW_COUNT: number
+     * ACTION_AWARE_SYNC_DATA_BATCH_STARTED
+     *    TABLE: string
+     *    ROW_COUNT: number
+     *    LAST_ROW_UPLOADED: number
+     * ACTION_AWARE_SYNC_DATA_FINISHED
+     *    TABLE: string
+     * ACTION_AWARE_SYNC_DATA_FAILED
+     *    TABLE: string
+     *    ERROR:
+     *    - NO_STUDY_SET
+     *    - OUT_OF_MEMORY
+     *    - TABLE_CREATION_FAILED
+     *    - SERVER_UNREACHABLE
+     *    - SERVER_CONNECTION_INTERRUPTED
+     *    - UNHANDLED_EXCEPTION
+     *      + EXCEPTION
+     */
+    public static final String ACTION_AWARE_SYNC_DATA_STARTED = "ACTION_AWARE_SYNC_DATA_STARTED";
+    public static final String ACTION_AWARE_SYNC_DATA_BATCH_STARTED = "ACTION_AWARE_SYNC_DATA_BATCH_STARTED";
+    public static final String ACTION_AWARE_SYNC_DATA_FINISHED = "ACTION_AWARE_SYNC_DATA_FINISHED";
+    public static final String ACTION_AWARE_SYNC_DATA_FAILED = "ACTION_AWARE_SYNC_DATA_FAILED";
+
+    /**
      * Received broadcast on all modules
      * - Cleans the data collected on the device
      */
@@ -275,7 +304,7 @@ public class Aware extends Service {
         IntentFilter awareActions = new IntentFilter();
         awareActions.addAction(Aware.ACTION_AWARE_SYNC_DATA);
         awareActions.addAction(Aware.ACTION_QUIT_STUDY);
-        registerReceiver(aware_BR, awareActions);
+        getApplicationContext().registerReceiver(aware_BR, awareActions);
 
         IntentFilter foreground = new IntentFilter();
         foreground.addAction(Aware.ACTION_AWARE_PRIORITY_FOREGROUND);
@@ -1472,6 +1501,8 @@ public class Aware extends Service {
      * @throws JSONException
      */
     private static ArrayList<JSONArray> pluginDiff(JSONArray server, JSONArray local) throws JSONException {
+        Log.v("pnplab::Aware", "JoinStudy#pluginDiff - Get plugin diff between client & server");
+
         JSONArray to_enable = new JSONArray();
         JSONArray to_disable = new JSONArray();
 
@@ -1520,6 +1551,8 @@ public class Aware extends Service {
      * @throws JSONException
      */
     private static ArrayList<JSONArray> sensorDiff(Context context, JSONArray server, JSONArray local) throws JSONException {
+
+        Log.v("pnplab::Aware", "Aware#sensorDiff - Get sensor diff between client & server");
 
         SensorManager manager = (SensorManager) context.getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
         List<Sensor> sensors = manager.getSensorList(Sensor.TYPE_ALL);
@@ -1618,6 +1651,18 @@ public class Aware extends Service {
 
     /**
      * Used by self-contained apps to join a study
+     *
+     * @pnplab
+     *
+     * @warning Overrided version of Aware#JoinStudy, with overriden part of study info's request
+     *     result, as server doesn't allow to disable status_mqtt, status_esm & status_webservice.
+     *     We need to disable webservice as it's not possible to disable it from the server and
+     *     having it activated as soon as the study is joined will sync data at the same time !
+     *     Considering we want to have the data sync occuring during the onboarding process so the
+     *     CI system can check if sensors are effectively synced, with data synced too early,
+     *     triggering an asynchronous data sync wont work because the mobile phone OS is in charge
+     *     of handling when the sync occurs and will decide the next sync we trigger later in the
+     *     onboarding process is too early considering a sync just happened.
      */
     public static class JoinStudy extends StudyUtils {
 
@@ -1771,11 +1816,28 @@ public class Aware extends Service {
                         }
 
                         //Set the sensors' settings first
+                        Log.v("pnplab::Aware", "JoinStudy#onHandleIntent - Set sensors' status' value");
                         for (int i = 0; i < sensors.length(); i++) {
                             try {
                                 JSONObject sensor_config = sensors.getJSONObject(i);
                                 String package_name = "com.aware.phone";
                                 if (getApplicationContext().getResources().getBoolean(R.bool.standalone)) package_name = getApplicationContext().getPackageName();
+
+
+                                // @pnplab injected code part !
+                                // @warning !!! dirty code !!!
+                                // @todo allow server to change these values!
+                                // Overrides server-side result to force webservice, esm & mqtt disabling.
+                                if (
+                                        sensor_config.getString("setting").equals("status_webservice") ||
+                                                sensor_config.getString("setting").equals("status_esm") ||
+                                                sensor_config.getString("setting").equals("status_mqtt")
+                                ) {
+                                    sensor_config.put("value", false);
+                                }
+                                // /@pnplab
+
+
                                 Aware.setSetting(getApplicationContext(), sensor_config.getString("setting"), sensor_config.get("value"), package_name);
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -1783,6 +1845,7 @@ public class Aware extends Service {
                         }
 
                         //Set the plugins' settings now
+                        Log.v("pnplab::Aware", "JoinStudy#onHandleIntent - Set plugins' status' value");
                         ArrayList<String> active_plugins = new ArrayList<>();
                         for (int i = 0; i < plugins.length(); i++) {
                             try {
@@ -1803,13 +1866,17 @@ public class Aware extends Service {
                         }
 
                         //Set schedulers
+                        Log.v("pnplab::Aware", "JoinStudy#onHandleIntent - Set schedulers");
                         if (schedulers.length() > 0)
                             Scheduler.setSchedules(getApplicationContext(), schedulers);
 
                         //Start plugins
+                        Log.v("pnplab::Aware", "JoinStudy#onHandleIntent - Start plugins");
                         for (String p : active_plugins) {
                             Aware.startPlugin(getApplicationContext(), p);
                         }
+
+                        Log.v("pnplab::Aware", "JoinStudy#onHandleIntent - Send broadcast ACTION_JOINED_STUDY");
 
                         //Let others know that we just joined a study
                         sendBroadcast(new Intent(Aware.ACTION_JOINED_STUDY));
@@ -2156,6 +2223,7 @@ public class Aware extends Service {
                 Aware.reset(context);
             }
             if (intent.getAction().equals(Aware.ACTION_AWARE_SYNC_DATA)) {
+                Log.v("pnplab::Aware", "#onReceive Aware_Provider ACTION_AWARE_SYNC_DATA");
                 Bundle sync = new Bundle();
                 sync.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
                 sync.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);

@@ -20,7 +20,7 @@ public class SyncAdapter extends Service {
 
     @Override
     public void onCreate() {
-        Log.i("SyncAdapter", "syncAdapter #onCreate org.pnplab.flux.awareplugin.eegmuse");
+        Log.v("pnplab.muse::SyncAdapter", "#onCreate");
 
         /*
         if (android.os.Debug.isDebuggerConnected()) {

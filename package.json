@@ -11,8 +11,9 @@
     "immutable": "4.0.0-rc.12",
     "lottie-react-native": "2.5.11",
     "memoize-one": "5.0.0",
-    "native-base": "2.11.0",
+    "native-base": "2.12.1",
     "react": "16.6.3",
+    "react-is": "^16.8.6",
     "react-native": "0.58.3",
     "react-native-appupdate": "1.1.2",
     "react-native-dev-menu": "2.0.2",
@@ -33,6 +34,7 @@
     "victory-native": "31.0.0"
   },
   "devDependencies": {
+    "@jest/reporters": "^24.8.0",
     "@semantic-release/changelog": "3.0.2",
     "@semantic-release/commit-analyzer": "6.1.0",
     "@semantic-release/exec": "3.3.2",
@@ -77,6 +79,25 @@
         "react-native"
       ]
     }
+  },
+  "detox": {
+    "specs": "./test-detox",
+    "runner-config": "./test-detox/config.json",
+    "configurations": {
+      "android.emu.debug": {
+        "binaryPath": "android/app/build/outputs/apk/debug/app-universal-debug.apk",
+        "build": "export FLUX_ENCRYPTION_KEY=abcd && cd android && FLUX_ENCRYPTION_KEY=abcd ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
+        "type": "android.emulator",
+        "name": "Nexus_5X_API_27"
+      },
+      "android.emu.release": {
+        "binaryPath": "android/app/build/outputs/apk/release/app-universal-release.apk",
+        "build": "export FLUX_ENCRYPTION_KEY=abcd && cd android && FLUX_ENCRYPTION_KEY=abcd ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release && cd ..",
+        "type": "android.emulator",
+        "name": "Nexus_5X_API_27"
+      }
+    },
+    "test-runner": "jest"
   },
   "release": {
     "branch": "master",

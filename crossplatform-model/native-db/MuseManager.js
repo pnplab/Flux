@@ -18,12 +18,13 @@ export const MuseStatus = {
 class MuseManager {
 
     _museManager = NativeModules.MuseManager;
-    _lastBluetoothStatus = MuseStatus.BLUETOOT_AWAITING;
-    _lastMuseStatus = MuseStatus.MUSE_DISCONNECTED;
+    // _lastBluetoothStatus = MuseStatus.BLUETOOT_AWAITING;
+    _lastMuseStatus = MuseStatus.BLUETOOT_AWAITING;
 
-    getBluetoothStatus() {
-        return this._lastBluetoothStatus;
-    }
+    // getBluetoothStatus() {
+    //     return this._lastBluetoothStatus;
+    // }
+
     getMuseStatus() {
         return this._lastMuseStatus;
     }
@@ -41,6 +42,33 @@ class MuseManager {
         //     if 2 devices are seen, 1st one will connect,
         //     then we disconnect it, 2nd one will still be available but
         //     connection wont retrigger!
+
+        // Mock museManager if related native module is not available. This
+        // happens when muse is incompatible with the current device (for
+        // instance when testing the app in an emulator).
+        if (!this._museManager) {
+            // @note Proxy are currently unsupported in react-native. They've
+            //     changed their js engine in next version so this code may 
+            //     work after r-n upgrade.
+            // this._museManager = new Proxy({}, {
+            //     // Return a noop function for every property call in
+            //     // _museManager. 
+            //     get: (obj, prop) => {
+            //         return () => { /* noop */ };
+            //     }
+            // });
+
+            // Instead we have to mock it manually :(
+            this._museManager = {
+                startListeningMuseList: () => { /* noop */ },
+                stopListeningMuseList: () => { /* noop */ },
+                stopListeningConnectionStatus: () => { /* noop */ },
+                startListeningConnectionStatus: () => { /* noop */ },
+                connectMuse: () => { /* noop */ },
+                checkBluetooth: () => { /* noop */ },
+                disconnectMuse: () => { /* noop */ },
+            };
+        }
 
         this.onBluetoothEnabledStream = new Subject<any>();
         this.onBluetoothDisabledStream = new Subject<any>();
@@ -81,6 +109,7 @@ class MuseManager {
     }
 
     unsubscribe$ = new Subject();
+
     startListening() {
         this.onBluetoothEnabledStream
             .pipe(
@@ -172,38 +201,43 @@ class MuseManager {
                 // this._museManager.stopListeningConnectionStatus();
             });
 
-        // We need to add runtime permission check for dangerous permissions
-        // on android ^23.
-        (async () => {
-            // Disable runtime permission check on IOS
-            if (Platform.OS !== 'android') {
-                return;
-            }
+        // @todo activate bluetooth manually!
+        
+        // // We need to add runtime permission check for dangerous permissions
+        // // on android ^23.
+        // (async () => {
+        //     // Disable runtime permission check on IOS
+        //     if (Platform.OS !== 'android') {
+        //         return;
+        //     }
 
-            try {
-                const granted = await PermissionsAndroid.request(
-                    PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
-                    {
-                        title: 'Permission Localisation/Bluetooth',
-                        message:
-                            'Veuillez activer la permission suivante ' +
-                            'pour pouvoir connecter votre Muse.',
-                        // buttonNeutral: 'Plus tard!',
-                        buttonNegative: 'Plus tard!',
-                        buttonPositive: 'OK',
-                    },
-                );
-                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                    console.log('ACCESS_COARSE_LOCATION/BLUETOOTH permission granted!');
-                    this.onBluetoothEnabledStream.next();
-                } else {
-                    console.log('ACCESS_COARSE_LOCATION/BLUETOOTH permission denied!');
-                    this.onBluetoothDisabledStream.next();
-                }
-            } catch (err) {
-                console.warn(err);
-            }
-        })();
+        //     try {
+        //         const granted = await PermissionsAndroid.request(
+        //             PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
+        //             {
+        //                 title: 'Permission Localisation/Bluetooth',
+        //                 message:
+        //                     'Veuillez activer la permission suivante ' +
+        //                     'pour pouvoir connecter votre Muse.',
+        //                 // buttonNeutral: 'Plus tard!',
+        //                 buttonNegative: 'Plus tard!',
+        //                 buttonPositive: 'OK',
+        //             },
+        //         );
+        //         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        //             console.log('ACCESS_COARSE_LOCATION/BLUETOOTH permission granted!');
+        //             this.onBluetoothEnabledStream.next();
+        //         } else {
+        //             console.log('ACCESS_COARSE_LOCATION/BLUETOOTH permission denied!');
+        //             this.onBluetoothDisabledStream.next();
+        //         }
+        //     } catch (err) {
+        //         console.warn(err);
+        //     }
+        // })();
+
+        // Retrieve bluetooth status.
+        this._museManager.checkBluetooth();
     }
 
     stopListening() {

@@ -1,0 +1,19 @@
+init_config:
+
+# @warning on centos server, pnplab.ca domain pointed to local ip address instead of public ip, thus breaking the
+#          checkup due to godaddy dns server bypass (we dont have the www.). Bypassed the issue by pointing www.
+#          dns manually through /etc/hosts to the local ip address (remote one is blocked through firewall)!
+instances:
+  - name: pnplab.ca php
+    url: https://www.pnplab.ca/index.php
+    timeout: 10
+    disable_ssl_validation: false      # default is true, so set false to check SSL validation
+    # ca_certs: /path/to/ca/file         # e.g. /etc/ssl/certs/ca-certificates.crt
+    # check_certificate_expiration: true # default is true
+    # days_warning: 28                   # default 14
+    # days_critical: 14                  # default 7
+    # timeout: 3                         # in seconds. Default is 10.
+  - name: pnplab.ca node
+    url: https://www.pnplab.ca/check-sync/android/0000monitoring
+    timeout: 10
+    disable_ssl_validation: false      # default is true, so set false to check SSL validation

@@ -29,7 +29,7 @@ type State = {
 };
 
 // Configure component logic.
-class RestingStateController extends PureComponent<Props, State> {
+export class RestingStateController extends PureComponent<Props, State> {
 
     static defaultProps = {
 
@@ -120,11 +120,17 @@ class RestingStateController extends PureComponent<Props, State> {
     onVideoError(e) {
         MuseManager.disconnectMuse();
         console.error('Video Error while watching resting state\'s video. Postponing video!', e);
-        this.props.postponeRestingStateTask();
+
+        // postpone resting state task
+        this.props.onVideoError(); 
     }
     
     onVideoEnd() {
         MuseManager.disconnectMuse();
+
+        console.warn('@todo store in db!');
+        // @todo store in db!
+
         this.props.submitRestingStateTask();
     }
 
@@ -136,7 +142,7 @@ const mapStateToProps = (state: AppState /*, ownProps*/) => ({
 });
 
 const mapDispatchToProps = {
-    postponeRestingStateTask,
+    onVideoError: postponeRestingStateTask,
     submitRestingStateTask
 };
 

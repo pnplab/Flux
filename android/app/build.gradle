@@ -135,10 +135,18 @@ android {
         resValue "string", "provider_timezones", android.defaultConfig.applicationId + ".provider.timezone"
         resValue "string", "provider_traffic", android.defaultConfig.applicationId + ".provider.traffic"
         resValue "string", "provider_wifi", android.defaultConfig.applicationId + ".provider.wifi"
+        
+        ndk {
+            abiFilters 'armeabi-v7a', 'x86'
+        }
+
+        // Detox
+        testBuildType System.getProperty('testBuildType', 'debug')  // This will later be used to control the test apk build type
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     signingConfigs {
         release {
@@ -156,22 +164,40 @@ android {
             enable enableSeparateBuildPerCPUArchitecture
             universalApk true  // If true, also generate a universal APK
             // universalApk true
-            include "armeabi-v7a", "x86", "arm64-v8a"
+            // @note realmdb not ready for arm64 yet! Thus app crashes on 
+            //       linking! latest realm version now supports it but we dont
+            //       need 64bit support yet anyway.
+            // @todo update realmdb to latest version to support 64bit and try
+            //       arm64-v8a again (muse wont probably work). Do the same
+            //       w/ abiFilters!
+            include 'armeabi-v7a', 'x86' //, "arm64-v8a"
         }
     }
     buildTypes {
         release {
-            debuggable false
+            // just so we can have logs inside appium E2E tests, as using the debug
+            // apk will fail due to react-native using dynamic javascript view in this
+            // mode which will make appium crash by changing android view's element
+            // position.
+            // @todo set back to false for official release or use env variable to set this!
+            debuggable true
+
             minifyEnabled enableProguardInReleaseBuilds
             shrinkResources enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
 			signingConfig signingConfigs.release
+
+            // Detox-specific additions to pro-guard
+            proguardFile "${rootProject.projectDir}/../node_modules/detox/android/detox/proguard-rules-app.pro"
         }
         debug {
             debuggable true
             minifyEnabled false
             shrinkResources false
             // proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro", "proguard-dev.pro"
+
+            // Detox-specific additions to pro-guard
+            // proguardFile "${rootProject.projectDir}/../node_modules/detox/android/detox/proguard-rules-app.pro"
         }
     }
     // applicationVariants are e.g. debug, release
@@ -220,7 +246,11 @@ dependencies {
     implementation "com.google.firebase:firebase-core:16.0.6"
     implementation "com.google.firebase:firebase-messaging:17.3.4"
     implementation "me.leolin:ShortcutBadger:1.1.21@aar" // use badge for notifications
-    
+
+    // Detox
+    androidTestImplementation('com.wix:detox:+') { transitive = true }
+    androidTestImplementation 'junit:junit:4.12'
+
     // @note might be useful to add support libraries as in (https://github.com/denzilferreira/aware-client/blob/master/aware-tests/build.gradle)
     // -> implementation "com.android.support:gridlayout-v7:$support_libs"
 }

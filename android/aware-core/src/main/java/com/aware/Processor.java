@@ -159,11 +159,17 @@ public class Processor extends Aware_Sensor {
         void onChanged(ContentValues data);
     }
 
+
+    @Override
+    protected String getAuthority() {
+        // This allows plugin data to be synced on demand from broadcast. Aware#ACTION_AWARE_SYNC_DATA
+        return Processor_Provider.getAuthority(this);
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
-        AUTHORITY = Processor_Provider.getAuthority(this);
-
+        
         if (Aware.DEBUG) Log.d(TAG, "Processor service created");
     }
 

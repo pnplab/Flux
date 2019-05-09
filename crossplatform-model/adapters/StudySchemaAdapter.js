@@ -8,7 +8,7 @@
 import type { Action } from '../memory-db/types';
 import type { Store, Dispatch } from 'redux';
 
-import { initStudyAsInitialized, initStudyAsNotInitialized, enableSurveyTask, disableSurveyTask, enableRestingStateTask, disableRestingStateTask } from '../memory-db/actions';
+import { initStudyAsInitialized, initStudyAsNotInitialized, enableSurveyTask, disableSurveyTask, enableRestingStateTask, disableRestingStateTask, onboarding } from '../memory-db/actions';
 
 import realm, { initStudySchema } from '../persistent-db';
 import AwareManager from '../native-db/AwareManager';
@@ -96,7 +96,7 @@ export const loadStudySchema: (store: Store) => Promise<void> = async (store: St
 };
 
 // Sync app state to db db on triggered action.
-export const syncStudyToRealmMiddleWare = () => (next: Dispatch) => async (action: Action) => {
+export const syncStudyToRealmMiddleWare = (store: Store) => (next: Dispatch) => async (action: Action) => {
     // @warning async is not handled ! We do not know in our app state when the
     //     database has effectively recorded the value !
 
@@ -140,7 +140,14 @@ export const syncStudyToRealmMiddleWare = () => (next: Dispatch) => async (actio
 
             await AwareManager.requestPermissions();
             AwareManager.startAware(participantId, encryptionKey);
-            AwareManager.joinStudy('https://www.pnplab.ca/index.php/webservice/index/1/AVo5cBt3prkk'); // @todo change url based on study.
+
+            //                !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // @warning @todo !!! Will make the app stuck if study fails !!!
+            //                !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            await AwareManager.joinStudy('https://www.pnplab.ca/index.php/webservice/index/2/UvxJCl3SC4J3'); // @todo change url based on study.
+
+            // Change aware study state once done!
+            store.dispatch(onboarding.setAwareStudyState(true));
 
             // await FirebaseManager.signIn();
             await FirebaseManager.requestPermissions();
@@ -153,13 +160,32 @@ export const syncStudyToRealmMiddleWare = () => (next: Dispatch) => async (actio
     });
 
     switch (action.type) {
-    case 'INITIALIZE_STUDY':
+    case 'ONBOARDING.INITIALIZE_STUDY':
         initStudy(action.participantId);
-        initModel(action.participantId);
+        await initModel(action.participantId);
+        
+        // Disable automatic mandatory wifi & battery for sync.
+        // @note This can't easily be done inside the Aware.syncData() method
+        //     as all these processes are completely decoupled & asynchrone,
+        //     without any result feedback inside the default aware source
+        //     code. We thus do it at the controller opening & closing.
+        AwareManager.disableAutomaticSync();
+        AwareManager.disableMandatoryWifiForSync();
+        AwareManager.disableMandatoryBatteryForSync();
+
         break;
 
     case 'INIT_STUDY_AS_INITIALIZED':
-        initModel(action.participantId);
+        await initModel(action.participantId);
+
+        // Force data sync settings at launch time.
+        // @warning !!! This is a dirty-fix in case of crash during the
+        //          Onboarding/CheckDataSyncController.js. See related
+        //          source code for more info !!!
+        AwareManager.enableMandatoryBatteryForSync();
+        AwareManager.enableMandatoryWifiForSync();
+        AwareManager.enableAutomaticSync();
+
         break;
 
     default:

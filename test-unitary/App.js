@@ -1,6 +1,9 @@
 /**
  * @format
  * @lint-ignore-every XPLATJSCOPYRIGHT1
+ *
+ * @todo rename to integration
+ * @todo rename integration to e2e/functional
  */
 
 // Fixes `ReferenceError: You are trying to `import` a file after the Jest environment has been torn down.
