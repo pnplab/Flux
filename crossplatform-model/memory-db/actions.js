@@ -11,7 +11,8 @@ export const onboarding: {
     confirmPermissions: () => Action,
     initializeStudy: (studyPassword: string, participantId: string) => Action,
     confirmPhenotyping: () => Action,
-    submitSurvey: (timestamp: number, values: {| [questionId: string]: number |}) => Action
+    submitSurvey: (timestamp: number, values: {| [questionId: string]: number |}) => Action,
+    confirmSurveyTask: () => Action
 } = {
     auth: (studyPassword: string, participantId: string) => ({
         type: 'ONBOARDING.AUTH',
@@ -44,6 +45,10 @@ export const onboarding: {
         type: 'ONBOARDING.SUBMIT_SURVEY',
         timestamp: timestamp,
         payload: values
+    }),
+    confirmSurveyTask: () => ({
+        // Used to go to next onboarding step!
+        type: 'ONBOARDING.CONFIRM_SURVEY_TASK'
     })
 };
 

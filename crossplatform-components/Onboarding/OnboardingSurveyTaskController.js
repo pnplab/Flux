@@ -41,22 +41,19 @@ class OnboardingSurveyTaskController extends PureComponent<Props, State> {
     }
 
 
-    // do not already enable resting state task as we're still on the
-    // onboarding process and do not want to interfere with the app behavior.
-    noop = () => {
-
-    }
+    // do not already enable resting state task in the main app flow  as we're 
+    // still on the onboarding process and do not want to interfere with the 
+    // app behavior.
+    noop = () => { }
 
     submitSurveyTaskForm = (timestamp, values) => {
         // Store in db!
-        console.log('store in db!');
         this.props.submitSurveyTaskForm(timestamp, values);
     }
 
     // Go to next step when the user pushes the submit button!
     goToNextStep = () => {
-        console.log('next! @todo!');
-        // @todo !
+        this.props.goToNextStep();
     }
 
     render() {
@@ -86,7 +83,8 @@ const mapStateToProps = (state: AppState /*, ownProps*/) => ({
 });
 
 const mapDispatchToProps = {
-    submitSurveyTaskForm: onboarding.submitSurvey
+    submitSurveyTaskForm: onboarding.submitSurvey,
+    goToNextStep: onboarding.confirmSurveyTask
 };
 
 export default connect(

@@ -9,6 +9,7 @@ export type Action =
     | {| +type: 'ONBOARDING.INITIALIZE_STUDY', +studyPassword: string, +participantId: string |}
     | {| +type: 'ONBOARDING.CONFIRM_PHENOTYPING' |}
     | {| +type: 'ONBOARDING.SUBMIT_SURVEY', +timestamp: number, +payload: {| [questionId: string]: number |} |}
+    | {| +type: 'ONBOARDING.CONFIRM_SURVEY_TASK' |}
     | {| +type: 'ONBOARDING.BYPASS_RESTING_STATE' |}
     // @pre This action should only be called at launch time.
     | {| +type: 'INIT_STUDY_AS_NOT_INITIALIZED' |}

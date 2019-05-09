@@ -10,10 +10,11 @@ import styled from 'styled-components';
 import { Container, Content, Title, Button, Form, Item, Label, Input, CircleButton, R3Container, R3Header, R3Content, R3Footer, CheckList, CLItem, CLIHeader, CLIHStatus, CLIHTitle, CLIContent } from '../../crossplatform-theme';
 
 type Props = {
-
+    +status: 'TEXT' | 'SYNC_ONGOING' | 'SYNC_DONE' | 'SYNC_ERROR',
+    +onSyncData: () => void,
 };
 
-const CheckDataSyncView = ({ onSubmit }: Props) => 
+const CheckDataSyncView = ({ status, onSyncData, onSubmit }: Props) => 
     <Container>
         <R3Container>
             <R3Header>
@@ -23,11 +24,11 @@ const CheckDataSyncView = ({ onSubmit }: Props) =>
             </R3Content>
             <R3Footer>
                 {
-                    true &&
-                    <CircleButton type="validate" color="blue" onPress={undefined} />
+                    status === 'TEXT' &&
+                    <CircleButton type="validate" color="blue" onPress={onSyncData} />
                 }
                 {
-                    false &&
+                    status === 'SYNC_DONE' &&
                     <CircleButton type="next" color="green" onPress={undefined} />
                 }
             </R3Footer>

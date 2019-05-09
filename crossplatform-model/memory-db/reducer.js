@@ -55,6 +55,12 @@ export default function reducer(state: State = initialState, action: Action): St
                 // registered in db!
                 // @todo refactor adapter names to something better!
             };
+        case 'ONBOARDING.CONFIRM_SURVEY_TASK':
+            return {
+                ...state,
+                // Jump to the next onboarding step.
+                route: '/onboarding/task/resting-state'
+            }
         case 'ONBOARDING.BYPASS_RESTING_STATE':
             return {
                 ...state,

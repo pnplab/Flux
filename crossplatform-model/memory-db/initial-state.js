@@ -10,7 +10,7 @@ import type { State } from './types';
 // @warning This is the default *synchronous* state. Asynchronous
 //    initialization occurs at an higher abstraction level, through adapters.
 const initialState: State = {
-    route: undefined || '/onboarding/task/resting-state',
+    route: undefined || '/onboarding/check/data-sync',
     hasStudyBeenInitialized: undefined,
     isSurveyTaskAvailable: undefined,
     isRestingStateTaskAvailable: undefined,
