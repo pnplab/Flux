@@ -3,6 +3,7 @@
  */
 
 import { Platform, NativeModules, PermissionsAndroid } from 'react-native';
+import { DeviceEventEmitter } from 'react-native';
 
 class AwareManager {
 
@@ -88,8 +89,79 @@ class AwareManager {
         this._awareManager.syncData();
     }
 
+    // @returns () => {}: unlistener.
+    listenSyncEvents({ onSyncStarted, onSyncBatchStarted, onSyncFinished, onSyncFailed }) {
+        //   * Aware.ACTION_AWARE_SYNC_DATA_STARTED
+        //        `TABLE`: string
+        //        `ROW_COUNT`: number
+        //   * Aware.ACTION_AWARE_SYNC_DATA_BATCH_STARTED
+        //        `TABLE`: string
+        //        `ROW_COUNT`: number
+        //        `LAST_ROW_UPLOADED`: number
+        //   * Aware.ACTION_AWARE_SYNC_DATA_FINISHED
+        //        `TABLE`: string
+        //   * Aware.ACTION_AWARE_SYNC_DATA_FAILED
+        //        `TABLE`: string
+        //        `ERROR`: string
+        //               | `NO_STUDY_SET`
+        //               | `OUT_OF_MEMORY`
+        //               | `TABLE_CREATION_FAILED`
+        //               | `SERVER_UNREACHABLE`
+        //               | `SERVER_CONNECTION_INTERRUPTED`
+        //               | `UNHANDLED_EXCEPTION`
+
+        let syncDataStartedSubscription = DeviceEventEmitter.addListener('Aware.ACTION_AWARE_SYNC_DATA_STARTED', (e: Event) => { 
+            onSyncStarted({
+                table: e.TABLE,
+                rowCount: e.ROW_COUNT
+            });
+        });
+        let syncDataBatchStartedSubscription = DeviceEventEmitter.addListener('Aware.ACTION_AWARE_SYNC_DATA_BATCH_STARTED', (e: Event) => { 
+            onSyncBatchStarted({
+                table: e.TABLE,
+                rowCount: e.ROW_COUNT,
+                lastRowUploaded: e.LAST_ROW_UPLOADED
+            });
+        });
+        let syncDataFinishedSubscription = DeviceEventEmitter.addListener('Aware.ACTION_AWARE_SYNC_DATA_FINISHED', (e: Event) => { 
+            onSyncFinished({
+                table: e.TABLE,
+            });
+        });
+        let syncDataFailedSubscription = DeviceEventEmitter.addListener('Aware.ACTION_AWARE_SYNC_DATA_FAILED', (e: Event) => { 
+            onSyncFailed({
+                table: e.TABLE,
+                error: e.ERROR
+            });
+        });
+
+        // Return unlisten function!
+        return () => {
+            syncDataStartedSubscription.remove();
+            syncDataBatchStartedSubscription.remove();
+            syncDataFinishedSubscription.remove();
+            syncDataFailedSubscription.remove();
+        };
+    }
+
     async getDeviceId() {
         return this._awareManager.getDeviceId();
+    }
+
+    async getSyncDataCheckup(deviceId?: stringd) {
+        // Set default deviceId to this device.
+        if (typeof deviceId === 'undefined') {
+            deviceId = await this.getDeviceId();
+        }
+
+        // Retrieve sync data checkup.
+        let response = await fetch(`https://www.pnplab.ca/check-sync/android/${deviceId}`);
+        console.log('response', response);
+        let rowCountByTable = await response.json();
+
+        // @note This return the number of row for this deviceId by table.
+        // @warning Unefficient server-side!
+        return rowCountByTable;
     }
 
 }

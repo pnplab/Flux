@@ -17,8 +17,8 @@ const initialState: State = {
 
     // Onboarding state namespace.
     onboarding: {
-        studyPassword: undefined,
-        participantId: undefined
+        studyPassword: undefined || '4wc2uw',
+        participantId: undefined || 'Test'
     },
 
     // Symptom Graph state namespace.

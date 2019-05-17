@@ -148,6 +148,7 @@ public class Aware extends Service {
      *    - SERVER_UNREACHABLE
      *    - SERVER_CONNECTION_INTERRUPTED
      *    - UNHANDLED_EXCEPTION
+     *      + EXCEPTION
      */
     public static final String ACTION_AWARE_SYNC_DATA_STARTED = "ACTION_AWARE_SYNC_DATA_STARTED";
     public static final String ACTION_AWARE_SYNC_DATA_BATCH_STARTED = "ACTION_AWARE_SYNC_DATA_BATCH_STARTED";

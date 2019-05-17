@@ -1,17 +1,23 @@
 package org.pnplab.flux;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.util.Log;
 
 import com.aware.Applications;
 import com.aware.Aware;
 import com.aware.Aware_Preferences;
 import com.aware.utils.DatabaseHelper;
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import org.pnplab.flux.awareplugin.survey.Survey;
 
@@ -21,6 +27,20 @@ public class AwareManagerModule extends ReactContextBaseJavaModule {
 
     public AwareManagerModule(ReactApplicationContext reactContext) {
         super(reactContext);
+
+        // Listen to aware sync events.
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Aware.ACTION_AWARE_SYNC_DATA_STARTED);
+        filter.addAction(Aware.ACTION_AWARE_SYNC_DATA_BATCH_STARTED);
+        filter.addAction(Aware.ACTION_AWARE_SYNC_DATA_FINISHED);
+        filter.addAction(Aware.ACTION_AWARE_SYNC_DATA_FAILED);
+        reactContext.registerReceiver(this.syncEventListener, filter);
+    }
+
+    @Override
+    public void onCatalystInstanceDestroy() {
+        // Unlisten aware sync events.
+        getReactApplicationContext().unregisterReceiver(this.syncEventListener);
     }
 
     @Override
@@ -92,6 +112,7 @@ public class AwareManagerModule extends ReactContextBaseJavaModule {
 
         Log.d("AwareManager", "broadcasting Aware.ACTION_AWARE_SYNC_DATA");
 
+        // Ask aware to sync data.
         Intent sync = new Intent(Aware.ACTION_AWARE_SYNC_DATA);
         context.sendBroadcast(sync);
     }
@@ -103,4 +124,98 @@ public class AwareManagerModule extends ReactContextBaseJavaModule {
 
         promise.resolve(deviceId);
     }
+
+    // Forward aware sync event updates to javascript.
+    //   * Aware.ACTION_AWARE_SYNC_DATA_STARTED
+    //        `TABLE`: string
+    //        `ROW_COUNT`: number
+    //   * Aware.ACTION_AWARE_SYNC_DATA_BATCH_STARTED
+    //        `TABLE`: string
+    //        `ROW_COUNT`: number
+    //        `LAST_ROW_UPLOADED`: number
+    //   * Aware.ACTION_AWARE_SYNC_DATA_FINISHED
+    //        `TABLE`: string
+    //   * Aware.ACTION_AWARE_SYNC_DATA_FAILED
+    //        `TABLE`: string
+    //        `ERROR`: string
+    //               | `NO_STUDY_SET`
+    //               | `OUT_OF_MEMORY`
+    //               | `TABLE_CREATION_FAILED`
+    //               | `SERVER_UNREACHABLE`
+    //               | `SERVER_CONNECTION_INTERRUPTED`
+    //               | `UNHANDLED_EXCEPTION`
+    // 
+    // @note These events have been added and are not part of the official
+    //       aware bundle.
+    private BroadcastReceiver syncEventListener = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            ReactApplicationContext reactContext = getReactApplicationContext();
+            DeviceEventManagerModule.RCTDeviceEventEmitter eventEmitter = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
+
+            switch (action) {
+                case Aware.ACTION_AWARE_SYNC_DATA_STARTED: {
+                    // Retrieve intent params.
+                    String table = intent.getStringExtra("TABLE");
+                    int rowCount = intent.getIntExtra("ROW_COUNT", -1);
+
+                    // Convert params to js bridge format.
+                    WritableMap params = Arguments.createMap();
+                    params.putString("TABLE", table);
+                    params.putInt("ROW_COUNT", rowCount);
+
+                    // Emit js event.
+                    eventEmitter.emit("Aware.ACTION_AWARE_SYNC_DATA_STARTED", params);
+
+                    break;
+                }
+                case Aware.ACTION_AWARE_SYNC_DATA_BATCH_STARTED: {
+                    // Retrieve intent params.
+                    String table = intent.getStringExtra("TABLE");
+                    int rowCount = intent.getIntExtra("ROW_COUNT", -1);
+                    int lastRowUploaded = intent.getIntExtra("LAST_ROW_UPLOADED", -1);
+
+                    // Convert params to js bridge format.
+                    WritableMap params = Arguments.createMap();
+                    params.putString("TABLE", table);
+                    params.putInt("ROW_COUNT", rowCount);
+                    params.putInt("LAST_ROW_UPLOADED", lastRowUploaded);
+
+                    // Emit js event.
+                    eventEmitter.emit("Aware.ACTION_AWARE_SYNC_DATA_BATCH_STARTED", params);
+
+                    break;
+                }
+                case Aware.ACTION_AWARE_SYNC_DATA_FINISHED: {
+                    // Retrieve intent params.
+                    String table = intent.getStringExtra("TABLE");
+
+                    // Convert params to js bridge format.
+                    WritableMap params = Arguments.createMap();
+                    params.putString("TABLE", table);
+
+                    // Emit js event.
+                    eventEmitter.emit("Aware.ACTION_AWARE_SYNC_DATA_FINISHED", params);
+
+                    break;
+                }
+                case Aware.ACTION_AWARE_SYNC_DATA_FAILED: {
+                    // Retrieve intent params.
+                    String table = intent.getStringExtra("TABLE");
+                    String error = intent.getStringExtra("ERROR");
+
+                    // Convert params to js bridge format.
+                    WritableMap params = Arguments.createMap();
+                    params.putString("TABLE", table);
+                    params.putString("ERROR", error);
+
+                    // Emit js event.
+                    eventEmitter.emit("Aware.ACTION_AWARE_SYNC_DATA_FAILED", params);
+
+                    break;
+                }
+            }
+        }
+    };
 }
