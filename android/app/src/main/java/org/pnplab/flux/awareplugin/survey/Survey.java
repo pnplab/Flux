@@ -1,10 +1,13 @@
 package org.pnplab.flux.awareplugin.survey;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.os.AsyncTask;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -21,7 +24,36 @@ public class Survey {
     public void start(Context context) {
         Log.i("AwareModule", "start org.pnplab.flux.awareplugin.survey");
         Aware.setSetting(context, Settings.STATUS_PLUGIN_SURVEY, true);
-        Aware.startPlugin(context, "org.pnplab.flux.awareplugin.survey");
+
+        // @warning !!! Aware launches a network request in the super onStartCommand method instead
+        //          of using "onHandleIntent" for that. This results in a crash! The network
+        //          request is `SSLManager.handleUrl(getApplicationContext(), Aware.getSetting(this, Aware_Preferences.WEBSERVICE_SERVER), true);`
+        //          To avoid this crash, study must have been joined first before starting the
+        //          plugin! Beware of unpredictable async crashes!
+        // @warning I am not too confident this function actually returns if the service is on or
+        //          off (it looks like it's actually checking in the db instead). This seems to be
+        //          working fine though but might be a false positive due to the delay it adds
+        //          before starting the plugin, has the current method is called in parallel with
+        //          joinStudy service's start.
+        if (Aware.isStudy(context)) {
+            // Start plugin.
+            Aware.startPlugin(context, "org.pnplab.flux.awareplugin.survey");
+        }
+        else {
+            // Start plugin once study has been joined.
+            BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    // Unregister receiver on first event received ! (listen only once)
+                    context.unregisterReceiver(this);
+                    // Start plugin.
+                    Aware.startPlugin(context, "org.pnplab.flux.awareplugin.survey");
+                }
+            };
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(Aware.ACTION_JOINED_STUDY);
+            context.registerReceiver(broadcastReceiver, filter);
+        }
     }
 
     // Interface between the aware survey plugin & external code.
@@ -59,4 +91,5 @@ public class Survey {
 
         _plugin.storeSurvey(timestamp, parsedContent);
     }
+
 }

@@ -95,6 +95,9 @@ public class Plugin extends Aware_Plugin {
     //This function gets called every 5 minutes by AWARE to make sure this plugin is still running.
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        // @warning !!! Aware launches a network request in this super method instead of using "onHandleIntent" for that.
+        // This results in a crash! The network request is `SSLManager.handleUrl(getApplicationContext(), Aware.getSetting(this, Aware_Preferences.WEBSERVICE_SERVER), true);`
+        // To avoid this crash, study must have been joined first before starting the plugin! Beware of unpredictable async crashes!
         super.onStartCommand(intent, flags, startId);
 
         if (PERMISSIONS_OK) {

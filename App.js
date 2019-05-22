@@ -83,7 +83,7 @@ if (__DEV__ || !__DEV__) {
 
 // Check environment variables.
 if (typeof process.env.FLUX_ENCRYPTION_KEY === 'undefined') {
-    throw new Error('FLUX_ENCRYPTION_KEY must be set! Don\'t forget to flush cache (`react-native start --reset-cache`)!');
+    throw new Error('FLUX_ENCRYPTION_KEY must be set! Don\'t forget to flush cache (`react-native start --reset-cache`)! In case of `./gradlew assembleRelease`, run `./gradlew clean` & use export prior to env-variable-prefixed bash command!');
 }
 
 // Automatically update the app when released

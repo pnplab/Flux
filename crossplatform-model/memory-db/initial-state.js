@@ -10,15 +10,15 @@ import type { State } from './types';
 // @warning This is the default *synchronous* state. Asynchronous
 //    initialization occurs at an higher abstraction level, through adapters.
 const initialState: State = {
-    route: undefined || '/onboarding/check/data-sync',
+    route: undefined && '/onboarding/check/data-sync',
     hasStudyBeenInitialized: undefined,
     isSurveyTaskAvailable: undefined,
     isRestingStateTaskAvailable: undefined,
 
     // Onboarding state namespace.
     onboarding: {
-        studyPassword: undefined || '4wc2uw',
-        participantId: undefined || 'Test'
+        studyPassword: undefined && '4wc2uw',
+        participantId: undefined && 'Test'
     },
 
     // Symptom Graph state namespace.

@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.aware.Aware;
 import com.aware.utils.SSLManager;
+import com.choosemuse.libmuse.MuseManagerAndroid;
 import com.facebook.react.ReactApplication;
 import com.rnfs.RNFSPackage;
 import com.parryworld.rnappupdate.RNAppUpdatePackage;
@@ -65,18 +66,29 @@ public class MainApplication extends Application implements ReactApplication {
             // MuseManagerPackage is only compatible with ARM v7 devices. Avoid launch-time errors
             // on android emulator (which is x86 on osx) by adding it conditionally.
             if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.LOLLIPOP) {
-                Log.e("Flux", "Checking MUSE compatibility. Android version < LOLLIPOP " + android.os.Build.VERSION.SDK_INT);
+                Log.e("Flux", "MUSE compatibility error: Android version < LOLLIPOP " + android.os.Build.VERSION.SDK_INT);
             }
             else {
                 // @note List -> SUPPORTED_ABIS `https://developer.android.com/ndk/guides/abis`
                 String[] archs = new String[0];
                 archs = Build.SUPPORTED_ABIS;
+                Log.d("Flux", Arrays.toString(archs));
                 if (!Arrays.asList(archs).contains("armeabi-v7a")) {
-                    Log.e("Flux", "Checking MUSE compatibility. 'armeabi-v7a' is not supported.");
+                    Log.e("Flux", "MUSE compatibility error: 'armeabi-v7a' is not supported.");
                 }
                 else {
-                    Log.i("Flux", "Checking MUSE compatibility. MUSE appears to be compatible.");
-                    list.add(new MuseManagerPackage());
+                    Log.i("Flux", "Checking MUSE compatibility: MUSE appears to be compatible.");
+
+                    // Ensure muse linking is working! Indeed, armeabi-v7a ABI appears on android-x86_64 but linking still fails.
+                    // This may simply be a build configuration issue we can resolve (ie. the muse .so isn't packaged inside the
+                    // react-native x86_64 apk).
+                    try {
+                        MuseManagerAndroid.getInstance();
+                        list.add(new MuseManagerPackage());
+                    }
+                    catch (UnsatisfiedLinkError e) {
+                        Log.e("Flux", "Couldn't link muse even if linking appears to be supported!.");
+                    }
                 }
             }
 
@@ -85,8 +97,8 @@ public class MainApplication extends Application implements ReactApplication {
 
         @Override
         protected String getJSMainModuleName() {
-        return "index";
-      }
+            return "index";
+        }
     };
 
     @Override

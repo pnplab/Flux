@@ -148,15 +148,42 @@ class AwareManager {
         return this._awareManager.getDeviceId();
     }
 
-    async getSyncDataCheckup(deviceId?: stringd) {
+    async getSyncedDataCheckupForTable(table: string, deviceId?: string) {
         // Set default deviceId to this device.
         if (typeof deviceId === 'undefined') {
             deviceId = await this.getDeviceId();
         }
 
+        // Check deviceId & table types for potential security issue (has it
+        // comes from a json response in CheckDataSyncController).
+        if (!/^[a-zA-Z0-9_\-]{3,}$/.test(deviceId)) {
+            throw new Error('Bad deviceId format!');
+        }
+        if (!/^[a-zA-Z0-9_\-]{3,}$/.test(table)) {
+            throw new Error('Bad table name format!');
+        }
+
+        // Retrieve sync data checkup.
+        let response = await fetch(`https://www.pnplab.ca/check-sync/android/${table}/${deviceId}`);
+        let rowCountByTable = await response.json();
+
+        // @note This return the number of row in the table for this deviceId (same response format as getSyncedDataCheckup).
+        return rowCountByTable;
+    }
+    async getSyncedDataCheckup(deviceId?: string) {
+        // Set default deviceId to this device.
+        if (typeof deviceId === 'undefined') {
+            deviceId = await this.getDeviceId();
+        }
+
+        // Check deviceId type for potential security issue (has it comes from
+        // a json response in CheckDataSyncController).
+        if (!/^[a-zA-Z0-9_\-]{3,}$/.test(deviceId)) {
+            throw new Error('Bad deviceId format!');
+        }
+
         // Retrieve sync data checkup.
         let response = await fetch(`https://www.pnplab.ca/check-sync/android/${deviceId}`);
-        console.log('response', response);
         let rowCountByTable = await response.json();
 
         // @note This return the number of row for this deviceId by table.
@@ -164,6 +191,32 @@ class AwareManager {
         return rowCountByTable;
     }
 
+
+    // Enable/Disable automatic and/or mandatory wifi & battery for sync.
+    // @note This can't easily be done inside the Aware.syncData() method
+    //     as all these processes are completely decoupled & asynchrone,
+    //     without any result feedback inside the default aware source
+    //     code. We thus do it at the controller opening & closing.
+    // @warning This is bad design as it overrides the settings set through
+    //     the web UI, making these useless without warning the user!
+    enableAutomaticSync() {
+        this._awareManager.enableAutomaticSync();
+    }
+    disableAutomaticSync() {
+        this._awareManager.disableAutomaticSync();
+    }    
+    enableMandatoryWifiForSync() {
+        this._awareManager.enableMandatoryWifiForSync();
+    }
+    disableMandatoryWifiForSync() {
+        this._awareManager.disableMandatoryWifiForSync();
+    }
+    enableMandatoryBatteryForSync() {
+        this._awareManager.enableMandatoryBatteryForSync();
+    }
+    disableMandatoryBatteryForSync() {
+        this._awareManager.disableMandatoryBatteryForSync();
+    }
 }
 
 const awareManager = new AwareManager();

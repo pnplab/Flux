@@ -140,7 +140,15 @@ export const syncStudyToRealmMiddleWare = () => (next: Dispatch) => async (actio
 
             await AwareManager.requestPermissions();
             AwareManager.startAware(participantId, encryptionKey);
-            AwareManager.joinStudy('https://www.pnplab.ca/index.php/webservice/index/1/AVo5cBt3prkk'); // @todo change url based on study.
+            AwareManager.joinStudy('https://www.pnplab.ca/index.php/webservice/index/2/UvxJCl3SC4J3'); // @todo change url based on study.
+
+            // Force data sync settings at launch time.
+            // @warning !!! This is a dirty-fix in case of crash during the
+            //          Onboarding/CheckDataSyncController.js. See related
+            //          source code for more info !!!
+            AwareManager.enableMandatoryBatteryForSync();
+            AwareManager.enableMandatoryWifiForSync();
+            AwareManager.enableAutomaticSync();
 
             // await FirebaseManager.signIn();
             await FirebaseManager.requestPermissions();

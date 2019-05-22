@@ -111,7 +111,6 @@ public class Aware_Plugin extends Service {
             permissions.putExtra(PermissionsHandler.EXTRA_REDIRECT_SERVICE, getApplicationContext().getPackageName() + "/" + getClass().getName()); //restarts plugin once permissions are accepted
             startActivity(permissions);
         } else {
-
             PERMISSIONS_OK = true;
 
             if (Aware.getSetting(this, Aware_Preferences.STATUS_WEBSERVICE).equals("true")) {

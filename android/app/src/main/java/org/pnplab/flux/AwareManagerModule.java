@@ -74,7 +74,7 @@ public class AwareManagerModule extends ReactContextBaseJavaModule {
         // required before joining study)
         // @warning However, atm, aware permission request appears to be buggy when used with
         //      react-native! permission should be requested before #startAware is called!).
-        Aware.startAWARE(context);
+        Aware.startAWARE(getReactApplicationContext().getApplicationContext());
 
         // Create aware plugin interfaces (but don't start them until the study has been joined)
         _survey = new Survey();
@@ -123,6 +123,43 @@ public class AwareManagerModule extends ReactContextBaseJavaModule {
         String deviceId = Aware.getSetting(context, Aware_Preferences.DEVICE_ID);
 
         promise.resolve(deviceId);
+    }
+    
+    @ReactMethod    
+    public void enableAutomaticSync() {
+        ReactApplicationContext context = getReactApplicationContext();
+
+        Aware.setSetting(context, Aware_Preferences.STATUS_WEBSERVICE, "true");
+    }
+    @ReactMethod
+    public void disableAutomaticSync() {
+        ReactApplicationContext context = getReactApplicationContext();
+
+        Aware.setSetting(context, Aware_Preferences.STATUS_WEBSERVICE, "false");
+    }    
+    @ReactMethod
+    public void enableMandatoryWifiForSync() {
+        ReactApplicationContext context = getReactApplicationContext();
+
+        Aware.setSetting(context, Aware_Preferences.WEBSERVICE_WIFI_ONLY, "true");
+    }
+    @ReactMethod
+    public void disableMandatoryWifiForSync() {
+        ReactApplicationContext context = getReactApplicationContext();
+
+        Aware.setSetting(context, Aware_Preferences.WEBSERVICE_WIFI_ONLY, "false");
+    }
+    @ReactMethod
+    public void enableMandatoryBatteryForSync() {
+        ReactApplicationContext context = getReactApplicationContext();
+
+        Aware.setSetting(context, Aware_Preferences.WEBSERVICE_CHARGING, "true");
+    }
+    @ReactMethod
+    public void disableMandatoryBatteryForSync() {
+        ReactApplicationContext context = getReactApplicationContext();
+
+        Aware.setSetting(context, Aware_Preferences.WEBSERVICE_CHARGING, "false");
     }
 
     // Forward aware sync event updates to javascript.

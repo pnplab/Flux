@@ -26,7 +26,8 @@ type State = {
             +status: 'SYNC_ONGOING' | 'SYNC_DONE' | 'SYNC_ERROR',
             rowCount?: number,
             lastRowUploaded?: number,
-            error?: number 
+            error?: number,
+            serverSideRowCount?: number | null // null in case of error sent during server-side retrieval process
         }
     },
 };
@@ -45,9 +46,18 @@ class CheckDataSyncController extends PureComponent<Props, State> {
     }
 
     componentDidMount() {
-        // @warning @todo Make sure the automatic aware sync is off duroing the
-        //          onboarding process as listened sync events could be 
-        //          overriden by it!
+        // @todo Make sure the automatic aware sync is off duroing the
+        //     onboarding process as listened sync events could be overriden by
+        //     it!
+
+        // Disable automatic mandatory wifi & battery for sync.
+        // @note This can't easily be done inside the Aware.syncData() method
+        //     as all these processes are completely decoupled & asynchrone,
+        //     without any result feedback inside the default aware source
+        //     code. We thus do it at the controller opening & closing.
+        AwareManager.disableAutomaticSync();
+        AwareManager.disableMandatoryWifiForSync();
+        AwareManager.disableMandatoryBatteryForSync();
 
         // Listen to sync events & update react state accordingly.
         this._unlistenSyncEvents = AwareManager.listenSyncEvents({
@@ -58,29 +68,61 @@ class CheckDataSyncController extends PureComponent<Props, State> {
         });
     }
 
+    componentWillUnmount() {
+        // Enable back automatic mandatory wifi & battery for sync on controller exit.
+        // @note This can't easily be done inside the Aware.syncData() method
+        //     as all these processes are completely decoupled & asynchrone,
+        //     without any result feedback inside the default aware source
+        //     code. We thus do it at the controller opening & closing.
+        // @warning This is bad design as it overrides the settings set through
+        //     the web UI, making these useless without warning the user!
+        // @warning @todo !!! This is problematic of the app crashes during the
+        //     check data onboarding process as automatic sync will never be
+        //     resumed !!! This is dirty-patched by launch-time method call in
+        //     StudySchemaAdapter in the meanwhile.
+        AwareManager.enableMandatoryBatteryForSync();
+        AwareManager.enableMandatoryWifiForSync();
+        AwareManager.enableAutomaticSync();
+    }
+
     // List of table to sync, so we know when the upload as finished.
     // @warning This has to be kept in sync depending on the study!
     // @todo Retrieve this table dynamically from Aware!
     tableToSync = [
         'accelerometer',
-        'applications',
+        'aware_device',
+        'aware_log',
+        'aware_studies',
         'battery',
-        'communication',
+        'battery_charges',
+        'battery_discharges',
         'calls',
-        'messages',
+        'cdma',
+        'gsm',
+        'gsm_neighbor',
         'gyroscope',
-        'location_gps',
-        'network_events',
+        'light',
+        'locations',
+        'messages',
+        'network',
         'network_traffic',
         'processor',
         'proximity',
+        'rotation',
         'screen',
+        'sensor_accelerometer',
+        'sensor_gyroscope',
+        'sensor_light',
+        'sensor_proximity',
+        'sensor_rotation',
+        'sensor_wifi',
         'telephony',
+        'touch',
         'wifi',
     ];
 
     onTableSyncStarted = ({ table, rowCount }) => {
-        // Update current table state.
+        // Init current table state.
         this.setState(s => ({
             ...s,
             syncStatus: {
@@ -89,7 +131,8 @@ class CheckDataSyncController extends PureComponent<Props, State> {
                     status: 'SYNC_ONGOING',
                     rowCount: rowCount,
                     lastRowUploaded: 0,
-                    error: undefined
+                    error: undefined,
+                    serverSideRowCount: undefined
                 }
             }
         }));
@@ -104,12 +147,12 @@ class CheckDataSyncController extends PureComponent<Props, State> {
                     ...s.syncStatus[table],
                     status: 'SYNC_ONGOING',
                     rowCount: rowCount,
-                    lastRowUploaded: lastRowUploaded,
+                    lastRowUploaded: lastRowUploaded
                 }
             }
         }));
     };
-    onTableSyncFinished = ({ table }) => {
+    onTableSyncFinished = async ({ table }) => {
         // Update current table state.
         this.setState(s => ({
             ...s,
@@ -131,6 +174,48 @@ class CheckDataSyncController extends PureComponent<Props, State> {
                 this.onFullSyncFinished();
             }
         });
+
+        // Check table status server-side !
+        try {
+            const serverSideTableRowCount = await AwareManager.getSyncedDataCheckupForTable(table);
+
+            // Update current table state.
+            this.setState(s => ({
+                ...s,
+                syncStatus: {
+                    ...s.syncStatus,
+                    [table]: {
+                        ...s.syncStatus[table],
+                        status: 'SYNC_DONE',
+                        // @note As lastRowUploaded is only sync in
+                        //       onTableSyncBatchStarted, last one update is
+                        //       missing so we update it manually!
+                        lastRowUploaded: s.syncStatus[table].rowCount,
+                        serverSideRowCount: serverSideTableRowCount
+                    }
+                }
+            }));
+        }
+        // Error while counting synced data server-side!
+        catch (e) {
+            console.error('Error while counting synced data server-side!', table, e);
+
+            this.setState(s => ({
+                ...s,
+                syncStatus: {
+                    ...s.syncStatus,
+                    [table]: {
+                        ...s.syncStatus[table],
+                        status: 'SYNC_DONE',
+                        // @note As lastRowUploaded is only sync in
+                        //       onTableSyncBatchStarted, last one update is
+                        //       missing so we update it manually!
+                        lastRowUploaded: s.syncStatus[table].rowCount,
+                        serverSideRowCount: null,
+                    }
+                }
+            }));
+        }
     };
     onTableSyncFailed = ({ table, error }) => {
         // Update current table state.
@@ -165,7 +250,7 @@ class CheckDataSyncController extends PureComponent<Props, State> {
     onFullSyncFinished = () => {
         // Check synced data server-side!
         try {
-            let dataCheckup = AwareManager.getSyncDataCheckup();
+            let dataCheckup = AwareManager.getSyncedDataCheckup();
             console.log('dataCheckup', dataCheckup);
         }
         catch (e) {
