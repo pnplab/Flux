@@ -3,7 +3,7 @@
 const path = require('path');
 import wd from 'wd';
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
 
 const { driver, capabilities } = generateSetup();
 
@@ -36,14 +36,62 @@ describe('SomeComponent', () => {
         // our test actions and expectations.
         // expect(await driver.hasElementByAccessibilityId('testview')).toBe(true);
 
-        // Seek elements for 5s if not found from start.
-        await driver.setImplicitWaitTimeout(5000);
+        // Seek elements for 20s if not found from start.
+        await driver.setImplicitWaitTimeout(20000);
 
-        let el1 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.widget.EditText");
-        // await el1.click();
-        await el1.sendKeys("4wc2uw");
-        let el2 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup");
+        let el1 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.EditText");
+        await el1.click();
+        await el1.sendKeys("qa");
+        let el2 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[2]/android.widget.EditText");
         await el2.click();
+        await el2.sendKeys("4wc2uw");
+        let el3 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[3]/android.widget.TextView");
+        await el3.click();
+        let el4 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.widget.TextView");
+        await el4.click();
+        let el5 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup[8]/android.widget.TextView");
+        await el5.click();
+        let el6 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.TextView");
+        await el6.click();
+        let el7 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.TextView");
+        await el7.click();
+        
+        // // Start survey task
+        // let el8 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.TextView");
+        // await el8.click();
+        
+        // // Finish survey task
+        // // Wait for the list to be loaded.
+        // driver.sleep(5000);
+        // // Scroll a lot!
+        // for (let i=0; i<20; ++i) {
+        //     let scrollAction = new wd.TouchAction(driver);
+        //     scrollAction
+        //         // @note y starts from the top bar, thus we don't start from 0!
+        //         .longPress({x: 50, y: 150})
+        //         .moveTo({x: 50, y: 600})
+        //         .release();
+        //     await scrollAction.perform();
+        // }
+
+        // let el9 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[8]/android.view.ViewGroup");
+        // await el9.click();
+        // // Resting state
+        // let restingStateButton = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.TextView");
+        // // Long press
+        // let action = new wd.TouchAction(driver);
+        // action.longPress({el: restingStateButton});
+        // await action.perform();
+
+        // // Sync data
+        // let el10 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.TextView");
+        // await el10.click();
+
+        // let el1 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.widget.EditText");
+        // await el1.click();
+        // await el1.sendKeys("4wc2uw");
+        // let el2 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup");
+        // await el2.click();
 
         // Do not start study yet has it depends on the current time!
         // let el3 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[2]");
@@ -59,8 +107,6 @@ function generateSetup() {
     if (typeof process.env.DEVICEFARM_DEVICE_NAME !== 'undefined') {
         console.log('Setup tests in aws device farm.');
 
-        const app_path = '/Users/medullosuprarenal/Documents/_eeg/pristine/Flux/android/app/build/outputs/apk/release/app-x86-release.apk';
-
         const SERVER_PORT = 4723;
         const SERVER_URL = 'localhost';
 
@@ -72,14 +118,16 @@ function generateSetup() {
 
             // Set app path for upload & installation, otherwise use `'bundleId':
             // 'org.pnplab.flux'` to prevent reinstall.
-            app: path.resolve(process.env.DEVICEFARM_APP_PATH),
+            // app: path.resolve(process.env.DEVICEFARM_APP_PATH),
 
-            platformName: process.env.DEVICEFARM_DEVICE_PLATFORM_NAME,
+            // platformName: process.env.DEVICEFARM_DEVICE_PLATFORM_NAME,
 
-            deviceName: process.env.DEVICEFARM_DEVICE_NAME,
-            udid: process.env.DEVICEFARM_DEVICE_UDID,
+            // deviceName: process.env.DEVICEFARM_DEVICE_NAME,
+            // udid: process.env.DEVICEFARM_DEVICE_UDID,
 
-            androidScreenshotPath: process.env.DEVICEFARM_SCREENSHOT_PATH,
+            // androidScreenshotPath: process.env.DEVICEFARM_SCREENSHOT_PATH,
+
+            automationName: 'UiAutomator2',
 
             // Make sure we reset the permissions
             fullReset: true, 
@@ -119,16 +167,20 @@ function generateSetup() {
         const CAPABILITIES = {
             platformName: 'Android',
             deviceName: 'Android Emulator',
+            // deviceName: '5505a915',
 
             // Set app path for upload & installation, otherwise use `'bundleId':
             // 'org.pnplab.flux'` to prevent reinstall.
             app: app_path,
+            // appPackage: 'org.pnplab.flux',
 
             // Make sure we reset the permissions
-            fullReset: true,
+            // fullReset: true,
 
             // Auto accept dialogs
             autoGrantPermissions: true,
+
+            automationName: 'UiAutomator2',
 
             // ios @todo convert from python
             //

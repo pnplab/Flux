@@ -2,7 +2,7 @@
 
 set -e
 
-echo "\[$1\] APP_PATH=/Users/medullosuprarenal/Documents/_eeg/pristine/Flux/android/app/build/outputs/apk/release/app-universal-release.apk"
+echo "\[\$1\] APP_PATH=/Users/medullosuprarenal/Documents/_eeg/pristine/Flux/android/app/build/outputs/apk/release/app-universal-release.apk"
 echo "@warning Build app first!"
 echo "@warning First configure aws using \`aws configure\`."
 echo -e "\tsee https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html"
