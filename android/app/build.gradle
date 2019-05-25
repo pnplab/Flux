@@ -135,6 +135,10 @@ android {
         resValue "string", "provider_timezones", android.defaultConfig.applicationId + ".provider.timezone"
         resValue "string", "provider_traffic", android.defaultConfig.applicationId + ".provider.traffic"
         resValue "string", "provider_wifi", android.defaultConfig.applicationId + ".provider.wifi"
+        
+        ndk {
+            abiFilters 'armeabi-v7a', 'x86'
+        }
     }
     compileOptions {
         sourceCompatibility 1.8
@@ -156,7 +160,13 @@ android {
             enable enableSeparateBuildPerCPUArchitecture
             universalApk true  // If true, also generate a universal APK
             // universalApk true
-            include "armeabi-v7a", "x86", "arm64-v8a"
+            // @note realmdb not ready for arm64 yet! Thus app crashes on 
+            //       linking! latest realm version now supports it but we dont
+            //       need 64bit support yet anyway.
+            // @todo update realmdb to latest version to support 64bit and try
+            //       arm64-v8a again (muse wont probably work). Do the same
+            //       w/ abiFilters!
+            include 'armeabi-v7a', 'x86' //, "arm64-v8a"
         }
     }
     buildTypes {
