@@ -171,7 +171,13 @@ android {
     }
     buildTypes {
         release {
-            debuggable false
+            // just so we can have logs inside appium E2E tests, as using the debug
+            // apk will fail due to react-native using dynamic javascript view in this
+            // mode which will make appium crash by changing android view's element
+            // position.
+            // @todo set back to false for official release or use env variable to set this!
+            debuggable true
+
             minifyEnabled enableProguardInReleaseBuilds
             shrinkResources enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
