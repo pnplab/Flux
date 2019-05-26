@@ -122,6 +122,8 @@ class CheckDataSyncController extends PureComponent<Props, State> {
     ];
 
     onTableSyncStarted = ({ table, rowCount }) => {
+        console.log('xxx onTableSyncStarted', table, rowCount);
+
         // Init current table state.
         this.setState(s => ({
             ...s,
@@ -138,6 +140,8 @@ class CheckDataSyncController extends PureComponent<Props, State> {
         }));
     };
     onTableSyncBatchStarted = ({ table, rowCount, lastRowUploaded }) => {
+        console.log('xxx onTableSyncBatchStarted', table, rowCount, lastRowUploaded);
+
         // Update current table state.
         this.setState(s => ({
             ...s,
@@ -153,6 +157,8 @@ class CheckDataSyncController extends PureComponent<Props, State> {
         }));
     };
     onTableSyncFinished = async ({ table }) => {
+        console.log('xxx onTableSyncFinished', table);
+
         // Update current table state.
         this.setState(s => ({
             ...s,
@@ -170,14 +176,15 @@ class CheckDataSyncController extends PureComponent<Props, State> {
         }), () => {
             // Trigger onFullSyncFinished once all the tables have either been
             // synced or have thrown an error
-            if (this.isFullSyncFinished()) {
-                this.onFullSyncFinished();
-            }
+            // if (this.isFullSyncFinished()) {
+            //     this.onFullSyncFinished();
+            // }
         });
 
         // Check table status server-side !
         try {
             const serverSideTableRowCount = await AwareManager.getSyncedDataCheckupForTable(table);
+            console.log('xxx serverSideTableRowCount', serverSideTableRowCount);
 
             // Update current table state.
             this.setState(s => ({
@@ -199,6 +206,7 @@ class CheckDataSyncController extends PureComponent<Props, State> {
         // Error while counting synced data server-side!
         catch (e) {
             console.error('Error while counting synced data server-side!', table, e);
+            console.log('xxx error', table, e);
 
             this.setState(s => ({
                 ...s,
@@ -217,7 +225,9 @@ class CheckDataSyncController extends PureComponent<Props, State> {
             }));
         }
     };
-    onTableSyncFailed = ({ table, error }) => {
+    onTableSyncFailed = ({ table, error }) => {  
+        console.log('xxx onTableSyncFailed', table, error);
+
         // Update current table state.
         this.setState(s => ({
             ...s,
@@ -232,9 +242,9 @@ class CheckDataSyncController extends PureComponent<Props, State> {
         }), () => {
             // Trigger onFullSyncFinished once all the tables have either been
             // synced or have thrown an error
-            if (this.isFullSyncFinished()) {
-                this.onFullSyncFinished();
-            }
+            // if (this.isFullSyncFinished()) {
+            //     this.onFullSyncFinished();
+            // }
         });
     };
 
@@ -248,14 +258,16 @@ class CheckDataSyncController extends PureComponent<Props, State> {
             .reduce((a,b) => a && b, true);
     };
     onFullSyncFinished = () => {
-        // Check synced data server-side!
-        try {
-            let dataCheckup = AwareManager.getSyncedDataCheckup();
-            console.log('dataCheckup', dataCheckup);
-        }
-        catch (e) {
-            console.error('dataCheckup failure', e);
-        }
+        // console.log('xxx onFullSyncFinished');
+
+        // // Check synced data server-side!
+        // try {
+        //     let dataCheckup = AwareManager.getSyncedDataCheckup();
+        //     console.log('dataCheckup', dataCheckup);
+        // }
+        // catch (e) {
+        //     console.error('dataCheckup failure', e);
+        // }
     };
 
     componentWillUnmount() {

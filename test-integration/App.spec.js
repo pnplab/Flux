@@ -1,5 +1,3 @@
-// const wd = require('wd');
-
 const path = require('path');
 import wd from 'wd';
 
@@ -39,12 +37,15 @@ describe('SomeComponent', () => {
         // Seek elements for 20s if not found from start.
         await driver.setImplicitWaitTimeout(20000);
 
+        const deviceId = `qa${Math.random().toString(36).substring(2, 10)}`;
+        const studyCode = '4wc2uw';
+
         let el1 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.EditText");
         await el1.click();
-        await el1.sendKeys("qa");
+        await el1.sendKeys(deviceId);
         let el2 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[2]/android.widget.EditText");
         await el2.click();
-        await el2.sendKeys("4wc2uw");
+        await el2.sendKeys(studyCode);
         let el3 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[3]/android.widget.TextView");
         await el3.click();
         let el4 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.widget.TextView");
@@ -55,8 +56,44 @@ describe('SomeComponent', () => {
         await el6.click();
         let el7 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.TextView");
         await el7.click();
+
+        // Required to wait a bit of time for some reason.. `await wd.TouchAction#perform` probably doesn't wait for lazy appearance of button, thus buggy!`
+        await driver.sleep(5000);
         
-        // // Start survey task
+        // Survey Task
+        let surveyButton = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.TextView");
+        // Long press
+        let action = new wd.TouchAction(driver);
+        action
+            .longPress({el: surveyButton})
+            .wait(10000) // 10 sec off the 7 s required (3 sec additional margin).
+            .release();
+        await action.perform();
+
+        // Required to wait a bit of time for some reason.. `await wd.TouchAction#perform` probably doesn't wait for lazy appearance of button, thus buggy!`
+        await driver.sleep(5000);
+
+        // Resting State Task
+        let restingStateButton = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.TextView");
+        // Long press
+        let action2 = new wd.TouchAction(driver);
+        action2
+            .longPress({el: restingStateButton})
+            .wait(10000) // 10 sec off the 7 s required (3 sec additional margin).
+            .release();
+        await action2.perform();
+
+        // Trigger sync 
+        await driver.sleep(1000);
+        let el8 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.TextView");
+        await el8.click();
+
+        // Wait 15 min till data are uploaded.
+        await driver.sleep(1000*15);
+
+
+
+        // Start survey task
         // let el8 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.TextView");
         // await el8.click();
         
@@ -158,7 +195,13 @@ function generateSetup() {
         // @todo use argv[1] w/ default
         // py:    app = path.abspath(argv[1])
         //        debug: /Users/medullosuprarenal/Documents/_eeg/pristine/Flux/android/app/build/outputs/apk/debug/app-universal-debug.apk
-        const app_path = '/Users/medullosuprarenal/Documents/_eeg/pristine/Flux/android/app/build/outputs/apk/release/app-universal-release.apk';
+        // 
+        // @warning does not work with debug apk as it will fail due to
+        //     react-native using dynamic javascript view in this mode which
+        //     will make appium crash by changing android view's element
+        //     position in dom! Use release apk with graddle debuggable
+        //     proporty on instead.
+        const app_path = '/Users/medullosuprarenal/Documents/_eeg/pristine/build/release/app-universal-release.apk';
 
         const SERVER_PORT = 4723;
         const SERVER_URL = 'localhost';
@@ -175,7 +218,7 @@ function generateSetup() {
             // appPackage: 'org.pnplab.flux',
 
             // Make sure we reset the permissions
-            // fullReset: true,
+            fullReset: true,
 
             // Auto accept dialogs
             autoGrantPermissions: true,

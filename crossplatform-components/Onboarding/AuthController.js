@@ -60,6 +60,12 @@ class AuthController extends PureComponent<Props, State> {
             return;
         }
 
+        // @todo
+        // if (!/^$/.test(this.state.currentParticipantId)) {
+        //     this.setState({ error: 'mauvais format de numéro d\'identification' });
+        //     return;
+        // }
+
         if (this.state.currentPassword !== this.props.activationPassword) {
             this.setState({ error: 'code d\'accès erroné' });
             return;

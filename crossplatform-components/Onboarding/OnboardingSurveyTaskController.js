@@ -62,6 +62,7 @@ class OnboardingSurveyTaskController extends PureComponent<Props, State> {
             return (
                 <OnboardingSurveyTaskView
                     onStartTask={this.onStartTask}
+                    onBypassTask={this.goToNextStep}
                 />
             );
         case 'task':
