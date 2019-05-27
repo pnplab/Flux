@@ -94,13 +94,7 @@ describe('SomeComponent', () => {
         await el8.click();
 
         // Wait 10 min till data are uploaded.
-        // Because newCommandTimeout is 60sec by default and we don't want to
-        // increase it, we sleep by multiple of 30 sec.
-        const total_sleep = 1000 * 60 * 10; // 10min
-        const sleep_chunk = 1000 * 30; // 30sec
-        for (let current_sleep = 0; current_sleep < total_sleep; current_sleep += sleep_chunk) {
-            await driver.sleep(sleep_chunk);
-        }
+        await driver.sleep(1000 * 60 * 10);
 
         // Start survey task
         // let el8 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.TextView");
