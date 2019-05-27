@@ -48,12 +48,16 @@ describe('SomeComponent', () => {
         await el2.sendKeys(studyCode);
         let el3 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[3]/android.widget.TextView");
         await el3.click();
+        await driver.sleep(500);
         let el4 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.widget.TextView");
         await el4.click();
+        await driver.sleep(500);
         let el5 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup[8]/android.widget.TextView");
         await el5.click();
+        await driver.sleep(500);
         let el6 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.TextView");
         await el6.click();
+        await driver.sleep(500);
         let el7 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.TextView");
         await el7.click();
 
@@ -88,9 +92,8 @@ describe('SomeComponent', () => {
         let el8 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.TextView");
         await el8.click();
 
-        // Wait 15 min till data are uploaded.
-        await driver.sleep(1000*15);
-
+        // Wait 10 min till data are uploaded.
+        await driver.sleep(1000*60*10);
 
 
         // Start survey task
