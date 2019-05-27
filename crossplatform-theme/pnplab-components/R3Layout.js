@@ -27,6 +27,8 @@ const R3Content = styled(View)`
 
 const R3Footer = styled(View)`
         height: 100px;
+        flex-direction: row;
+        justify-content: space-evenly;
         flex-shrink: 0;
         justify-content: center;
         align-items: center;

@@ -46,6 +46,7 @@ public class Plugin extends Aware_Plugin {
 
     @Override
     public void onCreate() {
+
         super.onCreate();
 
         //This allows plugin data to be synced on demand from broadcast Aware#ACTION_AWARE_SYNC_DATA

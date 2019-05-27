@@ -58,11 +58,11 @@ const CheckDataSyncView = ({ syncStatus, currentStep, onSyncData, onSubmit }: Pr
             </R3Content>
             <R3Footer>
                 {
-                    currentStep === 'TEXT' &&
-                    <CircleButton type="validate" color="blue" onPress={onSyncData} />
+                    (currentStep === 'TEXT' || true) &&
+                    <CircleButton type="validate" color="blue" onPress={onSyncData} accessibilityLabel="SyncButton" />
                 }
                 {
-                    currentStep === 'SYNC_DONE' &&
+                    (currentStep === 'SYNC_DONE' || true) &&
                     <CircleButton type="next" color="green" onPress={undefined} />
                 }
             </R3Footer>

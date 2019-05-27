@@ -44,10 +44,10 @@ public class Survey {
             BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                    // Unregister receiver on first event received ! (listen only once)
-                    context.unregisterReceiver(this);
-                    // Start plugin.
-                    Aware.startPlugin(context, "org.pnplab.flux.awareplugin.survey");
+                // Unregister receiver on first event received ! (listen only once)
+                context.unregisterReceiver(this);
+                // Start plugin.
+                Aware.startPlugin(context, "org.pnplab.flux.awareplugin.survey");
                 }
             };
             IntentFilter filter = new IntentFilter();

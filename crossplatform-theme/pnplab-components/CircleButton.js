@@ -15,7 +15,8 @@ type Props = {
     +disabled?: boolean,
     +color?: 'blue' | 'green',
     +onLongPress?: () => void,
-    +delayLongPress?: number
+    +delayLongPress?: number,
+    +accessibilityLabel?: string
 };
 
 // Views
@@ -32,8 +33,8 @@ const VTouchableOpacity = styled(TouchableOpacity)`
 `;
 
 // Components
-const CircleButton = ({ onPress, type, color = undefined, disabled = false, onLongPress = undefined, delayLongPress = undefined}: Props) => (
-    <VTouchableOpacity disabled={disabled} color={color} onPress={onPress} onLongPress={onLongPress} delayLongPress={delayLongPress}>
+const CircleButton = ({ onPress, type, color = undefined, disabled = false, onLongPress = undefined, delayLongPress = undefined, accessibilityLabel = undefined}: Props) => (
+    <VTouchableOpacity disabled={disabled} color={color} onPress={onPress} onLongPress={onLongPress} delayLongPress={delayLongPress} accessibilityLabel={accessibilityLabel}>
         {
             type === 'next' &&
                 <Icon 

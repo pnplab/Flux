@@ -35,7 +35,7 @@ describe('SomeComponent', () => {
         // expect(await driver.hasElementByAccessibilityId('testview')).toBe(true);
 
         // Seek elements for 20s if not found from start.
-        await driver.setImplicitWaitTimeout(20000);
+        await driver.setImplicitWaitTimeout(1000 * 20);
 
         const deviceId = `qa${Math.random().toString(36).substring(2, 10)}`;
         const studyCode = '4wc2uw';
@@ -89,14 +89,15 @@ describe('SomeComponent', () => {
 
         // Trigger sync 
         await driver.sleep(1000);
-        let el8 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.TextView");
+        let [ el8 ] = await driver.elementsByAccessibilityId("SyncButton");
+        // let el8 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.TextView");
         await el8.click();
 
         // Wait 10 min till data are uploaded.
         // Because newCommandTimeout is 60sec by default and we don't want to
         // increase it, we sleep by multiple of 30 sec.
-        const total_sleep = 1000*60*10; // 10min
-        const sleep_chunk = 1000*30; // 30sec
+        const total_sleep = 1000 * 60 * 10; // 10min
+        const sleep_chunk = 1000 * 30; // 30sec
         for (let current_sleep = 0; current_sleep < total_sleep; current_sleep += sleep_chunk) {
             await driver.sleep(sleep_chunk);
         }
@@ -172,6 +173,10 @@ function generateSetup() {
 
             // androidScreenshotPath: process.env.DEVICEFARM_SCREENSHOT_PATH,
 
+            // Disable newCommandTimeout so timeout doesn't occurs while we 
+            // wait 15min for data to sync without triggering any command.
+            newCommandTimeout: 0,
+
             automationName: 'UiAutomator2',
 
             // Make sure we reset the permissions
@@ -230,6 +235,10 @@ function generateSetup() {
 
             // Auto accept dialogs
             autoGrantPermissions: true,
+
+            // Disable newCommandTimeout so timeout doesn't occurs while we 
+            // wait 15min for data to sync without triggering any command.
+            newCommandTimeout: 0,
 
             automationName: 'UiAutomator2',
 
