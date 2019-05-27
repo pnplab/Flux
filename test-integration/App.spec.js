@@ -1,3 +1,7 @@
+// @warning When computer go to sleep, emulator can enter a weird state where
+//      ssl connections to the server fail. The solution is to restart the
+//      emulator!
+
 const path = require('path');
 import wd from 'wd';
 
@@ -94,7 +98,9 @@ describe('SomeComponent', () => {
         await el8.click();
 
         // Wait 10 min till data are uploaded.
-        await driver.sleep(1000 * 60 * 10);
+        await driver.sleep(1000 * 60 * 5);
+        await el8.click();
+        await driver.sleep(1000 * 60 * 5);
 
         // Start survey task
         // let el8 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.TextView");
