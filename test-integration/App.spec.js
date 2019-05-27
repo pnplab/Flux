@@ -1,7 +1,7 @@
 const path = require('path');
 import wd from 'wd';
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000*60*15; // 15min timeout!
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000*60*15; // 15min timeout, as there is a very long waiting time set to sync data! 
 
 const { driver, capabilities } = generateSetup();
 
