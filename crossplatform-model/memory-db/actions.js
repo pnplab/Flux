@@ -33,6 +33,10 @@ export const onboarding: {
         studyPassword: studyPassword,
         participantId: participantId
     }),
+    setAwareStudyState: (hasBeenSuccessfullyJoined: boolean) => ({
+        type: 'ONBOARDING.SET_AWARE_STUDY_STATE',
+        hasBeenSuccessfullyJoined: hasBeenSuccessfullyJoined
+    }),
     confirmPhenotyping: () => ({
         type: 'ONBOARDING.CONFIRM_PHENOTYPING'
     }),

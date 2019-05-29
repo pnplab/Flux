@@ -7,6 +7,7 @@ export type Action =
     | {| +type: 'ONBOARDING.CONFIRM_NETWORK' |}
     | {| +type: 'ONBOARDING.CONFIRM_PERMISSIONS' |}
     | {| +type: 'ONBOARDING.INITIALIZE_STUDY', +studyPassword: string, +participantId: string |}
+    | {| +type: 'ONBOARDING.SET_AWARE_STUDY_STATE', +hasBeenSuccessfullyJoined: boolean |}
     | {| +type: 'ONBOARDING.CONFIRM_PHENOTYPING' |}
     | {| +type: 'ONBOARDING.SUBMIT_SURVEY', +timestamp: number, +payload: {| [questionId: string]: number |} |}
     | {| +type: 'ONBOARDING.CONFIRM_SURVEY_TASK' |}

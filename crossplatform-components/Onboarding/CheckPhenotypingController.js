@@ -22,7 +22,8 @@ type Props = {
     +studyPassword: string,
     +participantId: string,
     +confirmPhenotyping: () => void,
-    +initializeStudy: (string, string) => void
+    +initializeStudy: (string, string) => void,
+    +isAwareStudyJoined: boolean
 };
 type State = {
     +step: 'activate-aware' | 'next'
@@ -34,7 +35,7 @@ class CheckPhenotypingController extends PureComponent<Props, State> {
         super(props);
 
         this.state = {
-            step: 'activate-aware'
+            
         };
     }
 
@@ -51,14 +52,6 @@ class CheckPhenotypingController extends PureComponent<Props, State> {
         
         // Initialize aware.
         this.props.initializeStudy(studyPassword, participantId);
-
-        // @note Use a setTimeout to make sure setState is done after the study 
-        // is initialized. The button will thus change only when the study has
-        // been initialized! This works as initializeStudy is done 
-        // sequencialy (but in 'js asynchronicty', on the js queue).
-        setTimeout(() => {
-            this.setState({ step: 'next' });
-        });
     }
 
     // Go to next step when the user pushes the submit button!
@@ -69,8 +62,8 @@ class CheckPhenotypingController extends PureComponent<Props, State> {
     render() {
         return (
             <CheckPhenotypingView
-                onActivateAware={this.state.step === 'activate-aware' && this.onActivateAware}
-                onNext={this.state.step === 'next' && this.onSubmit}
+                onActivateAware={!this.props.isAwareStudyJoined && this.onActivateAware}
+                onNext={this.props.isAwareStudyJoined && this.onSubmit}
             />
         );
     }
@@ -81,6 +74,7 @@ class CheckPhenotypingController extends PureComponent<Props, State> {
 const mapStateToProps = (state: AppState /*, ownProps*/) => ({
     studyPassword: state.onboarding.studyPassword,
     participantId: state.onboarding.participantId,
+    isAwareStudyJoined: state.onboarding.isAwareStudyJoined
 });
 
 const mapDispatchToProps = {

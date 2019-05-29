@@ -45,8 +45,25 @@ class CheckDataSyncController extends PureComponent<Props, State> {
         };
     }
 
-    componentDidMount() {
-        // @todo Make sure the automatic aware sync is off duroing the
+    async componentDidMount() {
+        // // @debug 
+        // if (typeof process.env.FLUX_ENCRYPTION_KEY === 'undefined') {
+        //     throw new Error('process.env.FLUX_ENCRYPTION_KEY is undefined!');
+        // }
+        // let encryptionKey = process.env.FLUX_ENCRYPTION_KEY;
+        // let participantId = 'yoh';
+        
+        // // let deviceId = DeviceInfo.getUniqueID();
+        // // console.log('DEVICE_ID', deviceId);
+
+        // await AwareManager.requestPermissions();
+        // AwareManager.startAware(participantId, encryptionKey);
+        // await AwareManager.joinStudy('https://www.pnplab.ca/index.php/webservice/index/2/UvxJCl3SC4J3'); // @todo change url based on study.
+        // // /@debug
+
+        
+
+        // @todo Make sure the automatic aware sync is off during the
         //     onboarding process as listened sync events could be overriden by
         //     it!
 

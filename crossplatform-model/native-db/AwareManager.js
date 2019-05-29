@@ -77,8 +77,8 @@ class AwareManager {
         this._awareManager.stopAware();
     }
 
-    joinStudy(studyUrl: string) {
-        this._awareManager.joinStudy(studyUrl);
+    async joinStudy(studyUrl: string) {
+        await this._awareManager.joinStudy(studyUrl);
     }
 
     addSurveyData(timestamp: number, payload: {| [questionId: string]: number |}) {

@@ -42,6 +42,16 @@ export default function reducer(state: State = initialState, action: Action): St
                 // Set the study as initialized.
                 hasStudyBeenInitialized: true
             };
+        case 'ONBOARDING.SET_AWARE_STUDY_STATE':
+            // Set aware study has joined so we can display the "go next step" 
+            // button in onboarding phenotyping step.
+            return {
+                ...state,
+                onboarding: {
+                    ...state.onboarding,
+                    isAwareStudyJoined: true
+                }
+            };
         case 'ONBOARDING.CONFIRM_PHENOTYPING':
             return {
                 ...state,

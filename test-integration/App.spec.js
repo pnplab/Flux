@@ -228,10 +228,10 @@ function generateSetup() {
             // Set app path for upload & installation, otherwise use `'bundleId':
             // 'org.pnplab.flux'` to prevent reinstall.
             app: app_path,
-            // appPackage: 'org.pnplab.flux',
+            appPackage: 'org.pnplab.flux',
 
             // Make sure we reset the permissions
-            fullReset: true,
+            // fullReset: true,
 
             // Auto accept dialogs
             autoGrantPermissions: true,

@@ -76,7 +76,7 @@ public class AwareManagerModule extends ReactContextBaseJavaModule {
         //      react-native! permission should be requested before #startAware is called!).
         Aware.startAWARE(getReactApplicationContext().getApplicationContext());
 
-        // Create aware plugin interfaces (but don't start them until the study has been joined)
+        // Create aware plugin interfaces (but don't start them until the study has been joined).
         _survey = new Survey();
     }
 
@@ -88,11 +88,25 @@ public class AwareManagerModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void joinStudy(String studyUrl) {
+    public void joinStudy(String studyUrl, Promise promise) {
         ReactApplicationContext context = getReactApplicationContext();
 
+        // Resolve promise once study has been joined.
+        BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                // Unregister receiver on first event received ! (listen only once)
+                context.unregisterReceiver(this);
+                // Resolve promise.
+                promise.resolve(null);
+            }
+        };
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Aware.ACTION_JOINED_STUDY);
+        context.registerReceiver(broadcastReceiver, filter);
+
+        // Join study.
         Aware.joinStudy(context, studyUrl);
-        // Aware.joinStudy(context, "https://api.awareframework.com/index.php/webservice/index/2310/SYd7YMg0Sgnz");
 
         // Start survey plugin
         _survey.start(context);
