@@ -35,6 +35,10 @@ const initialState: State = {
             
         }
     },
+
+    aware: {
+        hasStudyBeenJoined: false,
+    }
 };
 
 export default initialState;

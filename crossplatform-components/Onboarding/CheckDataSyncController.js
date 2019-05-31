@@ -9,6 +9,7 @@
  */
 
 import type { State as AppState } from '../../crossplatform-model/memory-db/types';
+import { aware } from '../../crossplatform-model/memory-db/actions';
 import AwareManager from '../../crossplatform-model/native-db/AwareManager';
 
 import React, { PureComponent } from 'react';
@@ -61,7 +62,10 @@ class CheckDataSyncController extends PureComponent<Props, State> {
         // await AwareManager.joinStudy('https://www.pnplab.ca/index.php/webservice/index/2/UvxJCl3SC4J3'); // @todo change url based on study.
         // // /@debug
 
-        
+        // @warning The aware study has to have webservices disabled in the
+        //     dashboard otherwise sync will occurs from the beginning and wont
+        //     be done during this step, even if the webservice is disabled
+        //     as soon as the study is joined!
 
         // @todo Make sure the automatic aware sync is off during the
         //     onboarding process as listened sync events could be overriden by
@@ -86,6 +90,8 @@ class CheckDataSyncController extends PureComponent<Props, State> {
     }
 
     componentWillUnmount() {
+        this.props.unlistenDataSync
+
         // Enable back automatic mandatory wifi & battery for sync on controller exit.
         // @note This can't easily be done inside the Aware.syncData() method
         //     as all these processes are completely decoupled & asynchrone,
@@ -322,7 +328,7 @@ const mapStateToProps = (state: AppState /*, ownProps*/) => ({
 });
 
 const mapDispatchToProps = {
-
+    unlistenDataSync: aware.unlistenDataSync
 };
 
 export default connect(

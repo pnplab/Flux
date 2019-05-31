@@ -37,6 +37,13 @@ export type Action =
     | {| +type: 'GRAPH.SYMPTOM.LOAD_SYMPTOMS' |}
     | {| +type: 'GRAPH.SYMPTOM.COMPLETE_LOAD_SYMPTOMS', +records: $PropertyType<$PropertyType<State, 'symptomGraph'>, 'symptomRecords'> |}
     | {| +type: 'GRAPH.SYMPTOM.OPEN_GRAPH' |}
+    // Aware.
+    | {| +type: 'AWARE.LISTEN_DATA_SYNC' |}
+    | {| +type: 'AWARE.UNLISTEN_DATA_SYNC' |}
+    | {| +type: 'AWARE.REQUEST_ALL_PERMISSIONS' |}
+    | {| +type: 'AWARE.START' |}
+    | {| +type: 'AWARE.JOIN_STUDY', +studyUrl: string |}
+    | {| +type: 'AWARE.JOIN_STUDY_SUCCEEDED' |}
 
 export type Route =
     | '/'
@@ -86,6 +93,11 @@ export type State = {|
                 [formSubmissionTimestamp: string]: number
             }
         },
+    |},
+
+    // State related to aware.
+    +aware: {|
+        +hasStudyBeenJoined: boolean
     |}
 |};
 

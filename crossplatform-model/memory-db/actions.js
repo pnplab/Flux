@@ -136,3 +136,25 @@ export const symptomGraph: {
         type: 'GRAPH.SYMPTOM.OPEN_GRAPH',
     })
 };
+
+export const aware = {
+    listenDataSync: () => ({
+        type: 'AWARE.LISTEN_DATA_SYNC'
+    }),
+    unlistenDataSync: () => ({
+        type: 'AWARE.UNLISTEN_DATA_SYNC'
+    }),
+    requestAllPermissions: () => ({
+        type: 'AWARE.REQUEST_ALL_PERMISSIONS'
+    }),
+    start: () => ({
+        type: 'AWARE.START'
+    }),
+    joinStudy: (studyUrl: string) => ({
+        type: 'AWARE.JOIN_STUDY',
+        studyUrl: studyUrl
+    }),
+    joinStudySucceeded: () => ({
+        type: 'AWARE.JOIN_STUDY_SUCCEEDED'
+    })
+};

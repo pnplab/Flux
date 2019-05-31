@@ -146,6 +146,15 @@ export const syncStudyToRealmMiddleWare = (store: Store) => (next: Dispatch) => 
             //                !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             await AwareManager.joinStudy('https://www.pnplab.ca/index.php/webservice/index/2/UvxJCl3SC4J3'); // @todo change url based on study.
 
+            // Disable automatic mandatory wifi & battery for sync.
+            // @note This can't easily be done inside the Aware.syncData() method
+            //     as all these processes are completely decoupled & asynchrone,
+            //     without any result feedback inside the default aware source
+            //     code. We thus do it at the controller opening & closing.
+            AwareManager.disableAutomaticSync();
+            AwareManager.disableMandatoryWifiForSync();
+            AwareManager.disableMandatoryBatteryForSync();
+
             // Change aware study state once done!
             store.dispatch(onboarding.setAwareStudyState(true));
 
@@ -164,15 +173,6 @@ export const syncStudyToRealmMiddleWare = (store: Store) => (next: Dispatch) => 
         initStudy(action.participantId);
         await initModel(action.participantId);
         
-        // Disable automatic mandatory wifi & battery for sync.
-        // @note This can't easily be done inside the Aware.syncData() method
-        //     as all these processes are completely decoupled & asynchrone,
-        //     without any result feedback inside the default aware source
-        //     code. We thus do it at the controller opening & closing.
-        AwareManager.disableAutomaticSync();
-        AwareManager.disableMandatoryWifiForSync();
-        AwareManager.disableMandatoryBatteryForSync();
-
         break;
 
     case 'INIT_STUDY_AS_INITIALIZED':
