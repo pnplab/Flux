@@ -33,7 +33,7 @@ const AuthView = (props: Props) =>
                 <Form>
                     <Item floatingLabel>
                         <Label>numéro d'identification</Label>
-                        <Input value={props.participantId} onChangeText={participantId => console.log('t', participantId) || props.onParticipantIdChanged(participantId)} />
+                        <Input value={props.participantId} onChangeText={participantId => props.onParticipantIdChanged(participantId)} />
                     </Item>
                     <Item floatingLabel>
                         <Label>code d'accès</Label>
