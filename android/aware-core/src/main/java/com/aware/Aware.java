@@ -1647,6 +1647,18 @@ public class Aware extends Service {
 
     /**
      * Used by self-contained apps to join a study
+     *
+     * @pnplab
+     *
+     * @warning Overrided version of Aware#JoinStudy, with overriden part of study info's request
+     *     result, as server doesn't allow to disable status_mqtt, status_esm & status_webservice.
+     *     We need to disable webservice as it's not possible to disable it from the server and
+     *     having it activated as soon as the study is joined will sync data at the same time !
+     *     Considering we want to have the data sync occuring during the onboarding process so the
+     *     CI system can check if sensors are effectively synced, with data synced too early,
+     *     triggering an asynchronous data sync wont work because the mobile phone OS is in charge
+     *     of handling when the sync occurs and will decide the next sync we trigger later in the
+     *     onboarding process is too early considering a sync just happened.
      */
     public static class JoinStudy extends StudyUtils {
 
@@ -1805,6 +1817,22 @@ public class Aware extends Service {
                                 JSONObject sensor_config = sensors.getJSONObject(i);
                                 String package_name = "com.aware.phone";
                                 if (getApplicationContext().getResources().getBoolean(R.bool.standalone)) package_name = getApplicationContext().getPackageName();
+
+
+                                // @pnplab injected code part !
+                                // @warning !!! dirty code !!!
+                                // @todo allow server to change these values!
+                                // Overrides server-side result to force webservice, esm & mqtt disabling.
+                                if (
+                                        sensor_config.getString("setting").equals("status_webservice") ||
+                                                sensor_config.getString("setting").equals("status_esm") ||
+                                                sensor_config.getString("setting").equals("status_mqtt")
+                                ) {
+                                    sensor_config.put("value", false);
+                                }
+                                // /@pnplab
+
+
                                 Aware.setSetting(getApplicationContext(), sensor_config.getString("setting"), sensor_config.get("value"), package_name);
                             } catch (JSONException e) {
                                 e.printStackTrace();

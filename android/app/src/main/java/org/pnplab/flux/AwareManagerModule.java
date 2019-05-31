@@ -1,15 +1,28 @@
 package org.pnplab.flux;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.DatabaseUtils;
+import android.net.Uri;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.aware.Applications;
 import com.aware.Aware;
 import com.aware.Aware_Preferences;
+import com.aware.providers.Aware_Provider;
 import com.aware.utils.DatabaseHelper;
+import com.aware.utils.Http;
+import com.aware.utils.Https;
+import com.aware.utils.SSLManager;
+import com.aware.utils.Scheduler;
+import com.aware.utils.StudyUtils;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -19,7 +32,15 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.pnplab.flux.awareplugin.survey.Survey;
+
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
 
 public class AwareManagerModule extends ReactContextBaseJavaModule {
 
@@ -97,6 +118,7 @@ public class AwareManagerModule extends ReactContextBaseJavaModule {
             public void onReceive(Context context, Intent intent) {
                 // Unregister receiver on first event received ! (listen only once)
                 context.unregisterReceiver(this);
+                Log.w(Aware.TAG, "---- STUDY JOINED LIST");
                 // Resolve promise.
                 promise.resolve(null);
             }
@@ -107,6 +129,7 @@ public class AwareManagerModule extends ReactContextBaseJavaModule {
 
         // Join study.
         Aware.joinStudy(context, studyUrl);
+        // this.__joinStudy(context, studyUrl);
 
         // Start survey plugin
         _survey.start(context);
