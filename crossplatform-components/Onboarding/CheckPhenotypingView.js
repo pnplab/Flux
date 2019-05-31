@@ -28,7 +28,7 @@ const CheckPhenotypingView = ({ onActivateAware, onNext }: Props) =>
                 }
                 {
                     onNext &&
-                    <CircleButton type="next" color="green" onPress={onNext} />
+                    <CircleButton type="next" color="green" onPress={onNext} accessibilityLabel="NextButton" />
                 }
             </R3Footer>
         </R3Container>
