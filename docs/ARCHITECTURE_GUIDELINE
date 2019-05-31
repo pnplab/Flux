@@ -2,40 +2,74 @@
 
 ## General
 
-- Use latest library versions,
-  as these are pretty unstable (ie. react-native).
+- Use latest library versions, as these are pretty unstable (ie. react-native).
 
-- A single entry point,
-  the entrypoint is in Javascript ReactNative. The UI events are propagated to native when needed.
-  The native-only events are retrieved and listened from js when needed.
-  The JS *always* trigger the native actions (ie. AWARE startup, notification setup, permission request, etc.) !
+- A single entry point, the entrypoint is in Javascript ReactNative. The UI
+  events are propagated to native when needed. The native-only events are
+  retrieved and listened from js when needed. The JS *always* trigger the
+  native actions (ie. AWARE startup, notification setup, permission request,
+  etc.) !
 
-- One store per platform,
-  the models stores aren't synchronized between platforms, instead, native platforms acts as a server,
-  synchronization between native code & javascript redux is handled as a realtime client-server.
-  The synchronization is done when needed and stores doesn't have to have the same structure.
+- One store per platform, the models stores aren't synchronized between
+  platforms, instead, native platforms acts as a server, synchronization
+  between native code & javascript redux is handled as a realtime
+  client-server. The synchronization is done when needed and stores doesn't
+  have to have the same structure.
   
-- One single source of truth per data type,
-  Multiple source of thruth should not emerge from multiple-store architecture. Thus, only one single source 
-  of thruth shall be considered by type of data. Ie, native is the source of thruth for AWARE data, javascript/redux
-  is the source of thruth for UI state. Thus, the source of thruth can sometimes be in the javascript side,
-  sometimes in the native side, depending on constraints (performances, available technologies, ...).
+- One single source of truth per data type, Multiple source of thruth should
+  not emerge from multiple-store architecture. Thus, only one single source of
+  thruth shall be considered by type of data. Ie, native is the source of
+  thruth for AWARE data, javascript/redux is the source of thruth for UI state.
+  Thus, the source of thruth can sometimes be in the javascript side, sometimes
+  in the native side, depending on constraints (performances, available
+  technologies, ...).
 
-- Developer-friendly first,
-  most up-to-date debugging tools are used.
+- Developer-friendly first, most up-to-date debugging tools are used.
 
-- Pristine setup first,
-  everything is installed manually, no boilerplate used so we use latest versions which we expect to be more reliable.
-  We have tried relying on boilerplate matching our requirements (ei. with Muse configurated) but this has proven
-  little avantage over time as these aren't actively updated.
+- Pristine setup first, everything is installed manually, no boilerplate used
+  so we use latest versions which we expect to be more reliable. We have tried
+  relying on boilerplate matching our requirements (ei. with Muse configurated)
+  but this has proven little avantage over time as these aren't actively
+  updated.
 
 ## React-Native
 
-- Folder structure is UI-based,
-  as javascript is primarily used for user interface.
+- Folder structure is UI-based, as javascript is primarily used for user
+  interface.
 
-- No routing libraries, instead,
-  we use Redux to route between screen, so to ensure a single source of thruth for UI state. Indeed synchronization
-  between redux and react-native router libs appeares to be fusy, even when the routing library are designed to do 
-  so. We also have specific constraint, such as enforcing certain user flow without allowing the user to go back (ie. 
-  when the user performs an experiment).
+- No routing libraries, instead, we use Redux to route between screen, so to
+  ensure a single source of thruth for UI state. Indeed synchronization between
+  redux and react-native router libs appeares to be fusy, even when the routing
+  library are designed to do so. We also have specific constraint, such as
+  enforcing certain user flow without allowing the user to go back (ie. when
+  the user performs an experiment).
+
+## Redux
+
+- Redux states & actions have a technical naming-scheme: Redux addresse two-way
+  binding asynchronoucity issues by forcing 1-way databinding, but still
+  decouples dataflow behind multiple technical layers (reducer, actions, state,
+  middlewares, ...). To address this issue and make the dataflow as readable as
+  possible, we choose a technical naming scheme over business-model or
+  UI-driven ones. Thus, redux states & actions are as atomic as possible and
+  accurately reflect what happens. It is generally considered a bad practice,
+  as this brings out the reading of the redux model from the business model and
+  thus require to have a general understanding of the technical intricacies as
+  well as the model to understand what's happening. On the other hand, redux
+  model is already flawful in this regard, as model is hidden aspread through
+  multiple technical side-layers (reducer, actions, middlewares, ...) no matter
+  how you design it, thus making it impossible to read at once. Thus, we
+  provide an simple and accurate dataflow view by relying on the standard MVC
+  pattern on top of redux instead. Using advantages of both patterns by
+  delegating asynchronicity concerns to redux while keeping the technical
+  dataflow understanding MVC brings. Although this is not the motivation, this
+  also eases up debugging by providing exhaustive description of the technical
+  dataflow in tools such as react-native debugger, pointing out potential
+  mistake just by looking at the event records. By naming state through a
+  technical, we also avoid having multiple source of thruth in the store,
+  thus simplifying maintenance.
+
+- Non-redux application-wide side-effects (such as listeners, shared states,
+  aso.) are handled through redux middleware, no matter if they aim to induce a
+  change in the redux store or not, as redux action & reducer can thus provide
+  an accurate & exhaustive description of application-wide side effects.
