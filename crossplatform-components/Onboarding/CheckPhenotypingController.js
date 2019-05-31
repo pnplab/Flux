@@ -9,7 +9,7 @@
  */
 
 import type { State as AppState } from '../../crossplatform-model/memory-db/types';
-import { onboarding, aware } from '../../crossplatform-model/memory-db/actions';
+import { onboarding } from '../../crossplatform-model/memory-db/actions';
 import AwareManager from '../../crossplatform-model/native-db/AwareManager';
 
 import React, { PureComponent } from 'react';
@@ -49,13 +49,6 @@ class CheckPhenotypingController extends PureComponent<Props, State> {
     // Activate aware!
     onActivateAware = () => {
         const { studyPassword, participantId } = this.props;
-
-        // Listen to data sync events so we can use them to assess sync is
-        // working during the check data sync onboarding process. Note we have
-        // no control over when these data sync happens since it's controlled
-        // by the android operating system (which optimise for battery usage
-        // aso), although it usually happens as soon as the study is launched!
-        this.props.listenDataSync();
         
         // Initialize aware.
         this.props.initializeStudy(studyPassword, participantId);
@@ -86,8 +79,7 @@ const mapStateToProps = (state: AppState /*, ownProps*/) => ({
 
 const mapDispatchToProps = {
     initializeStudy: onboarding.initializeStudy,
-    confirmPhenotyping: onboarding.confirmPhenotyping,
-    listenDataSync: aware.listenDataSync,
+    confirmPhenotyping: onboarding.confirmPhenotyping
 };
 
 export default connect(

@@ -215,31 +215,6 @@ export default function reducer(state: State = initialState, action: Action): St
                 }
             };
 
-        case 'AWARE.LISTEN_DATA_SYNC':
-            return state;
-            
-        case 'AWARE.UNLISTEN_DATA_SYNC':
-            return state;
-            
-        case 'AWARE.REQUEST_ALL_PERMISSIONS':
-            return state;
-            
-        case 'AWARE.START':
-            return state;
-            
-        case 'AWARE.JOIN_STUDY':
-            return state;
-            
-        case 'AWARE.JOIN_STUDY_SUCCEEDED':
-            return {
-                ...state,
-                aware: {
-                    ...state.aware,
-                    // Only used in check phenotyping onboarding controller.
-                    hasStudyBeenJoined: true
-                }
-            };
-
         /* ... */
         default:
             (action: empty);
