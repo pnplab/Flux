@@ -8,7 +8,7 @@
 const path = require('path');
 import wd from 'wd';
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000*60*15; // 15min timeout, as there is a very long waiting time set to sync data! 
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000*60*60; // 60min timeout, as there is a very long waiting time set to sync data! 
 
 const { driver, capabilities } = generateSetup();
 
@@ -108,6 +108,15 @@ describe('SomeComponent', () => {
             await driver.sleep(1000 * 60 * 5);
             await el8.click();
             await driver.sleep(1000 * 60 * 5);
+
+            // Wait 20min more!
+            await driver.sleep(1000 * 60 * 10);
+            await el8.click();
+            await driver.sleep(1000 * 60 * 10);
+            await el8.click();
+            await driver.sleep(1000 * 60 * 1);
+
+
         }
         catch (e) {
             // wait 15s before crashing so we can see where the issue happens. 
