@@ -13,7 +13,7 @@ import type { State as AppState } from '../../crossplatform-model/memory-db/type
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 
-import CheckPhenotypingView from './CheckPhenotypingView';
+import OnboardingEndView from './OnboardingEndView';
 
 // Configure types.
 type Props = {
@@ -22,7 +22,7 @@ type State = {
 };
 
 // Configure component logic.
-class CheckPhenotypingController extends PureComponent<Props, State> {
+export default class OnboardingEndController extends PureComponent<Props, State> {
     constructor(props) {
         super(props);
 
@@ -35,29 +35,15 @@ class CheckPhenotypingController extends PureComponent<Props, State> {
 
     // Go to next step when the user pushes the submit button!
     onSubmit = () => {
-
+        this.props.onStepFinished();
     }
 
     render() {
         return (
-            <CheckPhenotypingView
-                onSubmit={onSubmit}
+            <OnboardingEndView
+                onSubmit={this.onSubmit}
             />
         );
     }
 
 }
-
-// Bind comoponent to redux.
-const mapStateToProps = (state: AppState /*, ownProps*/) => ({
-
-});
-
-const mapDispatchToProps = {
-
-};
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(CheckPhenotypingController);

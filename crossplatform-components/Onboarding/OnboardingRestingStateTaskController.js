@@ -27,7 +27,7 @@ type State = {
 };
 
 // Configure component logic.
-class OnboardingRestingStateTaskController extends PureComponent<Props, State> {
+export default class OnboardingRestingStateTaskController extends PureComponent<Props, State> {
     constructor(props) {
         super(props);
 
@@ -45,7 +45,7 @@ class OnboardingRestingStateTaskController extends PureComponent<Props, State> {
     // as they dont have Muse.
     onBypassTask = () => {
         // @todo next go to step!
-        this.props.bypassRestingState();
+        this.props.onStepFinished();
     }
 
     // postponeRestingStateTask = () => {
@@ -69,6 +69,9 @@ class OnboardingRestingStateTaskController extends PureComponent<Props, State> {
         console.warn('@todo store in db!');
 
         // @todo store in db!
+
+        // Go to next step.
+        this.props.onStepFinished();
     }
 
     // Go to next step when the user pushes the submit button!
@@ -104,16 +107,16 @@ class OnboardingRestingStateTaskController extends PureComponent<Props, State> {
 
 }
 
-// Bind comoponent to redux.
-const mapStateToProps = (state: AppState /*, ownProps*/) => ({
+// // Bind comoponent to redux.
+// const mapStateToProps = (state: AppState /*, ownProps*/) => ({
 
-});
+// });
 
-const mapDispatchToProps = {
-    bypassRestingState: onboarding.bypassRestingState
-};
+// const mapDispatchToProps = {
+//     bypassRestingState: onboarding.bypassRestingState
+// };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(OnboardingRestingStateTaskController);
+// export default connect(
+//   mapStateToProps,
+//   mapDispatchToProps
+// )(OnboardingRestingStateTaskController);

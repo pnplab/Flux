@@ -38,7 +38,7 @@ const Router: StatelessFunctionalComponent<Props> = (props: Props): Node => {
         case '/onboarding/check/wifi':
             return <CheckWifi />;
         case '/onboarding/check/permissions':
-            return <CheckPermissions />
+            return <CheckPermissions />;
         case '/onboarding/check/phenotyping':
             return <CheckPhenotyping />;
         case '/onboarding/task/survey':

@@ -13,25 +13,18 @@ type Props = {
 
 };
 
-const CheckPhenotypingView = ({ onSubmit }: Props) => 
+const OnboardingEndView = ({ onSubmit }: Props) => 
     <Container>
         <R3Container>
             <R3Header>
-                <Title>Gestion des Permissions</Title>
+                <Title>Fin</Title>
             </R3Header>
             <R3Content>
             </R3Content>
             <R3Footer>
-                {
-                    onRequestPermission &&
-                    <CircleButton type="validate" color="blue" onPress={onRequestPermission} />
-                }
-                {
-                    onSubmit &&
-                    <CircleButton type="next" color="green" onPress={onSubmit} />
-                }
+                    <CircleButton type="validate" color="blue" onPress={onSubmit} />
             </R3Footer>
         </R3Container>
     </Container>;
 
-export default CheckPhenotypingView;
+export default OnboardingEndView;

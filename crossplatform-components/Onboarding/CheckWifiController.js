@@ -19,14 +19,14 @@ import CheckWifiView from './CheckWifiView';
 
 // Configure types.
 type Props = {
-    +confirmNetwork: () => void,
+    +onStepFinished: () => void,
 };
 type State = {
     +status: 'undefined' | 'none' | 'wifi' | 'cellular' | 'error';
 };
 
 // Configure component logic.
-class CheckWifiController extends PureComponent<Props, State> {
+export default class CheckWifiController extends PureComponent<Props, State> {
 
     constructor(props) {
         super(props);
@@ -69,7 +69,7 @@ class CheckWifiController extends PureComponent<Props, State> {
     }
 
     onSubmit = () => {
-        this.props.confirmNetwork();
+        this.props.onStepFinished();
     }
 
     render() {
@@ -83,16 +83,16 @@ class CheckWifiController extends PureComponent<Props, State> {
 
 }
 
-// Bind comoponent to redux.
-const mapStateToProps = (state: AppState /*, ownProps*/) => ({
+// // Bind comoponent to redux.
+// const mapStateToProps = (state: AppState /*, ownProps*/) => ({
 
-});
+// });
 
-const mapDispatchToProps = {
-    confirmNetwork: onboarding.confirmNetwork
-};
+// const mapDispatchToProps = {
+//     confirmNetwork: onboarding.confirmNetwork
+// };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(CheckWifiController);
+// export default connect(
+//   mapStateToProps,
+//   mapDispatchToProps
+// )(CheckWifiController);

@@ -13,6 +13,7 @@
     "memoize-one": "5.0.0",
     "native-base": "2.12.1",
     "react": "16.6.3",
+    "react-is": "^16.8.6",
     "react-native": "0.58.3",
     "react-native-appupdate": "1.1.2",
     "react-native-dev-menu": "2.0.2",

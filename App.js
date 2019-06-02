@@ -8,16 +8,18 @@
  */
 
 import React, { Component } from 'react';
-import { StatusBar, Alert } from 'react-native';
-import { Provider } from 'react-redux';
-import { StyleProvider } from 'native-base';
+import { Alert } from 'react-native';
 
 import AwareManager from './crossplatform-model/native-db/AwareManager';
-import { store } from './crossplatform-model/memory-db';
-import { getTheme } from './crossplatform-theme/';
 
-import Router from './crossplatform-components/Router';
+// import Router from './crossplatform-components/Router';
 import { triggerUpdateIfNeeded } from './Updater.js';
+
+import {
+    App,
+    Onboarding, Auth, CheckWifi, CheckPermissions, CheckPhenotyping, OnboardingSurveyTask, OnboardingRestingStateTask, CheckDataSync, OnboardingEnd,
+    Home
+} from './crossplatform-components';
 
 // -- About routing
 //
@@ -33,7 +35,7 @@ import { triggerUpdateIfNeeded } from './Updater.js';
 //         necessarily rely on browser history, but can rely on mobile native
 //         mechanism for backward/forward navigation instead. See
 //         `https://github.com/respond-framework/rudy/blob/master/packages/rudy/docs/react-native.md`.
-// 
+//  
 // @warning Rudy's documentation (the redux router) is partly out of date.
 
 // -- About theme and components
@@ -43,20 +45,69 @@ import { triggerUpdateIfNeeded } from './Updater.js';
 //         `./crossplatform/theme` folder.
 
 
-type Props = {};
-
-export default class App extends Component<Props> {
-    render() {
-        return (
-            <StyleProvider style={getTheme()}>
-                <Provider store={store}>
-                    <StatusBar backgroundColor="#FAFAFA" barStyle="dark-content" />
-                    <Router></Router>
-                </Provider>
-            </StyleProvider>
-        );
-    }
-}
+export default () => 
+    <App index={Onboarding}>
+        { 
+            ({ 
+                goTo
+            }) => 
+            <>
+                <Onboarding index={OnboardingEnd} bypass>
+                { 
+                    ({
+                        goToStep,
+                        setDeviceId, deviceId, 
+                        listenAwareDataSync, unlistenAwareDataSync, awareDataSyncEvents
+                    }) =>
+                    <>
+                        <Auth
+                            onStepFinished={
+                                (deviceId, studyId) => 
+                                    setDeviceId(deviceId) &
+                                    goToStep(CheckWifi)
+                            }
+                        />
+                        <CheckWifi
+                            onStepFinished={() => goToStep(CheckPermissions)}
+                        />
+                        <CheckPermissions
+                            onStepFinished={() => goToStep(CheckPhenotyping)}
+                        />
+                        <CheckPhenotyping
+                            deviceId={deviceId || "default"}
+                            onAwareStarting={() => undefined /*listenAwareDataSync()*/}
+                            onStepFinished={() => goToStep(OnboardingSurveyTask)}
+                        />
+                        <OnboardingSurveyTask
+                            onStepFinished={() => goToStep(OnboardingRestingStateTask)}
+                        />
+                        <OnboardingRestingStateTask
+                            onStepFinished={() => goToStep(OnboardingEnd)}
+                        />
+                        {/*
+                        <CheckDataSync
+                            dataSyncEvents={awareDataSyncEvents}
+                            onStepFinished={() =>
+                                unlistenAwareDataSync() &
+                                goToStep(OnboardingEnd)
+                            }
+                        />
+                        */}
+                        <OnboardingEnd onStepFinished={() => goTo(Home)} />
+                    </>
+                }
+                </Onboarding>
+                <Home />
+                {/*
+                <SurveyTask />
+                <PrepareRestingStateTask />
+                <RestingStateTask />
+                <Graphs menu="symptoms" />
+                <SymptomGraph />
+                */}
+            </>
+        }
+    </App>;
 
 // @note `AwareManager.startAware()` is set in the StudySchemaAdapter
 // @todo rename StudySchemaAdapter to InitAppSchemaAdapter.

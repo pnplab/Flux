@@ -19,7 +19,7 @@ import CheckPermissionsView from './CheckPermissionsView';
 
 // Configure types.
 type Props = {
-    +confirmPermissions: () => void
+    +onStepFinished: () => void
 };
 type State = {
     +currentPermissionName: 
@@ -34,7 +34,7 @@ type State = {
 };
 
 // Configure component logic.
-class CheckPermissionsController extends PureComponent<Props, State> {
+export default class CheckPermissionsController extends PureComponent<Props, State> {
 
     permissions = [
         {
@@ -203,7 +203,7 @@ class CheckPermissionsController extends PureComponent<Props, State> {
 
     // Go to next step when the user pushes the submit button!
     onSubmit = () => {
-        this.props.confirmPermissions();
+        this.props.onStepFinished();
     }
 
     render() {
@@ -222,16 +222,16 @@ class CheckPermissionsController extends PureComponent<Props, State> {
 
 }
 
-// Bind comoponent to redux.
-const mapStateToProps = (state: AppState /*, ownProps*/) => ({
+// // Bind comoponent to redux.
+// const mapStateToProps = (state: AppState /*, ownProps*/) => ({
 
-});
+// });
 
-const mapDispatchToProps = {
-    confirmPermissions: onboarding.confirmPermissions
-};
+// const mapDispatchToProps = {
+//     confirmPermissions: onboarding.confirmPermissions
+// };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(CheckPermissionsController);
+// export default connect(
+//   mapStateToProps,
+//   mapDispatchToProps
+// )(CheckPermissionsController);

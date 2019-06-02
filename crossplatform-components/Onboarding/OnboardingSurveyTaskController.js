@@ -20,14 +20,14 @@ import { SurveyTaskController } from '../SurveyTask/SurveyTaskController';
 
 // Configure types.
 type Props = {
-    submitSurveyTaskForm: (number, { [questionId: string]: number }) => void
+    // submitSurveyTaskForm: (number, { [questionId: string]: number }) => void
 };
 type State = {
     +step: 'text' | 'task'
 };
 
 // Configure component logic.
-class OnboardingSurveyTaskController extends PureComponent<Props, State> {
+export default class OnboardingSurveyTaskController extends PureComponent<Props, State> {
     constructor(props) {
         super(props);
 
@@ -48,12 +48,14 @@ class OnboardingSurveyTaskController extends PureComponent<Props, State> {
 
     submitSurveyTaskForm = (timestamp, values) => {
         // Store in db!
-        this.props.submitSurveyTaskForm(timestamp, values);
+        AwareManager.addSurveyData(timestamp, values);
+
+        // @todo store in realm to add graph back!
     }
 
     // Go to next step when the user pushes the submit button!
     goToNextStep = () => {
-        this.props.goToNextStep();
+        this.props.onStepFinished();
     }
 
     render() {
@@ -78,17 +80,17 @@ class OnboardingSurveyTaskController extends PureComponent<Props, State> {
 
 }
 
-// Bind comoponent to redux.
-const mapStateToProps = (state: AppState /*, ownProps*/) => ({
+// // Bind comoponent to redux.
+// const mapStateToProps = (state: AppState /*, ownProps*/) => ({
 
-});
+// });
 
-const mapDispatchToProps = {
-    submitSurveyTaskForm: onboarding.submitSurvey,
-    goToNextStep: onboarding.confirmSurveyTask
-};
+// const mapDispatchToProps = {
+//     submitSurveyTaskForm: onboarding.submitSurvey,
+//     goToNextStep: onboarding.confirmSurveyTask
+// };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(OnboardingSurveyTaskController);
+// export default connect(
+//   mapStateToProps,
+//   mapDispatchToProps
+// )(OnboardingSurveyTaskController);

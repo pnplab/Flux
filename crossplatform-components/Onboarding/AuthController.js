@@ -20,7 +20,7 @@ const DEFAULT_ACTIVATION_PASSWORD = '4wc2uw';
 
 // Configure types.
 type Props = {
-    +auth: (string, string) => void,
+    +onStepFinished: (string, string) => void,
 };
 type State = {
     currentPassword?: string,
@@ -29,7 +29,7 @@ type State = {
 };
 
 // Configure component logic.
-class AuthController extends PureComponent<Props, State> {
+export default class AuthController extends PureComponent<Props, State> {
 
     static defaultProps = {
         activationPassword: DEFAULT_ACTIVATION_PASSWORD
@@ -72,7 +72,7 @@ class AuthController extends PureComponent<Props, State> {
         }
         // Trigger initialization on success.
         this.setState({ error: undefined });
-        this.props.auth(this.state.currentPassword, this.state.currentParticipantId);
+        this.props.onStepFinished(this.state.currentPassword, this.state.currentParticipantId);
     }
 
     render() {
@@ -93,16 +93,16 @@ class AuthController extends PureComponent<Props, State> {
 
 }
 
-// Bind comoponent to redux.
-const mapStateToProps = (state: AppState /*, ownProps*/) => ({
+// // Bind comoponent to redux.
+// const mapStateToProps = (state: AppState /*, ownProps*/) => ({
 
-});
+// });
 
-const mapDispatchToProps = {
-    auth: onboarding.auth
-};
+// const mapDispatchToProps = {
+//     auth: onboarding.auth
+// };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(AuthController);
+// export default connect(
+//   mapStateToProps,
+//   mapDispatchToProps
+// )(AuthController);

@@ -16,6 +16,7 @@ import Questions from '../../crossplatform-model/immutable-db/QuestionData';
 import { submitSurveyTaskForm, enableRestingStateTask, openRestingStateTask } from '../../crossplatform-model/memory-db/actions'
 
 import SurveyTaskView from './SurveyTaskLeanView';
+import AwareManager from '../../crossplatform-model/native-db/AwareManager';
 
 // Configure types.
 type Props = {
