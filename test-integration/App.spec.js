@@ -1,9 +1,9 @@
 // @warning When computer go to sleep, emulator can enter a weird state where
 //      ssl connections to the server fail. The solution is to restart the
-//      emulator!
+//      emulator.
 // @warning App.spec.js connect to the built version of Flux, moved to a
 //      subdirectory, which means the test code can be out of sync with the 
-//      tested code! 
+//      tested code.
 
 const path = require('path');
 import wd from 'wd';
