@@ -12,7 +12,7 @@ import type { State as AppState } from '../../crossplatform-model/memory-db/type
 import { onboarding } from '../../crossplatform-model/memory-db/actions';
 
 import React, { PureComponent } from 'react';
-import { NetInfo } from 'react-native';
+import NetInfo from "@react-native-community/netinfo";
 import { connect } from 'react-redux';
 
 import CheckWifiView from './CheckWifiView';

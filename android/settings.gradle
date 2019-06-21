@@ -26,3 +26,6 @@ project(':react-native-linear-gradient').projectDir = new File(rootProject.proje
 
 include ':aware-core'
 include ':app'
+
+apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
+

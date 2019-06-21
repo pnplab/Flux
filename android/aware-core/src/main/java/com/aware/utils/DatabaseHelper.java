@@ -1,23 +1,20 @@
 
 package com.aware.utils;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.database.SQLException;
+
 import net.sqlcipher.database.SQLiteDatabase;
 import net.sqlcipher.database.SQLiteDatabase.CursorFactory;
 import net.sqlcipher.database.SQLiteException;
 import net.sqlcipher.database.SQLiteOpenHelper;
 import android.os.Build;
 import android.os.Environment;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.PermissionChecker;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.PermissionChecker;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.aware.Aware;
 import com.aware.R;
 
 import org.json.JSONArray;

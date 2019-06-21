@@ -11,7 +11,7 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.content.PermissionChecker;
+import androidx.core.content.PermissionChecker;
 import android.util.Log;
 
 import com.aware.Aware;

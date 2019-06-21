@@ -13,10 +13,10 @@ module.exports = {
     // ],
     presets: [
         // "@babel/preset-flow", // @note not sure it's doing anything. everything works without (except flow logs are not shown). / ! Not set in default react-native config !
-        "module:metro-react-native-babel-preset"
+        'module:metro-react-native-babel-preset'
     ],
     plugins: [
-        ["transform-inline-environment-variables", {
+        ['transform-inline-environment-variables', {
             "include": [
                 "FLUX_AUTO_UPDATE",
                 "FLUX_ENCRYPTION_KEY",
@@ -24,4 +24,4 @@ module.exports = {
             ]
         }]
     ]
-}
+};

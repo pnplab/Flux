@@ -25,9 +25,9 @@ import px.fluidicslider.RNFluidicSliderPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import io.realm.react.RealmReactPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
+import com.facebook.react.PackageList;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
-import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 
 import java.util.ArrayList;
@@ -45,23 +45,45 @@ public class MainApplication extends Application implements ReactApplication {
 
         @Override
         protected List<ReactPackage> getPackages() {
-            List<ReactPackage> list = new ArrayList<>(Arrays.asList(
-                new MainReactPackage(),
-                new RNFSPackage(),
-                new RNAppUpdatePackage(),
-                new RNDevMenuPackage(),
-                new LottiePackage(),
-                new RNFirebasePackage(),
-                new RNFirebaseMessagingPackage(),
-                new SvgPackage(),
-                new RNDeviceInfo(),
-                new ReactVideoPackage(),
-                new AwareManagerPackage(),
-                new RNFluidicSliderPackage(),
-                new VectorIconsPackage(),
-                new RealmReactPackage(),
-                new LinearGradientPackage()
-            ));
+            // List<ReactPackage> list = new ArrayList<>(Arrays.asList(
+            //     new MainReactPackage(),
+            //     new RNFSPackage(),
+            //     new RNAppUpdatePackage(),
+            //     new RNDevMenuPackage(),
+            //     new LottiePackage(),
+            //     new RNFirebasePackage(),
+            //     new RNFirebaseMessagingPackage(),
+            //     new SvgPackage(),
+            //     new RNDeviceInfo(),
+            //     new ReactVideoPackage(),
+            //     new AwareManagerPackage(),
+            //     new RNFluidicSliderPackage(),
+            //     new VectorIconsPackage(),
+            //     new RealmReactPackage(),
+            //     new LinearGradientPackage()
+            // ));
+
+            @SuppressWarnings("UnnecessaryLocalVariable")
+            List<ReactPackage> packages = new PackageList(this).getPackages();
+            packages.add(new RNFSPackage());
+            // packages.add(new RNAppUpdatePackage());
+            // packages.add(new RNDevMenuPackage());
+            packages.add(new LottiePackage());
+            packages.add(new RNFirebasePackage());
+            packages.add(new RNFirebaseMessagingPackage());
+            // packages.add(new SvgPackage());
+            // packages.add(new RNDeviceInfo());
+            packages.add(new ReactVideoPackage());
+            packages.add(new AwareManagerPackage());
+            // packages.add(new RNFluidicSliderPackage());
+            // packages.add(new VectorIconsPackage());
+            // packages.add(new RealmReactPackage());
+            packages.add(new LinearGradientPackage());
+
+            // Packages that cannot be autolinked yet can be added manually here, for example:
+            // packages.add(new MyReactNativePackage());
+
+            //return packages;
 
             // MuseManagerPackage is only compatible with ARM v7 devices. Avoid launch-time errors
             // on android emulator (which is x86 on osx) by adding it conditionally.
@@ -84,7 +106,8 @@ public class MainApplication extends Application implements ReactApplication {
                     // react-native x86_64 apk).
                     try {
                         MuseManagerAndroid.getInstance();
-                        list.add(new MuseManagerPackage());
+                        // list.add(new MuseManagerPackage());
+                        packages.add(new MuseManagerPackage());
                     }
                     catch (UnsatisfiedLinkError e) {
                         Log.e("Flux", "Couldn't link muse even if linking appears to be supported!.");
@@ -92,7 +115,7 @@ public class MainApplication extends Application implements ReactApplication {
                 }
             }
 
-            return list;
+            return packages;
         }
 
         @Override

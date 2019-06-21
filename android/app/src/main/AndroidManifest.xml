@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.pnplab.flux">
+  package="org.pnplab.flux">
 
     <permission
         android:name="com.aware.READ_CONTEXT_DATA"

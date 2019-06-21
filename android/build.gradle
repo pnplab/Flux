@@ -12,7 +12,7 @@ buildscript {
         buildToolsVersion = "28.0.3"
         minSdkVersion = 19 // @note 16 -> 19 because of Aware minSdkVersion requirements.
         compileSdkVersion = 28
-        targetSdkVersion = 27
+        targetSdkVersion = 28
         supportLibVersion = "28.0.0"
         kotlin_version = "1.3.30" // For aware-core & Detox
     }
@@ -21,7 +21,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.1'
+        classpath 'com.android.tools.build:gradle:3.4.1'
         classpath 'com.google.gms:google-services:4.0.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
@@ -62,25 +62,40 @@ allprojects {
         jcenter()
         maven {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-            url "$rootDir/../node_modules/react-native/android"
+            url("$rootDir/../node_modules/react-native/android")
+        }
+        maven {
+            // Android JSC is installed from npm
+            url("$rootDir/../node_modules/jsc-android/dist")
         }
         maven {
             // All of Detox' artifacts are provided via the npm module
-            url "$rootDir/../node_modules/detox/Detox-android"
+            url("$rootDir/../node_modules/detox/Detox-android")
         }
 
         // Fix lottie-react-native build issue.
         // Fix `Execution failed for task ':react-native-appupdate:verifyReleaseResources'`
+        // @note We now use androidx with jetifier.
+        /*
         configurations.all {
             resolutionStrategy {
                 force "com.android.support:appcompat-v7:$supportLibVersion"
                 force "com.android.support:support-v7:$supportLibVersion"
             }
         }
+        */
+        configurations.all {
+            resolutionStrategy {
+                force "androidx.core:core:1.0.0"
+                force "androidx.appcompat:appcompat:1.0.0"
+                force "androidx.vectordrawable:vectordrawable:1.0.0"
+
+            }
+        }
     }
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.7'
-    distributionUrl = distributionUrl.replace("bin", "all")
-}
+// task wrapper(type: Wrapper) {
+//     gradleVersion = '4.7'
+//     distributionUrl = distributionUrl.replace("bin", "all")
+// }

@@ -12,15 +12,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SyncResult;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
-import net.sqlcipher.database.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
+import androidx.core.app.NotificationCompat;
 import android.text.format.DateUtils;
 import android.util.Log;
 
