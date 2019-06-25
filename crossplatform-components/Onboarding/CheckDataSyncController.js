@@ -18,7 +18,6 @@ import CheckDataSyncView from './CheckDataSyncView';
 
 // Configure types.
 type Props = {
-    +dataSyncEvents: any
 };
 type State = {
     +currentStep: 'TEXT' | 'SYNC_ONGOING' | 'SYNC_DONE' | 'SYNC_ERROR',
@@ -39,7 +38,10 @@ export default class CheckDataSyncController extends PureComponent<Props, State>
         super(props);
 
         this.state = {
-            currentStep: 'TEXT'
+            currentStep: 'TEXT',
+            syncStatus: {
+
+            }
         };
     }
 
@@ -59,6 +61,8 @@ export default class CheckDataSyncController extends PureComponent<Props, State>
         // await AwareManager.joinStudy('https://www.pnplab.ca/index.php/webservice/index/2/UvxJCl3SC4J3'); // @todo change url based on study.
         // // /@debug
 
+        
+
         // @todo Make sure the automatic aware sync is off during the
         //     onboarding process as listened sync events could be overriden by
         //     it!
@@ -72,6 +76,13 @@ export default class CheckDataSyncController extends PureComponent<Props, State>
         AwareManager.disableMandatoryWifiForSync();
         AwareManager.disableMandatoryBatteryForSync();
 
+        // Listen to sync events & update react state accordingly.
+        this._unlistenSyncEvents = AwareManager.listenSyncEvents({
+            onSyncStarted: this.onTableSyncStarted,
+            onSyncBatchStarted: this.onTableSyncBatchStarted,
+            onSyncFinished: this.onTableSyncFinished,
+            onSyncFailed: this.onTableSyncFailed
+        });
     }
 
     componentWillUnmount() {
@@ -127,6 +138,200 @@ export default class CheckDataSyncController extends PureComponent<Props, State>
         'wifi',
     ];
 
+    onTableSyncStarted = ({ table, rowCount }) => {
+        console.log('pnplab::CheckDataSyncController #onTableSyncStarted', table, rowCount);
+
+        // Init current table state.
+        this.setState(s => ({
+            ...s,
+            syncStatus: {
+                ...s.syncStatus,
+                [table]: {
+                    status: 'SYNC_ONGOING',
+                    rowCount: rowCount,
+                    lastRowUploaded: 0,
+                    error: undefined,
+                    serverSideRowCount: undefined
+                }
+            }
+        }));
+    };
+    onTableSyncBatchStarted = ({ table, rowCount, lastRowUploaded }) => {
+        console.log('pnplab::CheckDataSyncController #onTableSyncBatchStarted', table, rowCount, lastRowUploaded);
+
+        // Update current table state.
+        this.setState(s => ({
+            ...s,
+            syncStatus: {
+                ...s.syncStatus,
+                [table]: {
+                    ...s.syncStatus[table],
+                    status: 'SYNC_ONGOING',
+                    rowCount: rowCount,
+                    lastRowUploaded: lastRowUploaded
+                }
+            }
+        }));
+    };
+    onTableSyncFinished = async ({ table }) => {
+        console.log('pnplab::CheckDataSyncController #onTableSyncFinished', table);
+
+        // Update current table state.
+        this.setState(s => ({
+            ...s,
+            syncStatus: {
+                ...s.syncStatus,
+                [table]: {
+                    ...s.syncStatus[table],
+                    status: 'SYNC_DONE',
+                    // @note As lastRowUploaded is only sync in
+                    //       onTableSyncBatchStarted, last one update is
+                    //       missing so we update it manually!
+                    lastRowUploaded: s.syncStatus[table].rowCount
+                }
+            }
+        }));
+
+        // Check table status server-side !
+        try {
+            const serverSideTableRowCount = await AwareManager.getSyncedDataCheckupForTable(table);
+            console.log('pnplab::CheckDataSyncController #serverSideTableRowCount', serverSideTableRowCount);
+
+            // Update current table state.
+            this.setState(s => ({
+                ...s,
+                syncStatus: {
+                    ...s.syncStatus,
+                    [table]: {
+                        ...s.syncStatus[table],
+                        status: 'SYNC_DONE',
+                        // @note As lastRowUploaded is only sync in
+                        //       onTableSyncBatchStarted, last one update is
+                        //       missing so we update it manually!
+                        lastRowUploaded: s.syncStatus[table].rowCount,
+                        serverSideRowCount: serverSideTableRowCount
+                    }
+                }
+            }), () => {
+                // Trigger onFullSyncFinished once all the tables have either been
+                // synced or have thrown an error
+                if (this.isFullSyncFinished()) {
+                    this.onFullSyncFinished();
+                }
+            });
+        }
+        // Error while counting synced data server-side!
+        catch (e) {
+            console.error('Error while counting synced data server-side!', table, e);
+            console.log('pnplab::CheckDataSyncController #error', table, e);
+
+            this.setState(s => ({
+                ...s,
+                syncStatus: {
+                    ...s.syncStatus,
+                    [table]: {
+                        ...s.syncStatus[table],
+                        status: 'SYNC_DONE',
+                        // @note As lastRowUploaded is only sync in
+                        //       onTableSyncBatchStarted, last one update is
+                        //       missing so we update it manually!
+                        lastRowUploaded: s.syncStatus[table].rowCount,
+                        serverSideRowCount: null,
+                    }
+                }
+            }), () => {
+                // Trigger onFullSyncFinished once all the tables have either been
+                // synced or have thrown an error
+                if (this.isFullSyncFinished()) {
+                    this.onFullSyncFinished();
+                }
+            });
+        }
+    };
+    onTableSyncFailed = ({ table, error }) => {  
+        console.log('pnplab::CheckDataSyncController #onTableSyncFailed', table, error);
+
+        // Update current table state.
+        this.setState(s => ({
+            ...s,
+            syncStatus: {
+                ...s.syncStatus,
+                [table]: {
+                    ...s.syncStatus[table],
+                    status: 'SYNC_ERROR',
+                    error: error
+                }
+            }
+        }), () => {
+            // Trigger onFullSyncFinished once all the tables have either been
+            // synced or have thrown an error
+            if (this.isFullSyncFinished()) {
+                this.onFullSyncFinished();
+            }
+        });
+    };
+
+    isFullSyncFinished = () => {
+        // @todo compare this to full table list.
+
+        let studySensors = AwareManager.getStudySensorList();
+
+        // Check if all sensors have already received an event from aware and 
+        // thus are in the state.
+        let observedSensors = Object.keys(this.state.syncStatus);
+
+        // Return false if there is not enough sensor having received an event yet.
+        if (observedSensors.length < studySensors.length) {
+            return false;
+        }
+
+        // Sort them so we can compare item per item.
+        studySensors = studySensors.sort();
+        observedSensors = observedSensors.sort();
+
+        // Make sure the study & observed sensors are the same (optional but
+        // extra precautionous).
+        let haveAllSensorsReceivedAnEvent = studySensors.every((v, i) => v === observedSensors[i]);
+
+        // Return false otherwise.
+        if (!haveAllSensorsReceivedAnEvent) {
+            return false;
+        }
+
+        // Return true if all of them have either finished syncing or received
+        // an error in the meanwhile.
+        let haveAllSensorsFinished = observedSensors
+            .map(table =>
+                this.state.syncStatus[table].status === 'SYNC_DONE' ||
+                this.state.syncStatus[table].status === 'SYNC_ERROR'
+            )
+            .reduce((a,b) => a && b, true);
+
+        return haveAllSensorsFinished;
+    };
+
+    onFullSyncFinished = async () => {
+        console.log('pnplab::CheckDataSyncController #onFullSyncFinished');
+
+        // Check synced data server-side!
+        try {
+            // @todo verify no client sync error first.
+            // let dataCheckup = await AwareManager.getSyncedDataCheckup();
+            // console.log('dataCheckup', dataCheckup);
+        }
+        catch (e) {
+            console.error('dataCheckup failure', e);
+        }
+
+        // @todo verify server sync is succesful first.
+        this.setState({ currentStep: 'SYNC_DONE' })
+    };
+
+    componentWillUnmount() {
+        // Unlisten to sync events.
+        this._unlistenSyncEvents();
+    }
+
     // Sync data to the server
     onSyncData = async () => {
         this.setState({ currentStep: 'SYNC_ONGOING' });
@@ -138,88 +343,15 @@ export default class CheckDataSyncController extends PureComponent<Props, State>
         this.props.onStepFinished();
     }
 
-    processDataSyncEvents = () => {
-        const dataSyncEvents = this.props.dataSyncEvents;
-
-        let eventsByTable = {};
-
-        for (let i=0; i<dataSyncEvents.length; ++i) {
-            const evt = dataSyncEvents[i];
-
-            // Initialise table name.
-            eventsByTable[evt.table] = eventsByTable[evt.table] || [];
-
-            // Add current evt to the table event list.
-            eventsByTable[evt.table].push(evt);
-        }
-
-        const tableInfo = Object
-            .keys(eventsByTable)
-            .map(table => 
-                ({
-                    startedCount: eventsByTable[table]
-                        .filter(evt => evt.type === 'SyncStarted')
-                        .length > 0,
-                    issueCount: eventsByTable[table]
-                        .filter(evt => evt.type === 'SyncFailed')
-                        .length,
-                    succeededCount: eventsByTable[table]
-                        .filter(evt => evt.type === 'SyncFinished')
-                        .length
-                })
-            );
-
-        const startedTables = Object
-            .keys(eventsByTable)
-            .filter(table => 
-                eventsByTable[table]
-                    .filter(evts => evts.type === 'SyncStarted')
-                    .length > 0
-            );
-
-
-        const failedTables = Object
-            .keys(eventsByTable)
-            .filter(table => 
-                eventsByTable[table]
-                    .filter(evts => evts.type === 'SyncFailed')
-                    .length > 0
-            );
-
-        const succeedTables = Object
-            .keys(eventsByTable)
-            .filter(table => 
-                eventsByTable[table]
-                    .filter(evts => evts.type === 'SyncFinished')
-                    .length > 0
-            );
-
-        eventsByTable.filter
-    }
-
     render() {
         return (
             <CheckDataSyncView
                 currentStep={this.state.currentStep}
-                syncStatus={this.processDataSyncEvents()}
+                syncStatus={this.state.syncStatus}
                 onSyncData={this.onSyncData}
-                onSubmit={this.goToNextStep}
+                onNextClicked={this.goToNextStep}
             />
         );
     }
 
 }
-
-// // Bind comoponent to redux.
-// const mapStateToProps = (state: AppState /*, ownProps*/) => ({
-
-// });
-
-// const mapDispatchToProps = {
-
-// };
-
-// export default connect(
-//   mapStateToProps,
-//   mapDispatchToProps
-// )(CheckDataSyncController);

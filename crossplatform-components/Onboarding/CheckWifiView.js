@@ -48,7 +48,7 @@ const CheckWifiView = ({ status, onSubmit }: Props) =>
                 }
             </MainView>
             <ButtonView>
-                <CircleButton type="next" success={status === 'wifi'} disabled={status !== 'wifi' && status !== 'cellular'} onPress={e => onSubmit()} />
+                <CircleButton type="next" success={status === 'wifi'} disabled={status !== 'wifi' && status !== 'cellular'} onPress={e => onSubmit()} accessibilityLabel="CheckWifiNextButton" />
             </ButtonView>
         </EnableCenteredContent>
     </Container>;

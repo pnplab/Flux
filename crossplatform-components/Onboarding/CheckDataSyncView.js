@@ -20,10 +20,10 @@ type Props = {
     },
     +currentStep: 'TEXT' | 'SYNC_ONGOING' | 'SYNC_DONE' | 'SYNC_ERROR',
     +onSyncData: () => void,
-    +onSubmit: () => void
+    +onNextClicked: () => void
 };
 
-const CheckDataSyncView = ({ syncStatus, currentStep, onSyncData, onSubmit }: Props) => 
+const CheckDataSyncView = ({ syncStatus, currentStep, onSyncData, onNextClicked }: Props) => 
     <Container>
         <R3Container>
             <R3Header>
@@ -36,18 +36,24 @@ const CheckDataSyncView = ({ syncStatus, currentStep, onSyncData, onSubmit }: Pr
                             .keys(syncStatus)
                             .map(table => 
                                 <View key={table} style={{marginBottom: 15}}>
-                                    <Text>
+                                    <Text accessibilityLabel={`${table}Status`}>
                                         {table}: {syncStatus[table].status}
                                     </Text>
                                     {
                                         typeof syncStatus[table].rowCount !== 'undefined' &&
-                                            <Text>
+                                            <Text accessibilityLabel={`${table}ClientUploadCount`}>
                                                 upload: {syncStatus[table].lastRowUploaded || 0}/{syncStatus[table].rowCount}
                                             </Text>
                                     }
                                     {
+                                        typeof syncStatus[table].serverSideRowCount !== 'undefined' &&
+                                            <Text accessibilityLabel={`${table}ServerStoredCount`}>
+                                                server: {syncStatus[table].serverSideRowCount}
+                                            </Text>
+                                    }
+                                    {
                                         typeof syncStatus[table].error !== 'undefined' &&
-                                            <Text>
+                                            <Text accessibilityLabel={`${table}Error`}>
                                                 error: {syncStatus[table].error}
                                             </Text>
                                     }
@@ -58,12 +64,12 @@ const CheckDataSyncView = ({ syncStatus, currentStep, onSyncData, onSubmit }: Pr
             </R3Content>
             <R3Footer>
                 {
-                    (currentStep === 'TEXT' || true) &&
+                    currentStep === 'TEXT' &&
                     <CircleButton type="validate" color="blue" onPress={onSyncData} accessibilityLabel="SyncButton" />
                 }
                 {
-                    (currentStep === 'SYNC_DONE' || true) &&
-                    <CircleButton type="next" color="green" onPress={undefined} />
+                    currentStep === 'SYNC_DONE' &&
+                    <CircleButton type="next" color="green" onPress={onNextClicked} accessibilityLabel="CheckDataSyncNextButton" />
                 }
             </R3Footer>
         </R3Container>

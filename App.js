@@ -45,6 +45,18 @@ import {
 //         both android & ios. The native-base-theme's theme is located in the
 //         `./crossplatform/theme` folder.
 
+
+// Start aware study
+// { (async () => await startAware('test') & await joinAwareStudy())() && null }
+
+// Store survey integration test.
+// { (async () => await startAware('test') & await joinAwareStudy() & storeSurvey({ abcd: 0.31 /* empty :D */ }) & AwareManager.disableMandatoryWifiForSync() & AwareManager.disableMandatoryBatteryForSync() & AwareManager.syncData() )() && null }
+
+// Disable yellow box (conosle.warn popups inside the app). It breaks
+// integration testing as it sometimes prevent button sitting underneath the
+// yellow boxes to be clicked.
+console.disableYellowBox = true;
+
 export default () => 
     <App index={Onboarding}>
     {
@@ -65,7 +77,6 @@ export default () =>
         /* / / App / / */
 
         <>
-            { (async () => await startAware('test') & await joinAwareStudy() & storeSurvey({ abcd: 0.31 /* empty :D */ }) & AwareManager.disableMandatoryWifiForSync() & AwareManager.disableMandatoryBatteryForSync() & AwareManager.syncData() )() && null }
 
             <Onboarding index={Auth}>
             {
@@ -77,16 +88,11 @@ export default () =>
                     // Device id, set at auth, needed to start aware.
                     setDeviceId,
                     deviceId, 
-
-                    // Aware data sync events, listened once aware starts, needed at
-                    // data sync checkup step.
-                    listenAwareDataSync,
-                    unlistenAwareDataSync,
-                    awareDataSyncEvents
                 }) =>
                 /* / / Onboarding / / */
 
                 <>
+
                     <Auth onStepFinished={ (deviceId, studyId) => setDeviceId(deviceId) & goToStep(CheckWifi) } />
 
                     <CheckWifi onStepFinished={ () => goToStep(CheckPermissions) } />
@@ -97,7 +103,6 @@ export default () =>
                         hasAwareStudyBeenJoined={ hasAwareStudyBeenJoined }
                         onStartAwareClicked={ async () => 
                             await startAware(deviceId || 'byp0auth') &
-                            /* listenAwareDataSync() & */
                             await joinAwareStudy()
                         }
                         onStepFinished={ () => goToStep(SurveyTaskOnboarding) }
@@ -105,22 +110,14 @@ export default () =>
 
                     <SurveyTaskOnboarding
                         onStartTaskClicked={ () => goToStep(SurveyTask) }
-                        onStepBypassed={ () => goToStep(RestingStateTaskOnboarding) }
+                        onStepBypassed={ () => storeSurvey({ fake: 0.1, fake2: 0.6, fake3: 0.4 }) & goToStep(RestingStateTaskOnboarding) }
                     />
 
                     <SurveyTask onSubmit={ (values) => storeSurvey(values) & goToStep(RestingStateTaskOnboarding) } />
 
-                    <RestingStateTaskOnboarding onStepFinished={ () => goToStep(OnboardingEnd) } />
+                    <RestingStateTaskOnboarding onStepFinished={ () => goToStep(CheckDataSync) } />
 
-                    {/*
-                        <CheckDataSync
-                            dataSyncEvents={awareDataSyncEvents}
-                            onStepFinished={() =>
-                                unlistenAwareDataSync() &
-                                goToStep(OnboardingEnd)
-                            }
-                        />
-                    */}
+                    <CheckDataSync onStepFinished={() => goToStep(OnboardingEnd) } />
 
                     <OnboardingEnd onStepFinished={ () => goTo(Home) } />
 

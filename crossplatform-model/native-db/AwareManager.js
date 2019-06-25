@@ -84,6 +84,21 @@ class AwareManager {
         this._awareManager.stopAware();
     }
 
+    getStudySensorList() {
+        // @note can't get them through http request -> it's a POST request!
+        // @note can't get them through java checkup -> sensor architecture is completely decoupled
+        // @note only way is to either modify server or sensor architecture or to do tricky design (ie. caching the POST req. result)
+        // We thus retrieve it manually.
+        
+        return [
+            'survey',
+            'aware_device',
+            'aware_studies',
+            'aware_log',
+            // @todo ...
+        ];
+    }
+
     async joinStudy(studyUrl: string) {
         await this._awareManager.joinStudy(studyUrl);
     }
@@ -178,33 +193,58 @@ class AwareManager {
             throw new Error('Bad table name format!');
         }
 
-        // Retrieve sync data checkup.
-        let response = await fetch(`https://www.pnplab.ca/check-sync/android/${table}/${deviceId}`);
-        let rowCountByTable = await response.json();
-
-        // @note This return the number of row in the table for this deviceId (same response format as getSyncedDataCheckup).
-        return rowCountByTable;
-    }
-    async getSyncedDataCheckup(deviceId?: string) {
-        // Set default deviceId to this device.
-        if (typeof deviceId === 'undefined') {
-            deviceId = await this.getDeviceId();
+        // Retrieve server from study id parameter.
+        if (typeof process.env.STUDY_URL === 'undefined') {
+            throw new Error('Undefined STUDY_URL in env!');
         }
-
-        // Check deviceId type for potential security issue (has it comes from
-        // a json response in CheckDataSyncController).
-        if (!/^[a-zA-Z0-9_\-]{3,}$/.test(deviceId)) {
-            throw new Error('Bad deviceId format!');
-        }
+        const studyUrl = process.env.STUDY_URL;
+        const [, serverUrl] = studyUrl.match(/^(https?:\/\/[^\/]+)\/.*/);
 
         // Retrieve sync data checkup.
-        let response = await fetch(`https://www.pnplab.ca/check-sync/android/${deviceId}`);
-        let rowCountByTable = await response.json();
-
-        // @note This return the number of row for this deviceId by table.
-        // @warning Unefficient server-side!
-        return rowCountByTable;
+        // @todo add try/catch block to capture network error.
+        let response = await fetch(`${serverUrl}/check-sync/android/${table}/${deviceId}`);
+        if (!response.ok) {
+            throw new Error(`Request ${serverUrl}/check-sync/android/${deviceId} failed with error ${response.status} - ${await response.text()}`)
+        }
+        else {
+            let rowCountByTable = await response.json();
+            // @note This return the number of row in the table for this deviceId (same response format as getSyncedDataCheckup).
+            // @warning Unefficient server-side!
+            return rowCountByTable[table];
+        }
     }
+    // async getSyncedDataCheckup(deviceId?: string) {
+    //     // Set default deviceId to this device.
+    //     if (typeof deviceId === 'undefined') {
+    //         deviceId = await this.getDeviceId();
+    //     }
+
+    //     // Check deviceId type for potential security issue (has it comes from
+    //     // a json response in CheckDataSyncController).
+    //     if (!/^[a-zA-Z0-9_\-]{3,}$/.test(deviceId)) {
+    //         throw new Error('Bad deviceId format!');
+    //     }
+
+    //     // Retrieve server from study id parameter.
+    //     if (typeof process.env.STUDY_URL === 'undefined') {
+    //         throw new Error('Undefined STUDY_URL in env!');
+    //     }
+    //     const studyUrl = process.env.STUDY_URL;
+    //     const [, serverUrl] = studyUrl.match(/^(https?:\/\/[^\/]+)\/.*/);
+
+    //     // Retrieve sync data checkup.
+    //     // @todo add try/catch block to capture network error.
+    //     let response = await fetch(`${serverUrl}/check-sync/android/${deviceId}`);
+    //     if (!response.ok) {
+    //         throw new Error(`Request ${serverUrl}/check-sync/android/${deviceId} failed with error ${response.status} - ${await response.text()}`)
+    //     }
+    //     else {
+    //         let rowCountByTable = await response.json();
+    //         // @note This return the number of row for this deviceId by table.
+    //         // @warning Unefficient server-side!
+    //         return rowCountByTable;
+    //     }
+    // }
 
 
     // Enable/Disable automatic and/or mandatory wifi & battery for sync.

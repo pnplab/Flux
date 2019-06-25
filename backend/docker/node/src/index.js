@@ -63,6 +63,7 @@ const available_tables = [
     'telephony',
     'touch',
     'wifi',
+    'survey'
 ];
 
 // @returns The number of row by table for deviceId.

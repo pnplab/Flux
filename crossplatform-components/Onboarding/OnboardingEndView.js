@@ -22,7 +22,7 @@ const OnboardingEndView = ({ onSubmit }: Props) =>
             <R3Content>
             </R3Content>
             <R3Footer>
-                    <CircleButton type="validate" color="blue" onPress={onSubmit} />
+                    <CircleButton type="validate" color="blue" onPress={onSubmit} accessibilityLabel="OnboardingEndNextButton" />
             </R3Footer>
         </R3Container>
     </Container>;

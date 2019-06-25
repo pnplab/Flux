@@ -24,7 +24,7 @@ const OnboardingSurveyTaskView = ({ onStartTask, onBypassTask }: Props) =>
                 <Text>Présentation de la tâche de survey...</Text>
             </R3Content>
             <R3Footer>
-                <CircleButton type="next" color="green" onPress={onStartTask} onLongPress={onBypassTask} delayLongPress={7000} />
+                <CircleButton type="next" color="green" onPress={onStartTask} onLongPress={onBypassTask} delayLongPress={7000} accessibilityLabel="StartSurveyTaskButton" />
             </R3Footer>
         </R3Container>
     </Container>;

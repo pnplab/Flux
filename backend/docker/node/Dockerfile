@@ -8,6 +8,7 @@ RUN npm install
 
 # Copy app
 COPY ./src ./src
+VOLUME ./src
 
 # Expose port
 EXPOSE 7982

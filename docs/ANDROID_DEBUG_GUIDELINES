@@ -11,14 +11,39 @@ project's gradle version to something more recent, as android studio is based
 upon an old version of intellij idea (although google upgrade could be
 forwarded first into android studio).
 
-## In case of debugger crash during app debugging
+## NewGradleSyncNotSupportedException: New Gradle Sync is not supported due to containing Kotlin modules using an unsupported plugin version
+Try setting not.eligible.for.single.variant.sync to true in .idea/workspace.xml
+cf. https://stackoverflow.com/questions/54201216/android-studio-3-3-new-gradle-sync-is-not-supported-due-to-containing-kotlin-mo
+
+```
+<component name="PropertiesComponent">
+    <property name="not.eligible.for.single.variant.sync" value="true" />
+</component>
+```
+
+# ./gradlew assembleRelease stuck during bundleReleaseJsAndAssets stage
+
+Do the bundling manually instead:
+
+```
+$ npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/
+$ cd android/
+$ ./gradlew assembleRelease -x bundleReleaseJsAndAssets
+```
+
+# Remote js debugger fails & prevent the app from working: `Error: DeltaPatcher should receive a base Bundle when being initialized`
+
+Actually just a source code error, watch your `npx react-native start ...` result.
+
+
+# Android debugger crash during app debugging
 Seems to occur due to ARN.
 
 Still to test:
 - use upgraded IDE (intellij Idea instead of android studio) - attempted but couldn't import the project.
 - use minimal study setup with lower sensor service count in order to reduce debugger's overhead impact.
 
-## In case of breakpoint not hitting w/ android studio
+# Breakpoint not hitting w/ android studio
 Breakpoint doesn't seem to hit in certain situation:
 - inside listeners who have already been instanciated ? (could be)
 - often, line-based breakpoint.

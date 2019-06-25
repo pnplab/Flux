@@ -74,7 +74,7 @@ public class AwareManagerModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void startAware(String participantId, String encryptionKey) {
+    public void startAware(String deviceId, String encryptionKey) {
         Context context = getReactApplicationContext().getApplicationContext();
 
         // Set db encryption key (the key can be modified through script).
@@ -93,7 +93,7 @@ public class AwareManagerModule extends ReactContextBaseJavaModule {
 
         // @warning AWARE device_id is random UUID which makes it untraceable. We need to specify a
         //     static device_id. We use manually mapped participant id.
-        Aware.setSetting(context, Aware_Preferences.DEVICE_ID, participantId);
+        Aware.setSetting(context, Aware_Preferences.DEVICE_ID, deviceId);
 
         // Start Aware (mainly as this starts scheduler and thus ask permission requests which is
         // required before joining study)

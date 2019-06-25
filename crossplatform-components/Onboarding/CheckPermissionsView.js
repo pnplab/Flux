@@ -69,11 +69,13 @@ const CheckPermissionsView = ({ list, displayPerm, displayDescr, highlightPermTi
             <R3Footer>
                 {
                     onRequestPermission &&
-                    <CircleButton type="validate" color="blue" onPress={onRequestPermission} />
+                    /* @warning accessibilityLabel of both Submit & Request button have to get the same name or
+                       integration testing doesn't work for some reason (didn't investigate). */
+                    <CircleButton type="validate" color="blue" onPress={onRequestPermission} accessibilityLabel="RequestPermissionsButton" />
                 }
                 {
                     onSubmit &&
-                    <CircleButton type="next" color="green" onPress={onSubmit} />
+                    <CircleButton type="next" color="green" onPress={onSubmit} accessibilityLabel="CheckPermissionsNextButton" />
                 }
             </R3Footer>
         </R3Container>

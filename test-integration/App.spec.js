@@ -42,129 +42,219 @@ describe('SomeComponent', () => {
         // expect(await driver.hasElementByAccessibilityId('testview')).toBe(true);
         try {
             // Seek elements for 20s if not found from start.
-            await driver.setImplicitWaitTimeout(1000 * 20);
+            const implicitWaitTimeout = 1000 * 20;
+            await driver.setImplicitWaitTimeout(implicitWaitTimeout);
 
-            const deviceId = `qa${Math.random().toString(36).substring(2, 10)}`;
-            const studyCode = '4wc2uw';
+            // @warning make sure all button have different accessibility id
+            //     inbetween screens otherwise appium might not find out the
+            //     button has changed as it doesn't detect screen transition.
 
-            let el1 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.EditText");
-            await el1.click();
-            await el1.sendKeys(deviceId);
-            let el2 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[2]/android.widget.EditText");
-            await el2.click();
-            await el2.sendKeys(studyCode);
-            let el3 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[3]/android.widget.TextView");
-            await el3.click();
-            await driver.sleep(500);
-            let el4 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.widget.TextView");
-            await el4.click();
-            await driver.sleep(500);
-            let el5 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup[8]/android.widget.TextView");
-            await el5.click();
-            await driver.sleep(500);
-            let el6 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.TextView");
-            await el6.click();
+            /* Onboarding / Auth Screen */
+            {
+                const deviceId = `qa${Math.random().toString(36).substring(2, 10)}`;
+                const studyCode = '4wc2uw';
 
-            // Button changes when study has been joined.
-            await driver.sleep(500);
-            let [ el7 ] = await driver.elementsByAccessibilityId("NextButton");
-            await el7.click();
+                // deviceIdInput
+                let deviceIdInput = await driver.elementByAccessibilityId('DeviceIdInput, ');
+                // await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.EditText");
+                await deviceIdInput.click();
+                await deviceIdInput.sendKeys(deviceId);
 
-            // Required to wait a bit of time for some reason.. `await wd.TouchAction#perform` probably doesn't wait for lazy appearance of button, thus buggy!`
-            await driver.sleep(5000);
-            
-            // Survey Task
-            let surveyButton = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.TextView");
-            // Long press
-            let action = new wd.TouchAction(driver);
-            action
-                .longPress({el: surveyButton})
-                .wait(10000) // 10 sec off the 7 s required (3 sec additional margin).
-                .release();
-            await action.perform();
+                // studyPasswordInput
+                let studyCodeInput = await driver.elementByAccessibilityId('StudyCodeInput, ');
+                await studyCodeInput.click();
+                await studyCodeInput.sendKeys(studyCode);
 
-            // Required to wait a bit of time for some reason.. `await wd.TouchAction#perform` probably doesn't wait for lazy appearance of button, thus buggy!`
-            await driver.sleep(5000);
+                // Next button
+                let nextButton = await driver.elementByAccessibilityId('AuthNextButton, ');
+                await nextButton.click();
+            }
 
-            // Resting State Task
-            let restingStateButton = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.TextView");
-            // Long press
-            let action2 = new wd.TouchAction(driver);
-            action2
-                .longPress({el: restingStateButton})
-                .wait(10000) // 10 sec off the 7 s required (3 sec additional margin).
-                .release();
-            await action2.perform();
+            /* Onboarding / Check Wifi Screen */
+            { 
+                // await driver.sleep(500);
+                let nextButton = await driver.elementByAccessibilityId('CheckWifiNextButton, ');
+                await nextButton.click();
+            }
 
-            // Trigger sync 
-            // @warning setImplicitWaitTimeout doesn't work here has elementsByAccessibilityId is looking for an array of elements instead of a single item!
-            //      thus we need either to reimplement it ourself or to set longer timeout.
-            await driver.sleep(1000);
-            let [ el8 ] = await driver.elementsByAccessibilityId("SyncButton");
-            // let el8 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.TextView");
-            await el8.click();
+            /* Onboarding / Check Permissions Screen */
+            { 
+                // Check permissions first. Due to auto permission accept, this 
+                // will trigger & validate all the permission at once unlike.
+                // regular end-user workflow.
 
-            // Wait 10 min till data are uploaded.
-            await driver.sleep(1000 * 60 * 5);
-            await el8.click();
-            await driver.sleep(1000 * 60 * 5);
+                // @warning Both button are called the same name though. 
+                try {
+                    let checkPermissionsButton = await driver.elementByAccessibilityId('RequestPermissionsButton, ');
+                    await checkPermissionsButton.click();
+                    await driver.sleep(500);
+                }
+                catch (e) {
+                    // Ignore issue if request perm button is not found, it 
+                    // likely means app had already the permission granted.
+                }
+                let nextButton = await driver.elementByAccessibilityId('CheckPermissionsNextButton, ');
+                await nextButton.click();
+            }
 
-            // Wait 20min more!
-            await driver.sleep(1000 * 60 * 10);
-            await el8.click();
-            await driver.sleep(1000 * 60 * 10);
-            await el8.click();
-            await driver.sleep(1000 * 60 * 1);
+            /* Onboarding / Check Phenotyping */
+            { 
+                let startAwareButton = await driver.elementByAccessibilityId('StartAwareButton, ');
+                await startAwareButton.click();
+                let nextButton = await driver.elementByAccessibilityId('CheckPhenotypingNextButton, ');
+                await nextButton.click();
+            }
 
+            /* Onboarding / Survey Task */
+            {
+                // Required to wait a bit of time for some reason.. `await wd.TouchAction#perform` probably doesn't wait for lazy appearance of button, thus buggy!`
+                // await driver.sleep(5000);
 
+                // @note Scroll is not working..
+                // // Finish survey task
+                // // Wait for the list to be loaded.
+                // driver.sleep(5000);
+                // // Scroll a lot!
+                // for (let i=0; i<20; ++i) {
+                //     let scrollAction = new wd.TouchAction(driver);
+                //     scrollAction
+                //         // @note y starts from the top bar, thus we don't start from 0!
+                //         .longPress({x: 50, y: 150})
+                //         .moveTo({x: 50, y: 600})
+                //         .release();
+                //     await scrollAction.perform();
+                // }
+
+                // Survey Task - Long press on start task button to bypass it.
+                let startTaskButton = await driver.elementByAccessibilityId('StartSurveyTaskButton, ');
+                let action = new wd.TouchAction(driver);
+                action
+                    .longPress({el: startTaskButton})
+                    .wait(10000) // 10 sec off the 7 s required (3 sec additional margin).
+                    .release();
+                await action.perform();
+            }
+
+            /* Onboarding / Resting State Task */
+            {
+                // Required to wait a bit of time for some reason.. `await wd.TouchAction#perform` probably doesn't wait for lazy appearance of button, thus buggy!`
+                // await driver.sleep(5000);
+                
+                // Survey Task - Long press on start task button to bypass it.
+                let StartRestingStateTaskButton = await driver.elementByAccessibilityId('StartRestingStateTaskButton, ');
+                let action = new wd.TouchAction(driver);
+                action
+                    .longPress({el: StartRestingStateTaskButton})
+                    .wait(10000) // 10 sec off the 7 s required (3 sec additional margin).
+                    .release();
+                await action.perform();
+            }
+
+            /* Onboarding / Check Data Sync */
+            {
+                let syncButton = await driver.elementByAccessibilityId('SyncButton, ');
+                await syncButton.click();
+
+                // @todo check content & expect it to be <xxx>...
+
+                // Once data sync is finished (and thus nextButton is shown).
+                await driver.elementByAccessibilityId('CheckDataSyncNextButton, ');
+
+                // Look up for every table.
+                const tables = [
+                    'survey'
+                ];
+                for (let i=0; i < tables.length; ++i) {
+                    let table = tables[i];
+
+                    // Disable waiting time as item may not be available
+                    // and thus slow down the test run (as it can happens for 
+                    // every table).
+                    await driver.setImplicitWaitTimeout(0);
+
+                    // Retrieve data.
+                    let status, clientUploadedCount, clientUploadingCount, serverStoredCount, error;
+                    {
+                        let statusTextElement = await driver.elementByAccessibilityId(`${table}Status, `);
+                        let statusText = await statusTextElement.text();
+                        let [, status_] = statusText.match(/^[^:]+:\s*(.*)$/);
+                        status = status_;
+                        console.log(`${table}: status: `, status);
+                    }
+
+                    {
+                        let clientUploadCountTextElement = await driver.elementByAccessibilityId(`${table}ClientUploadCount, `);
+                        let clientUploadCountText = await clientUploadCountTextElement.text();
+                        let [, clientUploadedCount_, clientUploadingCount_] = clientUploadCountText.match(/^[^:]+:\s*([0-9]+)\/([0-9]+)$/);
+                        clientUploadedCount = +clientUploadedCount_;
+                        clientUploadingCount = +clientUploadingCount_;
+                        console.log(`${table}: clientUploadedCount/clientUploadingCount: ${clientUploadedCount}/${clientUploadingCount}`);
+                    }
+
+                    {
+                        let serverStoredCountTextElement = await driver.elementByAccessibilityId(`${table}ServerStoredCount, `);
+                        let serverStoredCountText = await serverStoredCountTextElement.text();
+                        let [, serverStoredCount_] = serverStoredCountText.match(/^[^:]+:\s*(.*)$/);
+                        serverStoredCount = +serverStoredCount_;
+                        console.log(`${table}: serverStoredCount: ${serverStoredCount}`);
+                    }
+
+                    try {
+                        let errorTextElement = await driver.elementByAccessibilityId(`${table}Error, `);
+                        let errorText = await errorTextElement.text();
+                        let [, error_] = errorText.match(/^[^:]+:\s*(.*)$/);
+                        error = error_ || undefined;
+
+                        // We do not check for error because it can just be a
+                        // reconnection attempt & SYNC_DONE check is enough.
+                        // SERVER_CONNECTION_INTERRUPTED is ignored because
+                        // it's looped upon until all rows are uploaded.
+                        // expect(error).toBe('SERVER_CONNECTION_INTERRUPTED');
+                    }
+                    catch (e) {
+                        /* ignore: element not found. */
+                    }
+
+                    expect(status).toBe('SYNC_DONE');
+                    expect(clientUploadedCount).toBe(clientUploadingCount);
+                    expect(clientUploadedCount).toBeGreaterThan(0);
+                    expect(serverStoredCount).toBeGreaterThan(0);
+                    if (typeof process.env.DEVICEFARM_DEVICE_NAME === 'undefined') {
+                        // Check for >= instead of === because we might be in
+                        // debug mode with aware already started before app
+                        // launch. In such case, new random deviceId wasn't
+                        // taken into account at Auth step and thus db may
+                        // already have records before sync.
+                        expect(serverStoredCount).toBeGreaterThanOrEqual(clientUploadedCount);
+                    }
+                    else {
+                        expect(serverStoredCount).toBe(clientUploadedCount);
+                    }
+                    expect(error).toBe(undefined);
+
+                    // Set back implicit waiting back.
+                    await driver.setImplicitWaitTimeout(implicitWaitTimeout);
+                }
+
+                let nextButton = await driver.elementByAccessibilityId('CheckDataSyncNextButton, ');
+                await nextButton.click();
+            }
+
+            /* Onboarding / End Onboarding */
+            {
+                let nextButton = await driver.elementByAccessibilityId('OnboardingEndNextButton, ');
+                await nextButton.click();
+            }
+
+            // Wait 15s so we have time to see the last screen and know it's
+            // not a crash.
+            await driver.sleep(1000 * 15);
         }
         catch (e) {
-            // wait 15s before crashing so we can see where the issue happens. 
+            // wait 15s before crashing so we can see where the issue has happened. 
             await driver.sleep(1000 * 15);
             throw e;
         }
-        // Start survey task
-        // let el8 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.TextView");
-        // await el8.click();
-        
-        // // Finish survey task
-        // // Wait for the list to be loaded.
-        // driver.sleep(5000);
-        // // Scroll a lot!
-        // for (let i=0; i<20; ++i) {
-        //     let scrollAction = new wd.TouchAction(driver);
-        //     scrollAction
-        //         // @note y starts from the top bar, thus we don't start from 0!
-        //         .longPress({x: 50, y: 150})
-        //         .moveTo({x: 50, y: 600})
-        //         .release();
-        //     await scrollAction.perform();
-        // }
-
-        // let el9 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[8]/android.view.ViewGroup");
-        // await el9.click();
-        // // Resting state
-        // let restingStateButton = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.TextView");
-        // // Long press
-        // let action = new wd.TouchAction(driver);
-        // action.longPress({el: restingStateButton});
-        // await action.perform();
-
-        // // Sync data
-        // let el10 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.TextView");
-        // await el10.click();
-
-        // let el1 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.widget.EditText");
-        // await el1.click();
-        // await el1.sendKeys("4wc2uw");
-        // let el2 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup");
-        // await el2.click();
-
-        // Do not start study yet has it depends on the current time!
-        // let el3 = await driver.elementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[2]");
-        // await el3.click();
-
-        expect(true);
     });
 });
 

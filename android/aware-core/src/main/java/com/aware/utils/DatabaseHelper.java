@@ -64,7 +64,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase.loadLibs(context);
 
         if (DB_ENCRYPTION_KEY.equals("passwordChangeMe")) {
-            throw new RuntimeException("DatabaseHelper#DB_ENCRYPTION_KEY must be set!");
+            throw new RuntimeException("DatabaseHelper#DB_ENCRYPTION_KEY must be set! Flux: Note this exeption is sometimes triggered because aware hasn't been started yet.");
         }
     }
 

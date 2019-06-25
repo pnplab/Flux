@@ -33,11 +33,11 @@ const AuthView = (props: Props) =>
                 <Form>
                     <Item floatingLabel>
                         <Label>numéro d'identification</Label>
-                        <Input value={props.participantId} onChangeText={participantId => props.onParticipantIdChanged(participantId)} />
+                        <Input value={props.participantId} onChangeText={participantId => props.onParticipantIdChanged(participantId)} accessibilityLabel="DeviceIdInput" />
                     </Item>
                     <Item floatingLabel>
                         <Label>code d'accès</Label>
-                        <Input value={props.password} onChangeText={password => props.onPasswordChanged(password)} onSubmitEditing={e => props.onSubmit()} />
+                        <Input value={props.password} onChangeText={password => props.onPasswordChanged(password)} onSubmitEditing={e => props.onSubmit()} accessibilityLabel="StudyCodeInput" />
                     </Item>
                 </Form>
             </InputView>
@@ -47,7 +47,7 @@ const AuthView = (props: Props) =>
                 </ErrorView>
             }
             <ButtonView>
-                <CircleButton type="next" onPress={e => props.onSubmit()} />
+                <CircleButton type="next" onPress={e => props.onSubmit()} accessibilityLabel="AuthNextButton" />
             </ButtonView>
         </EnableCenteredContent>
     </Container>;
@@ -72,7 +72,7 @@ const IdInput = styled(Input)
     .attrs({
         placeholder: 'Numéro d\'identification',
         autoCorrect: false,
-        secureTextEntry: false
+        secureTextEntry: false,
     }
     )`
         border-bottom-color: #AAA;
