@@ -6,6 +6,7 @@ Make sure you have set your android/gradle.properties file (it's in .gitignore
 due to cryptographic info):
 
 ```
+# @note These can be set to CI by using ./graldlew -PVAR_NAME1=... -PVAR_NAME2=... -PPACKAGE.VAR_NAME=...
 FLUX_RELEASE_STORE_FILE=xxxxxxxxx.keystore
 FLUX_RELEASE_KEY_ALIAS=xxxxxxxxx
 FLUX_RELEASE_STORE_PASSWORD=xxxxxxxxx
@@ -14,7 +15,8 @@ FLUX_RELEASE_KEY_PASSWORD=xxxxxxxxx
 android.useAndroidX=true
 android.enableJetifier=true
 
-org.gradle.jvmargs=-Xms128m -Xmx1024m -XX:+CMSClassUnloadingEnabled
+# @note This can be set to CI by prepending GRADLE_OPTS="-Xms128m -Xmx2048m -XX:+CMSClassUnloadingEnabled" to the command.
+org.gradle.jvmargs=-Xms128m -Xmx2048m -XX:+CMSClassUnloadingEnabled
 ```
 
 Also, make sure you set the proper keystore (see react-native official doc, cf. `https://facebook.github.io/react-native/docs/signed-apk-android`).
