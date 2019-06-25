@@ -36,7 +36,7 @@ build:android:
         - echo ${FLUX_RELEASE_KEY_KEYSTORE_B64} | base64 -d > android/app/flux-release-key.keystore
         - echo ${GOOGLE_SERVICES_JSON} > android/app/google-services.json
         - npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/
-        - cd android && ./gradlew assembleRelease -PFLUX_RELEASE_STORE_PASSWORD=${FLUX_RELEASE_STORE_PASSWORD} -PFLUX_RELEASE_KEY_PASSWORD=${FLUX_RELEASE_KEY_PASSWORD} -Pandroid.useAndroidX=true -Pandroid.enableJetifier=true -Porg.gradle.jvmargs="-Xms128m -Xmx1024m -XX:+CMSClassUnloadingEnabled" -x bundleReleaseJsAndAssets && cd ..
+        - cd android && GRADLE_OPTS="-Xms128m -Xmx2048m -XX:+CMSClassUnloadingEnabled" ./gradlew assembleRelease -PFLUX_RELEASE_STORE_PASSWORD=${FLUX_RELEASE_STORE_PASSWORD} -PFLUX_RELEASE_KEY_PASSWORD=${FLUX_RELEASE_KEY_PASSWORD} -Pandroid.useAndroidX=true -Pandroid.enableJetifier=true -x bundleReleaseJsAndAssets && cd ..
     after_script:
         - cp ${GRADLE_OUTPUT_PATH} ${APK_FILE}
 
