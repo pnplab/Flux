@@ -2,10 +2,15 @@
 #
 # @note aws doc `https://docs.aws.amazon.com/devicefarm/latest/developerguide/how-to-create-test-run.html`
 
-set -e
+set -ex
 
 echo "@warning make sure you have npm-bundle installed"
 echo -e "\t\`npm install -g npm-bundle\`"
+
+
+# Remove temporary files if already exists.
+# That only need to be done if script has crashed during execution (and thus hasn't been done at the end) 
+rm -r test-package/ || true
 
 # Copy minimal amount of file to run integration tests (so copy to aws device farm doesn't take too long)
 mkdir test-package/
@@ -23,13 +28,14 @@ cat package.json | jq '
         "react-native": .dependencies["react-native"],
         "@babel/core": .devDependencies["@babel/core"],
         "@babel/runtime": .devDependencies["@babel/runtime"],
-        "@jest/reporters: .devDependencies["@jest/reporters"],
+        "@jest/reporters": .devDependencies["@jest/reporters"],
         "babel-plugin-transform-inline-environment-variables": .devDependencies["babel-plugin-transform-inline-environment-variables"],
         "jest": .devDependencies["jest"],
         "react-test-renderer": .devDependencies["react-test-renderer"],
-        "wd": .devDependencies["wd"]
+        "wd": .devDependencies["wd"],
+        "@react-native-community/cli": "2.0.0"
     },
-    jest: .jest | del(.setupFilesAfterEnv?)
+    jest: .jest | del(.setupFilesAfterEnv?) | del(.preset)
 }
 ' > test-package/package.json
 mkdir test-package/__tests__/

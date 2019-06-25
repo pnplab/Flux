@@ -101,8 +101,15 @@ describe('SomeComponent', () => {
             { 
                 let startAwareButton = await driver.elementByAccessibilityId('StartAwareButton, ');
                 await startAwareButton.click();
-                let nextButton = await driver.elementByAccessibilityId('CheckPhenotypingNextButton, ');
-                await nextButton.click();
+
+                try {
+                    let nextButton = await driver.elementByAccessibilityId('CheckPhenotypingNextButton, ');
+                    await nextButton.click();
+                }
+                catch (e) {
+                    console.error('Aware study has probably not been joined. Is server online ?');
+                    throw e;
+                }
             }
 
             /* Onboarding / Survey Task */

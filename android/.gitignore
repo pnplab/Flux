@@ -1,5 +1,5 @@
 # Prevent key/cryptographic files from being published
-android/app/src/main/assets/index.android.bundle
+app/src/main/assets/index.android.bundle
 gradle.properties
 app/flux-release-key.keystore
 app/google-services.json
