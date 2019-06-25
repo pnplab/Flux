@@ -21,8 +21,9 @@ cat package.json | jq '
     scripts: { test: "node node_modules/jest/bin/jest.js" },
     dependencies: {
         "react-native": .dependencies["react-native"],
-        "babel-core": .devDependencies["babel-core"],
-        "babel-jest": .devDependencies["babel-jest"],
+        "@babel/core": .devDependencies["@babel/core"],
+        "@babel/runtime": .devDependencies["@babel/runtime"],
+        "@jest/reporters: .devDependencies["@jest/reporters"],
         "babel-plugin-transform-inline-environment-variables": .devDependencies["babel-plugin-transform-inline-environment-variables"],
         "jest": .devDependencies["jest"],
         "react-test-renderer": .devDependencies["react-test-renderer"],
