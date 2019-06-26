@@ -32,39 +32,12 @@ if (typeof process.env.MYSQL_HOST === 'undefined' ||
     throw new Error('Missing at least one mandatory MYSQL environment variable!');
 }
 
-const available_tables = [
-    'accelerometer',
-    'aware_device',
-    'aware_log',
-    'aware_studies',
-    'battery',
-    'battery_charges',
-    'battery_discharges',
-    'calls',
-    'cdma',
-    'gsm',
-    'gsm_neighbor',
-    'gyroscope',
-    'light',
-    'locations',
-    'messages',
-    'network',
-    'network_traffic',
-    'processor',
-    'proximity',
-    'rotation',
-    'screen',
-    'sensor_accelerometer',
-    'sensor_gyroscope',
-    'sensor_light',
-    'sensor_proximity',
-    'sensor_rotation',
-    'sensor_wifi',
-    'telephony',
-    'touch',
-    'wifi',
-    'survey'
-];
+// Retrieve synced table array from environment.
+if (typeof process.env.SYNCED_TABLES === 'undefined') {
+    throw new Error('process.env.SYNCED_TABLES is undefined!');
+}
+const syncedTablesString = process.env.SYNCED_TABLES;
+const available_tables = JSON.parse(syncedTablesString);
 
 // @returns The number of row by table for deviceId.
 router.get('/check-sync/android/:deviceId', async (ctx, next) => {

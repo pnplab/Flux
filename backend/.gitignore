@@ -1,3 +1,8 @@
+
+# @warning Make sure all the ignored files from ./backend *and* underlying 
+# folder goes into this single .gitignore file as it is used in 
+# `../scripts/backend/rsync.sh` to not copy files such as sql db etc.
+
 application/logs/*
 docker/letsencrypt/data/*
 docker/letsencrypt/webroot/*

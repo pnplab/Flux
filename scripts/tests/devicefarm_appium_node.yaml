@@ -12,7 +12,7 @@ phases:
       # To install a newer version of Appium use the following commands:
       - export APPIUM_VERSION=1.13.0
       - avm $APPIUM_VERSION
-      - ln -s /usr/local/avm/versions/$APPIUM_VERSION/node_modules/.bin/appium  /usr/local/avm/versions/$APPIUM_VERSION/node_modules/appium/bin/appium.js
+      - ln -s /usr/local/avm/versions/$APPIUM_VERSION/node_modules/.bin/appium /usr/local/avm/versions/$APPIUM_VERSION/node_modules/appium/bin/appium.js
       
       # By default the node version installed is 11.4.0
       # you can switch to an alternate node version using below command.
@@ -41,7 +41,7 @@ phases:
       - >-
         appium --log-timestamp --device-name $DEVICEFARM_DEVICE_NAME
         --platform-name $DEVICEFARM_DEVICE_PLATFORM_NAME --app $DEVICEFARM_APP_PATH
-        --udid $DEVICEFARM_DEVICE_UDID --chromedriver-executable $DEVICEFARM_CHROMEDRIVER_EXECUTABLE  >> $DEVICEFARM_LOG_DIR/appiumlog.txt 2>&1 &
+        --udid $DEVICEFARM_DEVICE_UDID --chromedriver-executable $DEVICEFARM_CHROMEDRIVER_EXECUTABLE >> $DEVICEFARM_LOG_DIR/appiumlog.txt 2>&1 &
       
       - >-
         start_appium_timeout=0;

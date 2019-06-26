@@ -73,7 +73,6 @@ class AwareManager {
         if (typeof process.env.FLUX_ENCRYPTION_KEY === 'undefined') {
             throw new Error('process.env.FLUX_ENCRYPTION_KEY is undefined!');
         }
-
         const encryptionKey = process.env.FLUX_ENCRYPTION_KEY;
 
         // @warning Permissions must be received first before calling !
@@ -90,13 +89,15 @@ class AwareManager {
         // @note only way is to either modify server or sensor architecture or to do tricky design (ie. caching the POST req. result)
         // We thus retrieve it manually.
         
-        return [
-            'survey',
-            'aware_device',
-            'aware_studies',
-            'aware_log',
-            // @todo ...
-        ];
+        // Retrieve synced table array from environment.
+        if (typeof process.env.SYNCED_TABLES === 'undefined') {
+            throw new Error('process.env.SYNCED_TABLES is undefined!');
+        }
+        const syncedTablesString = process.env.SYNCED_TABLES;
+        const syncedTables = JSON.parse(syncedTablesString);
+
+        // Return the value.
+        return syncedTables;
     }
 
     async joinStudy(studyUrl: string) {

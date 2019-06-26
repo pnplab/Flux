@@ -88,6 +88,7 @@ services:
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
             MYSQL_DATABASE: ${MYSQL_DATABASE}
             DD_AGENT_HOST: datadog
+            SYNCED_TABLES: ${SYNCED_TABLES}
         volumes:
             # @warning Source code is on volume but not node_modules! Rebuild is required in case of dependency change!
             - ./docker/node/src/:/usr/src/app/src/

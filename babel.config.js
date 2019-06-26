@@ -20,7 +20,8 @@ module.exports = {
             "include": [
                 "FLUX_AUTO_UPDATE",
                 "FLUX_ENCRYPTION_KEY",
-                "STUDY_URL"
+                "STUDY_URL",
+                "SYNCED_TABLES"
             ]
         }]
     ]
