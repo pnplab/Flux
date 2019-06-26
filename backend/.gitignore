@@ -1,10 +1,12 @@
-
 # @warning Make sure all the ignored files from ./backend *and* underlying 
 # folder goes into this single .gitignore file as it is used in 
 # `../scripts/backend/rsync.sh` to not copy files such as sql db etc.
+#
+# @warning For some reason globs seems to break the pattern in OSX rsync's 
+# `--exclude-from`. Do not end folder patterns with `/*` globs !
 
-application/logs/*
-docker/letsencrypt/data/*
-docker/letsencrypt/webroot/*
+application/logs/
+docker/letsencrypt/data/
+docker/letsencrypt/webroot/
 docker/letsencrypt/dhparam-2048.pem
-docker/mysql/data/*
+docker/mysql/data/
