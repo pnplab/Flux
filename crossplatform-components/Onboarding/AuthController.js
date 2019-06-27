@@ -24,7 +24,7 @@ type Props = {
 };
 type State = {
     currentPassword?: string,
-    currentParticipantId?: string,
+    currentDeviceId?: string,
     error?: string
 };
 
@@ -40,7 +40,7 @@ export default class AuthController extends PureComponent<Props, State> {
 
         this.state = {
             currentPassword: '',
-            currentParticipantId: '',
+            currentDeviceId: '',
             error: undefined,
         };
     }
@@ -49,19 +49,19 @@ export default class AuthController extends PureComponent<Props, State> {
         this.setState({ currentPassword: password });
     }
 
-    onParticipantIdChanged = (participantId: string) => {
-        this.setState({ currentParticipantId: participantId });
+    onDeviceIdChanged = (deviceId: string) => {
+        this.setState({ currentDeviceId: deviceId });
     }
     
     onSubmit = () => {
         // Show error on failure.
-        if (this.state.currentParticipantId === '') {
+        if (this.state.currentDeviceId === '') {
             this.setState({ error: 'numéro d\'identification non défini' });
             return;
         }
 
         // @todo
-        // if (!/^$/.test(this.state.currentParticipantId)) {
+        // if (!/^$/.test(this.state.currentDeviceId)) {
         //     this.setState({ error: 'mauvais format de numéro d\'identification' });
         //     return;
         // }
@@ -72,7 +72,7 @@ export default class AuthController extends PureComponent<Props, State> {
         }
         // Trigger initialization on success.
         this.setState({ error: undefined });
-        this.props.onStepFinished(this.state.currentPassword, this.state.currentParticipantId);
+        this.props.onStepFinished(this.state.currentPassword, this.state.currentDeviceId);
     }
 
     render() {
@@ -83,8 +83,8 @@ export default class AuthController extends PureComponent<Props, State> {
                 password={this.state.currentPassword}
                 onPasswordChanged={this.onPasswordChanged}
                 
-                participantId={this.state.currentParticipantId}
-                onParticipantIdChanged={this.onParticipantIdChanged}
+                deviceId={this.state.currentDeviceId}
+                onDeviceIdChanged={this.onDeviceIdChanged}
 
                 onSubmit={this.onSubmit}
             />

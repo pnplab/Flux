@@ -93,7 +93,7 @@ export default () =>
 
                 <>
 
-                    <Auth onStepFinished={ (deviceId, studyId) => setDeviceId(deviceId) & goToStep(CheckWifi) } />
+                    <Auth onStepFinished={ (studyId, deviceId) => setDeviceId(deviceId) & goToStep(CheckWifi) } />
 
                     <CheckWifi onStepFinished={ () => goToStep(CheckPermissions) } />
 

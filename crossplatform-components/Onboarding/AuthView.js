@@ -11,8 +11,8 @@ import { Container, Content, Title, Text, Button, Form, Item, Label, Input, Circ
 
 type Props = {
     +error?: string,
-    +participantId?: string,
-    +onParticipantIdChanged: (participantId: string) => void,
+    +deviceId?: string,
+    +onDeviceIdChanged: (deviceId: string) => void,
     +password?: string,
     +onPasswordChanged: (password: string) => void,
     +onSubmit: () => void
@@ -33,7 +33,7 @@ const AuthView = (props: Props) =>
                 <Form>
                     <Item floatingLabel>
                         <Label>numéro d'identification</Label>
-                        <Input value={props.participantId} onChangeText={participantId => props.onParticipantIdChanged(participantId)} accessibilityLabel="DeviceIdInput" />
+                        <Input value={props.deviceId} onChangeText={deviceId => props.onDeviceIdChanged(deviceId)} accessibilityLabel="DeviceIdInput" />
                     </Item>
                     <Item floatingLabel>
                         <Label>code d'accès</Label>
