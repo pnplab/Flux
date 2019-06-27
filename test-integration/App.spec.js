@@ -37,7 +37,7 @@ describe('SomeComponent', () => {
         }
     });
     
-    test('renders some use case', async () => {
+    test('Assess data synchronization', async () => {
         // our test actions and expectations.
         // expect(await driver.hasElementByAccessibilityId('testview')).toBe(true);
         try {
@@ -53,6 +53,11 @@ describe('SomeComponent', () => {
             {
                 const deviceId = `qa${Math.random().toString(36).substring(2, 10)}`;
                 const studyCode = '4wc2uw';
+
+                console.info(`========= STUDY SETUP ==========`);
+                console.info(`deviceId: ${deviceId}`);
+                console.info(`studyCode: ${studyCode}`);
+                console.info(`========= STUDY SETUP ==========`);
 
                 // deviceIdInput
                 let deviceIdInput = await driver.elementByAccessibilityId('DeviceIdInput, ');
@@ -78,21 +83,36 @@ describe('SomeComponent', () => {
             }
 
             /* Onboarding / Check Permissions Screen */
-            { 
-                // Check permissions first. Due to auto permission accept, this 
-                // will trigger & validate all the permission at once unlike.
-                // regular end-user workflow.
-
-                // @warning Both button are called the same name though. 
+            {
+                // If we're in dev mode, may be permissions have already been
+                // accepted because the app was already installed. In this case,
+                // fast forward the process.
+                await driver.setImplicitWaitTimeout(1000);
+                let havePermissionsAlreadyBeenAccepted = undefined;
                 try {
-                    let checkPermissionsButton = await driver.elementByAccessibilityId('RequestPermissionsButton, ');
-                    await checkPermissionsButton.click();
-                    await driver.sleep(500);
+                    await driver.elementByAccessibilityId('CheckPermissionsNextButton, ');
+                    havePermissionsAlreadyBeenAccepted = true;
                 }
                 catch (e) {
-                    // Ignore issue if request perm button is not found, it 
-                    // likely means app had already the permission granted.
+                    havePermissionsAlreadyBeenAccepted = false;
                 }
+                await driver.setImplicitWaitTimeout(implicitWaitTimeout);
+
+                // Request permissions first. Due to auto permission accept, this 
+                // will trigger & validate all the permission at once unlike.
+                // regular end-user workflow.
+                if (!havePermissionsAlreadyBeenAccepted) {
+                    try {
+                        let checkPermissionsButton = await driver.elementByAccessibilityId('RequestPermissionsButton, ');
+                        await checkPermissionsButton.click();
+                    }
+                    catch (e) {
+                        // Ignore issue if request perm button is not found, it 
+                        // likely means app had already the permission granted.
+                    }
+                }
+
+                // Go to next step.
                 let nextButton = await driver.elementByAccessibilityId('CheckPermissionsNextButton, ');
                 await nextButton.click();
             }
@@ -171,10 +191,11 @@ describe('SomeComponent', () => {
                 const tables = [
                     'survey'
                 ];
+                let resultsByTables = {};
                 for (let i=0; i < tables.length; ++i) {
                     let table = tables[i];
 
-                    // Disable waiting time as item may not be available
+                    // Disable waiting time as synced table may not be available
                     // and thus slow down the test run (as it can happens for 
                     // every table).
                     await driver.setImplicitWaitTimeout(0);
@@ -222,6 +243,41 @@ describe('SomeComponent', () => {
                         /* ignore: element not found. */
                     }
 
+                    // Set back implicit waiting back.
+                    await driver.setImplicitWaitTimeout(implicitWaitTimeout);
+
+                    // Store results in object so we can log all tables before
+                    // throwing at first error and stopping the tests.
+                    resultsByTables = {
+                        ...resultsByTables,
+                        [table]: {
+                            status,
+                            clientUploadedCount,
+                            clientUploadingCount,
+                            serverStoredCount,
+                            error
+                        }
+                    };
+                }
+
+                // Log each table results.
+                for (let table in resultsByTables) {
+                    let { status, clientUploadedCount, clientUploadingCount, serverStoredCount, error } = resultsByTables[table];
+
+                    console.info(`========= TABLE: ${table} ==========`);
+                    console.info(`status: ${status}`);
+                    console.info(`clientUploadedCount: ${clientUploadedCount}`);
+                    console.info(`clientUploadingCount: ${clientUploadingCount}`);
+                    console.info(`serverStoredCount: ${serverStoredCount}`);
+                    console.info(`error: ${error}`);
+                    console.info(``);
+
+                }
+
+                // Assess each table result.
+                for (let table in resultsByTables) {
+                    let { status, clientUploadedCount, clientUploadingCount, serverStoredCount, error } = resultsByTables[table];
+
                     expect(status).toBe('SYNC_DONE');
                     expect(clientUploadedCount).toBe(clientUploadingCount);
                     expect(clientUploadedCount).toBeGreaterThan(0);
@@ -238,11 +294,9 @@ describe('SomeComponent', () => {
                         expect(serverStoredCount).toBe(clientUploadedCount);
                     }
                     expect(error).toBe(undefined);
-
-                    // Set back implicit waiting back.
-                    await driver.setImplicitWaitTimeout(implicitWaitTimeout);
                 }
 
+                // Go to next step.
                 let nextButton = await driver.elementByAccessibilityId('CheckDataSyncNextButton, ');
                 await nextButton.click();
             }

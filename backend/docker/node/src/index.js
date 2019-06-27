@@ -36,6 +36,8 @@ if (typeof process.env.MYSQL_HOST === 'undefined' ||
 if (typeof process.env.SYNCED_TABLES === 'undefined') {
     throw new Error('process.env.SYNCED_TABLES is undefined!');
 }
+console.info(`process.env.SYNCED_TABLES: `);
+console.info(process.env.SYNCED_TABLES);
 const syncedTablesString = process.env.SYNCED_TABLES;
 const available_tables = JSON.parse(syncedTablesString);
 

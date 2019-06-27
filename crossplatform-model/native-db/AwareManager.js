@@ -205,7 +205,7 @@ class AwareManager {
         // @todo add try/catch block to capture network error.
         let response = await fetch(`${serverUrl}/check-sync/android/${table}/${deviceId}`);
         if (!response.ok) {
-            throw new Error(`Request ${serverUrl}/check-sync/android/${deviceId} failed with error ${response.status} - ${await response.text()}`)
+            throw new Error(`Request ${serverUrl}/check-sync/android/${table}/${deviceId} failed with error ${response.status} - ${await response.text()}`)
         }
         else {
             let rowCountByTable = await response.json();

@@ -139,7 +139,7 @@ export default class CheckDataSyncController extends PureComponent<Props, State>
     ];
 
     onTableSyncStarted = ({ table, rowCount }) => {
-        console.log('pnplab::CheckDataSyncController #onTableSyncStarted', table, rowCount);
+        console.debug('pnplab::CheckDataSyncController #onTableSyncStarted', table, rowCount);
 
         // Init current table state.
         this.setState(s => ({
@@ -157,7 +157,7 @@ export default class CheckDataSyncController extends PureComponent<Props, State>
         }));
     };
     onTableSyncBatchStarted = ({ table, rowCount, lastRowUploaded }) => {
-        console.log('pnplab::CheckDataSyncController #onTableSyncBatchStarted', table, rowCount, lastRowUploaded);
+        console.debug('pnplab::CheckDataSyncController #onTableSyncBatchStarted', table, rowCount, lastRowUploaded);
 
         // Update current table state.
         this.setState(s => ({
@@ -174,7 +174,7 @@ export default class CheckDataSyncController extends PureComponent<Props, State>
         }));
     };
     onTableSyncFinished = async ({ table }) => {
-        console.log('pnplab::CheckDataSyncController #onTableSyncFinished', table);
+        console.debug('pnplab::CheckDataSyncController #onTableSyncFinished', table);
 
         // Update current table state.
         this.setState(s => ({
@@ -195,7 +195,7 @@ export default class CheckDataSyncController extends PureComponent<Props, State>
         // Check table status server-side !
         try {
             const serverSideTableRowCount = await AwareManager.getSyncedDataCheckupForTable(table);
-            console.log('pnplab::CheckDataSyncController #serverSideTableRowCount', serverSideTableRowCount);
+            console.debug('pnplab::CheckDataSyncController #serverSideTableRowCount', serverSideTableRowCount);
 
             // Update current table state.
             this.setState(s => ({
@@ -223,7 +223,7 @@ export default class CheckDataSyncController extends PureComponent<Props, State>
         // Error while counting synced data server-side!
         catch (e) {
             console.error('Error while counting synced data server-side!', table, e);
-            console.log('pnplab::CheckDataSyncController #error', table, e);
+            console.debug('pnplab::CheckDataSyncController #error', table, e);
 
             this.setState(s => ({
                 ...s,
@@ -249,7 +249,7 @@ export default class CheckDataSyncController extends PureComponent<Props, State>
         }
     };
     onTableSyncFailed = ({ table, error }) => {  
-        console.log('pnplab::CheckDataSyncController #onTableSyncFailed', table, error);
+        console.debug('pnplab::CheckDataSyncController #onTableSyncFailed', table, error);
 
         // Update current table state.
         this.setState(s => ({
@@ -311,7 +311,7 @@ export default class CheckDataSyncController extends PureComponent<Props, State>
     };
 
     onFullSyncFinished = async () => {
-        console.log('pnplab::CheckDataSyncController #onFullSyncFinished');
+        console.debug('pnplab::CheckDataSyncController #onFullSyncFinished');
 
         // Check synced data server-side!
         try {
