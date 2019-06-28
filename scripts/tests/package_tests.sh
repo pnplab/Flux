@@ -5,6 +5,7 @@
 set -ex
 
 echo "@warning make sure you have npm-bundle installed"
+echo "@warning make sure SYNCED_TABLES variable is sourced"
 echo -e "\t\`npm install -g npm-bundle\`"
 
 
@@ -40,6 +41,11 @@ cat package.json | jq '
 ' > test-package/package.json
 mkdir test-package/__tests__/
 cp -R test-integration/ test-package/__tests__/
+
+# Inect synced tables environment variable into tests.
+# Remove newlines for sed.
+SYNCED_TABLES_TR=`echo ${SYNCED_TABLES} | tr '\n' ' ' | tr '[' ' ' | tr ']' ' '`
+sed -i -e "s/\/\* @SED_SYNCED_TABLES_FROM_ENV \*\//${SYNCED_TABLES_TR}/g" test-package/__tests__/*.spec.js
 
 # Open folder
 cd test-package/

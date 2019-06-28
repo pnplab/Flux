@@ -102,42 +102,6 @@ export default class CheckDataSyncController extends PureComponent<Props, State>
         AwareManager.enableAutomaticSync();
     }
 
-    // List of table to sync, so we know when the upload as finished.
-    // @warning This has to be kept in sync depending on the study!
-    // @todo Retrieve this table dynamically from Aware!
-    tableToSync = [
-        'accelerometer',
-        'aware_device',
-        'aware_log',
-        'aware_studies',
-        'battery',
-        'battery_charges',
-        'battery_discharges',
-        'calls',
-        'cdma',
-        'gsm',
-        'gsm_neighbor',
-        'gyroscope',
-        'light',
-        'locations',
-        'messages',
-        'network',
-        'network_traffic',
-        'processor',
-        'proximity',
-        'rotation',
-        'screen',
-        'sensor_accelerometer',
-        'sensor_gyroscope',
-        'sensor_light',
-        'sensor_proximity',
-        'sensor_rotation',
-        'sensor_wifi',
-        'telephony',
-        'touch',
-        'wifi',
-    ];
-
     onTableSyncStarted = ({ table, rowCount }) => {
         console.debug('pnplab::CheckDataSyncController #onTableSyncStarted', table, rowCount);
 

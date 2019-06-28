@@ -6,14 +6,55 @@
 //      tested code.
 
 const path = require('path');
+const fs = require('fs'); // To store screenshot
 import wd from 'wd';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000*60*60; // 60min timeout, as there is a very long waiting time set to sync data! 
 
 const { driver, capabilities } = generateSetup();
 
-describe('SomeComponent', () => {
-                      
+// // Register screenshot when error happens so we can see what happened.
+// // Taken & adapted from https://github.com/smooth-code/jest-puppeteer/issues/131
+// const takeScreenshot = async () => {
+//     let b64Png = await driver.takeScreenshot();
+//     let b64PngData = b64Png.replace(/^data:image\/png;base64,/, '');
+// 
+//     fs.writeFile("screenshot-error.png", b64PngData, 'base64', (err) => {
+//         if (err) {
+//             throw err;
+//         }
+//         else {
+//             console.debug('file screenshot-error.png written');
+//         }
+//     });
+// }
+// 
+// /**
+//  * jasmine reporter does not support async.
+//  * So we store the screenshot promise and wait for it before each test
+//  */
+// let screenshotPromise = Promise.resolve();
+// beforeEach(() => screenshotPromise);
+// afterAll(() => screenshotPromise);
+// 
+// /**
+//  * Take a screenshot on Failed test.
+//  * Jest standard reporters run in a separate process so they don't have
+//  * access to the page instance. Using jasmine reporter allows us to
+//  * have access to the test result, test name and page instance at the same time.
+//  */
+// jasmine.getEnv().addReporter({
+//     specDone: async result => {
+//         if (result.status === 'failed') {
+//             screenshotPromise = screenshotPromise
+//                 .catch()
+//                 .then(() => takeScreenshot(result.fullName));
+//         }
+//     },
+// });
+
+describe('Flux', () => {
+
     beforeAll(async () => {
         try {
             await driver.init(capabilities);
@@ -49,6 +90,7 @@ describe('SomeComponent', () => {
             //     inbetween screens otherwise appium might not find out the
             //     button has changed as it doesn't detect screen transition.
 
+
             /* Onboarding / Auth Screen */
             {
                 const deviceId = `qa${Math.random().toString(36).substring(2, 10)}`;
@@ -57,7 +99,7 @@ describe('SomeComponent', () => {
                 console.info(`========= STUDY SETUP ==========`);
                 console.info(`deviceId: ${deviceId}`);
                 console.info(`studyCode: ${studyCode}`);
-                console.info(`========= STUDY SETUP ==========`);
+                console.info(`================================`);
 
                 // deviceIdInput
                 let deviceIdInput = await driver.elementByAccessibilityId('DeviceIdInput, ');
@@ -179,18 +221,39 @@ describe('SomeComponent', () => {
 
             /* Onboarding / Check Data Sync */
             {
+                // Retrieve list of table to check.
+                let tables;
+                if (typeof process.env.SYNCED_TABLES === 'undefined') {
+                    // Retrieve synced table array manually, replaced by sed 
+                    // from env during test packaging.
+                    tables = [ /* @SED_SYNCED_TABLES_FROM_ENV */ ];
+                }
+                else {
+                    // Retrieve synced table array from environment, mostly 
+                    // used for local test setup.
+                    console.debug('process.env.SYNCED_TABLES: ', process.env.SYNCED_TABLES);
+                    const syncedTablesString = process.env.SYNCED_TABLES;
+                    tables = JSON.parse(syncedTablesString);
+                }
+                console.info(`=========== TABLES =============`);
+                console.info(tables);
+                console.info(`================================`);
+
                 let syncButton = await driver.elementByAccessibilityId('SyncButton, ');
                 await syncButton.click();
 
                 // @todo check content & expect it to be <xxx>...
 
                 // Once data sync is finished (and thus nextButton is shown).
-                await driver.elementByAccessibilityId('CheckDataSyncNextButton, ');
+                try {
+                    await driver.elementByAccessibilityId('CheckDataSyncNextButton, ');
+                }
+                catch (e) {
+                    // Prevent exception from quitting the script. May be sync took more than 20secs ?
+                    console.error(e);
+                }
 
                 // Look up for every table.
-                const tables = [
-                    'survey'
-                ];
                 let resultsByTables = {};
                 for (let i=0; i < tables.length; ++i) {
                     let table = tables[i];
@@ -198,7 +261,7 @@ describe('SomeComponent', () => {
                     // Disable waiting time as synced table may not be available
                     // and thus slow down the test run (as it can happens for 
                     // every table).
-                    await driver.setImplicitWaitTimeout(0);
+                    await driver.setImplicitWaitTimeout(1000);
 
                     // Retrieve data.
                     let status, clientUploadedCount, clientUploadingCount, serverStoredCount, error;
@@ -258,12 +321,8 @@ describe('SomeComponent', () => {
                             error
                         }
                     };
-                }
 
-                // Log each table results.
-                for (let table in resultsByTables) {
-                    let { status, clientUploadedCount, clientUploadingCount, serverStoredCount, error } = resultsByTables[table];
-
+                    // Log each table results.
                     console.info(`========= TABLE: ${table} ==========`);
                     console.info(`status: ${status}`);
                     console.info(`clientUploadedCount: ${clientUploadedCount}`);
@@ -271,7 +330,6 @@ describe('SomeComponent', () => {
                     console.info(`serverStoredCount: ${serverStoredCount}`);
                     console.info(`error: ${error}`);
                     console.info(``);
-
                 }
 
                 // Assess each table result.
@@ -312,8 +370,8 @@ describe('SomeComponent', () => {
             await driver.sleep(1000 * 15);
         }
         catch (e) {
-            // wait 15s before crashing so we can see where the issue has happened. 
-            await driver.sleep(1000 * 15);
+            // wait 1m before crashing so we can see where the issue has happened. 
+            await driver.sleep(1000 * 60);
             throw e;
         }
     });
