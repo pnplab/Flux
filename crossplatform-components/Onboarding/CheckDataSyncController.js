@@ -168,11 +168,6 @@ export default class CheckDataSyncController extends PureComponent<Props, State>
                     ...s.syncStatus,
                     [table]: {
                         ...s.syncStatus[table],
-                        status: 'SYNC_DONE',
-                        // @note As lastRowUploaded is only sync in
-                        //       onTableSyncBatchStarted, last one update is
-                        //       missing so we update it manually!
-                        lastRowUploaded: s.syncStatus[table].rowCount,
                         serverSideRowCount: serverSideTableRowCount
                     }
                 }
@@ -195,11 +190,6 @@ export default class CheckDataSyncController extends PureComponent<Props, State>
                     ...s.syncStatus,
                     [table]: {
                         ...s.syncStatus[table],
-                        status: 'SYNC_DONE',
-                        // @note As lastRowUploaded is only sync in
-                        //       onTableSyncBatchStarted, last one update is
-                        //       missing so we update it manually!
-                        lastRowUploaded: s.syncStatus[table].rowCount,
                         serverSideRowCount: null,
                     }
                 }
@@ -276,6 +266,17 @@ export default class CheckDataSyncController extends PureComponent<Props, State>
 
     onFullSyncFinished = async () => {
         console.debug('pnplab::CheckDataSyncController #onFullSyncFinished');
+
+        // Log all data so they can be retrieved in integration tests.
+        console.info('######## FLUX INTEGRATION TEST DATA ########');
+        for (let table in this.state.syncStatus) {
+            let { status, lastRowUploaded, rowCount, serverSideRowCount, error } = this.state.syncStatus[table];
+            if (serverSideRowCount === null) serverSideRowCount = 'null';
+            if (error === undefined) error = 'undefined';
+
+            console.info(`~test ${table}: ${status} ${lastRowUploaded}/${rowCount} ${serverSideRowCount} ${error}`)            
+        }
+        console.info('#############################################');
 
         // Check synced data server-side!
         try {

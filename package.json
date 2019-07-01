@@ -58,6 +58,7 @@
     "wd": "1.11.1"
   },
   "jest": {
+    "verbose": true,
     "preset": "react-native",
     "setupFilesAfterEnv": [
       "<rootDir>/test-mocks/mockFirebase",
