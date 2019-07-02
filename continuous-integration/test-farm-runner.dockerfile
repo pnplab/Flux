@@ -11,8 +11,8 @@ RUN apk add --no-cache --virtual .build-deps-yarn curl gnupg tar && for key in 6
 # Install aws-cli
 RUN apk -v --update add python py-pip groff less mailcap && pip install --upgrade awscli==1.16.70 s3cmd==2.0.1 python-magic && apk -v --purge del py-pip && rm /var/cache/apk/*
 
-# Install bash, zip, curl & jq
-RUN apk add --update --no-cache bash zip curl jq
+# Install/upgrade bash, zip, curl, sed & jq
+RUN apk add --update --no-cache bash zip curl jq sed
 
 # Install npm-bundle
 RUN npm install -g npm-bundle

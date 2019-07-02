@@ -70,6 +70,7 @@ buck-out/
 coverage/
 .npmbundle
 test-bundle.zip
+test-package/
 trace.html
 
 # Realm db

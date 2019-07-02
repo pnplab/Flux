@@ -40,7 +40,10 @@ cat package.json | jq '
 }
 ' > test-package/package.json
 mkdir test-package/__tests__/
-cp -R test-integration/ test-package/__tests__/
+
+# @warning wildcard is mandatory on CI for some reason. Not required on local
+# implementation. Might be due to docker-alpine:3.9 incompatibility.
+cp -R test-integration/* test-package/__tests__/
 
 # Inect synced tables environment variable into tests.
 # Remove newlines for sed.
