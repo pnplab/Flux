@@ -168,7 +168,7 @@ describe('Flux', () => {
                     });
                 }
                 else {
-                    test(`${table} contains exaclty the same amount of data on the server than what was uploaded`, async () => {
+                    test(`${table} contains exactly the same amount of data on the server than what was uploaded`, async () => {
                         // Retrieve table data.
                         let tableData = testData.filter(data => data.table === table)[0];
                         let { status, clientUploadedCount, clientUploadingCount, serverStoredCount, error } = tableData;
@@ -184,7 +184,7 @@ describe('Flux', () => {
 
                     expect(error).toBeUndefined();
                 });
-                
+
             });
         }
 

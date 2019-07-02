@@ -125,6 +125,12 @@ class OnboardingPageObjectModel {
 
     syncAwareData = async () => {
         const { driver, implicitWaitTimeout } = this;
+
+        // Wait 12 minutes in aws device farm to make sure sensor gather wifi
+        // data aso.
+        if (typeof process.env.DEVICEFARM_DEVICE_NAME !== 'undefined') {
+            await driver.sleep(1000 * 60 * 12);
+        }
         
         // Clear logs..
         await driver.log('logcat');

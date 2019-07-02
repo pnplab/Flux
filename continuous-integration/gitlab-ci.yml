@@ -60,7 +60,7 @@ test:android:
         - ./scripts/tests/upload_yaml.sh &
         - ./scripts/tests/upload_app.sh "${APK_FILE}" &
         - wait
-        - export RUN_ARN=$(./scripts/tests/run.sh -q)
+        - export RUN_ARN=$(./scripts/tests/run.sh -p "Android" -q)
         - ./scripts/tests/poll_run_results.sh -a ${RUN_ARN} -q
 
 
