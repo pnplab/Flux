@@ -1,9 +1,8 @@
 // @warning When computer go to sleep, emulator can enter a weird state where
 //      ssl connections to the server fail. The solution is to restart the
 //      emulator.
-// @warning App.spec.js connect to the built version of Flux, moved to a
-//      subdirectory, which means the test code can be out of sync with the 
-//      tested code.
+// @warning This file connects to a moved built version of Flux, which means 
+//      the test code can be out of sync with the tested code.
 
 import OnboardingPOM from './Onboarding.pom';
 

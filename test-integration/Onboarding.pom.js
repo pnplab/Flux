@@ -180,9 +180,18 @@ class OnboardingPageObjectModel {
                 error: error === 'undefined' ? undefined : error
             }));
 
-        // Go to next step.
-        let nextButton = await driver.elementByAccessibilityId('CheckDataSyncNextButton, ');
-        await nextButton.click();
+        // Go to next step. 
+        // CheckDataSyncNextButton appears. Catch any error because we don't
+        // want unavailable nextButton to prevent the method result from being
+        // returned. This may happen because the button only appear when all 
+        // the synced data services return something.
+        try {
+            let nextButton = await driver.elementByAccessibilityId('CheckDataSyncNextButton, ');
+            await nextButton.click();
+        }
+        catch (e) {
+            console.error(e);
+        }
 
         return testData;
     }
