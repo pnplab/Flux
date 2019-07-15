@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
-    "test": "jest",
+    "test": "jest --clearCache && source dev.env && jest test-integration",
     "postinstall": "npx jetify",
     "serve": "source dev.env && npx react-native start --reset-cache",
     "emulator:debug": "source dev.env && npx react-native bundle --platform android --dev true --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/ && cd android && ./gradlew installDebug -x bundleReleaseJsAndAssets && adb -e shell monkey -p org.pnplab.flux 1 && adb reverse tcp:8081 tcp:8081 ; cd ..",
