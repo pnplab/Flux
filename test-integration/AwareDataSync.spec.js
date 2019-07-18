@@ -20,7 +20,8 @@ const driver = ((isDeviceFarm) => {
     }
     // Local test run.
     else {
-        const appPath = '/Users/medullosuprarenal/Documents/_eeg/pristine/build/release/app-universal-release.apk';
+	const cwd = process.cwd();
+        const appPath = `${cwd}/../build/release/app-universal-release.apk`;
         console.log('Setup tests locally.');
         console.log(`path: ${appPath}`)
         const EmulatorDriver = require('./EmulatorDriver').default;
