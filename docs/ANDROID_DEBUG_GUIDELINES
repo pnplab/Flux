@@ -1,5 +1,17 @@
 # Basic configuration
 
+## Test run no launch issue
+
+Appium log:
+[debug] [Instrumentation] INSTRUMENTATION_RESULT: shortMsg=Process crashed.
+
+adb logcat:
+adbd    : failed to connect to socket 'tcp:6790': Operation not permitted
+
+==> Android 9.+ bug -- use another android version for tests
+==> see https://issuetracker.google.com/issues/132325318
+==> see https://github.com/appium/appium/issues/12754
+
 ## ./gradlew assembleRelease/assembleDebug issue
 
 Make sure you have set your android/gradle.properties file (it's in .gitignore

@@ -1,5 +1,90 @@
 List of development installation instruction for OSX.
 
+# Note taken from clean install with os 10.13.6
+ 
+## Download git repo
+
+$ git clone https://github.com/pnplab/Flux
+
+## Install dependencies
+
+install docker https://docs.docker.com/docker-for-mac/install/
+install homebrew https://brew.sh/index_fr
+install yarn https://yarnpkg.com/en/
+install node v10 through n $ brew install node && yarn global add n && n 10
+install react-native CLI and dependencies (android sdk) https://facebook.github.io/react-native/docs/getting-started.html -> CLI Quickstart w/ deps
+@warning while applying react-native getting started guide, make sure you install android 28 (9.0) as android 29's (9.+) adb is buggy and doesn't launch in appium
+install appium $ yarn global add appium
+install pidcat $ brew install pidcat
+
+## Increase emulator device storage size
+
+Going through react native getting started procedure, you should have added a virtual device for the emulator.
+
+You should add more disk space otherwise test and app install will stop working at some point:
+com.android.ddmlib.InstallException: INSTALL_FAILED_INSUFFICIENT_STORAGE
+Increase internal storage to 12GO and SD card to 4GO
+
+@warning This requires the emulator to be off for change to happen. I had to kill adb server as well. Double-check storage change has happened. You can use android settings panel to do so.
+
+Through android studio > Tools > AVD Manager > Your device in the list > Actions > Edit > Advanced Options.
+
+## Accept android sdk licences
+
+$ ~/Library/Android/sdk/tools/bin/sdkmanager --licenses
+
+## Install project dependencies
+
+$ yarn
+
+## Generate google-services.json file
+
+apply firebase config procedure https://firebase.google.com/docs/android/setup#add_firebase_to_your_app
+helper command : $ mv ~/Downloads/google-services.json android/app/
+
+## Generate gradle.properties file
+
+See https://facebook.github.io/react-native/docs/signed-apk-android#generating-an-upload-key or retrieve values from CI.
+Note the keystore file name has changed.
+
+$ export FLUX_RELEASE_KEY_KEYSTORE_B64="xxxx" # Generated through `base64 -i android/app/flux-release-key.keystore -o <outfile>`
+$ export FLUX_RELEASE_KEY_ALIAS=xxxx
+$ export FLUX_RELEASE_STORE_PASSWORD=xxxx
+$ export FLUX_RELEASE_KEY_PASSWORD=xxxx
+
+$ echo $FLUX_RELEASE_KEY_KEYSTORE_B64 | base64 -D > android/app/flux-release-key.keystore # @note option -D is lowercase in some linux systems
+$ echo -e "FLUX_RELEASE_STORE_FILE=flux-release-key.keystore\nFLUX_RELEASE_KEY_ALIAS=$FLUX_RELEASE_KEY_ALIAS\nFLUX_RELEASE_STORE_PASSWORD=$FLUX_RELEASE_STORE_PASSWORD\nFLUX_RELEASE_KEY_PASSWORD=$FLUX_RELEASE_KEY_PASSWORD\nandroid.useAndroidX=true\nandroid.enableJetifier=true\n\norg.gradle.jvmargs=-Xms128m -Xmx2048m -XX:+CMSClassUnloadingEnabled" > android/gradle.properties
+
+## Generate dev key
+
+$ # With key $ keystore password requests answered as `android`:
+$ sudo keytool -genkey -v -keystore android/app/debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000
+
+## Generate dev.env file
+
+$ cp dev.env.default dev.env
+$ # Edit OAUTH_ID and OAUTH_SECRET - you can generate them from google console.
+$ vim dev.env
+$ # (optional) Edit the rest of SERVER SIDE section as you please 
+
+$ ## Create new study
+
+$ # Launch local backend
+$ yarn backend
+$ # Create study through browser
+$ open http://localhost:8888
+$ # Connect, create study
+
+$ ## Configure dev.env file
+
+$ # Change MYSQL_DATABASE, STUDY_URL according to the new study info found in browser
+$ # @warning Use 10.0.2.2 instead of localhost for STUDY_URL's domain in order to use emulator's proxy!
+$ vim dev.env
+
+$ ## Relaunch backend (CTRL-C on previously launched + `yarn backend` again).
+
+
+# Previous notes
 -g
 node@10.15.1 through `n`
 npm@6.7.0 through `npm i -g npm`
