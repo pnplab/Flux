@@ -187,10 +187,10 @@ class OnboardingPageObjectModel {
 
         return {
             awaitDataToBeCollected: async () => {
-                // Wait 12 minutes in aws device farm to make sure sensor gather wifi
+                // Wait 1 minutes in aws device farm to make sure sensor gather wifi
                 // data aso.
                 if (typeof process.env.DEVICEFARM_DEVICE_NAME !== 'undefined') {
-                    await driver.sleep(1000 * 60 * 12);
+                    await driver.sleep(1000 * 60 * 1);
                 }
             },
             clearLogs: async () => {
