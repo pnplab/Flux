@@ -5,6 +5,7 @@
 # Debug env
 # @note we put it in .gitignore to avoid mistakly sharing google oauth api credentials.
 dev.env
+prod.env
 
 # OSX
 #
