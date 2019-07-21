@@ -7,7 +7,7 @@ import { View } from 'react-native';
 
 import styled from 'styled-components';
 
-import { Container, Content, Title, Text, Button, Form, Item, Label, Input, CircleButton } from '../../crossplatform-theme';
+import { Container, Content, Title, Text, Form, Item, Label, Input, CircleButton } from '../../crossplatform-theme';
 
 type Props = {
     +error?: string,
@@ -19,7 +19,7 @@ type Props = {
 };
 
 const AuthView = (props: Props) => 
-    <Container>
+    <Container accessibilityLabel="onboarding-auth">
         {/* @note native-base `Content` replaces KeyboardAvoidingView! */}
         <EnableCenteredContent>
             <Title>Flux</Title>
@@ -33,11 +33,11 @@ const AuthView = (props: Props) =>
                 <Form>
                     <Item floatingLabel>
                         <Label>numéro d'identification</Label>
-                        <Input value={props.deviceId} onChangeText={deviceId => props.onDeviceIdChanged(deviceId)} accessibilityLabel="DeviceIdInput" />
+                        <Input value={props.deviceId} onChangeText={deviceId => props.onDeviceIdChanged(deviceId)} accessibilityLabel="auth-deviceid" />
                     </Item>
                     <Item floatingLabel>
                         <Label>code d'accès</Label>
-                        <Input value={props.password} onChangeText={password => props.onPasswordChanged(password)} onSubmitEditing={e => props.onSubmit()} accessibilityLabel="StudyCodeInput" />
+                        <Input value={props.password} onChangeText={password => props.onPasswordChanged(password)} onSubmitEditing={e => props.onSubmit()} accessibilityLabel="auth-password" />
                     </Item>
                 </Form>
             </InputView>
@@ -47,15 +47,10 @@ const AuthView = (props: Props) =>
                 </ErrorView>
             }
             <ButtonView>
-                <CircleButton type="next" onPress={e => props.onSubmit()} accessibilityLabel="AuthNextButton" />
+                <CircleButton type="next" onPress={e => props.onSubmit()} accessibilityLabel="auth-submit" />
             </ButtonView>
         </EnableCenteredContent>
     </Container>;
-
-// Stretched view to set free space.
-const StretchedView = styled(View)`
-        flex: 1;
-    `;
 
 // Main view, padded & centered.
 const InputView = styled(View)`
@@ -65,30 +60,6 @@ const InputView = styled(View)`
         padding-left: 64px;
         padding-right: 64px;
         min-height: 100px;
-    `;
-
-// User id input field.
-const IdInput = styled(Input)
-    .attrs({
-        placeholder: 'Numéro d\'identification',
-        autoCorrect: false,
-        secureTextEntry: false,
-    }
-    )`
-        border-bottom-color: #AAA;
-        border-bottom-width: 1px;
-    `;
-
-// Password input field.
-const PasswordInput = styled(Input)
-    .attrs({
-        placeholder: 'Mot de passe',
-        autoCorrect: false,
-        secureTextEntry: true
-    }
-    )`
-        border-bottom-color: #AAA;
-        border-bottom-width: 1px;
     `;
 
 // Button's view, 70% button width.

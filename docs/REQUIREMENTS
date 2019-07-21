@@ -1,7 +1,7 @@
 List of development installation instruction for OSX.
 
 # Note taken from clean install with os 10.13.6
- 
+
 ## Download git repo
 
 $ git clone https://github.com/pnplab/Flux
@@ -16,6 +16,7 @@ install react-native CLI and dependencies (android sdk) https://facebook.github.
 @warning while applying react-native getting started guide, make sure you install android 28 (9.0) as android 29's (9.+) adb is buggy and doesn't launch in appium
 install appium $ yarn global add appium
 install pidcat $ brew install pidcat
+install jq $ brew install jq
 
 ## Increase emulator device storage size
 
@@ -53,7 +54,7 @@ $ export FLUX_RELEASE_STORE_PASSWORD=xxxx
 $ export FLUX_RELEASE_KEY_PASSWORD=xxxx
 
 $ echo $FLUX_RELEASE_KEY_KEYSTORE_B64 | base64 -D > android/app/flux-release-key.keystore # @note option -D is lowercase in some linux systems
-$ echo -e "FLUX_RELEASE_STORE_FILE=flux-release-key.keystore\nFLUX_RELEASE_KEY_ALIAS=$FLUX_RELEASE_KEY_ALIAS\nFLUX_RELEASE_STORE_PASSWORD=$FLUX_RELEASE_STORE_PASSWORD\nFLUX_RELEASE_KEY_PASSWORD=$FLUX_RELEASE_KEY_PASSWORD\nandroid.useAndroidX=true\nandroid.enableJetifier=true\n\norg.gradle.jvmargs=-Xms128m -Xmx2048m -XX:+CMSClassUnloadingEnabled" > android/gradle.properties
+$ echo -e "FLUX_RELEASE_STORE_FILE=flux-release-key.keystore\nFLUX_RELEASE_KEY_ALIAS=$FLUX_RELEASE_KEY_ALIAS\nFLUX_RELEASE_STORE_PASSWORD=$FLUX_RELEASE_STORE_PASSWORD\nFLUX_RELEASE_KEY_PASSWORD=$FLUX_RELEASE_KEY_PASSWORD\nandroid.useAndroidX=true\nandroid.enableJetifier=true\nandroid.enableUnitTestBinaryResources=true\n\norg.gradle.jvmargs=-Xms128m -Xmx2048m -XX:+CMSClassUnloadingEnabled" > android/gradle.properties
 
 ## Generate dev key
 
@@ -97,6 +98,12 @@ ative run-android` ! @warning add the export commands to your `~/.*_profile` fil
 android-studio@ through `brew cask install android-studio`
 gradle@4.7 through `react-native run-android`
 react-native-debugger@0.9.4 brew cask install react-native-debugger
+
+@note
+If you use Visual Studio Code w/ jest testing, checkout the jest visual studio
+code extension cf. `https://github.com/jest-community/vscode-jest` as well as 
+Coverage Gutters cf. 
+`https://marketplace.visualstudio.com/items?itemName=ryanluker.vscode-coverage-gutters`.
 
 @warning
 if you install both android (emulators, ...) from brew and android-studio, you'll ends up with conflicting version (brew doesn't take precedence !)

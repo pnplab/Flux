@@ -1,1 +1,1 @@
-export { default } from './PrepareRestingStateController';
+export { default } from './RestingStateTaskController';

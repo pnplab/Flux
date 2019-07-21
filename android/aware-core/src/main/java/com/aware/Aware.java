@@ -284,6 +284,8 @@ public class Aware extends Service {
 
     @Override
     public void onCreate() {
+        Log.d("AW", "onCreate");
+
         super.onCreate();
 
         AUTHORITY = Aware_Provider.getAuthority(this);
@@ -1162,7 +1164,9 @@ public class Aware extends Service {
 
         //We already have a Device ID, do nothing!
         if (key.equals(Aware_Preferences.DEVICE_ID) && Aware.getSetting(context, Aware_Preferences.DEVICE_ID).length() > 0) {
+            Log.e(TAG, "Couldn't define DEVICE_ID as it's already defined!");
             Log.d(Aware.TAG, "AWARE UUID: " + Aware.getSetting(context, Aware_Preferences.DEVICE_ID) + " in " + context.getPackageName());
+
             return;
         }
 
@@ -1186,18 +1190,29 @@ public class Aware extends Service {
         if (qry != null && qry.moveToFirst()) {
             try {
                 if (!qry.getString(qry.getColumnIndex(Aware_Settings.SETTING_VALUE)).equals(value.toString())) {
-                    context.getApplicationContext().getContentResolver().update(Aware_Settings.CONTENT_URI, setting, Aware_Settings.SETTING_ID + "=" + qry.getInt(qry.getColumnIndex(Aware_Settings.SETTING_ID)), null);
+                    int affectedRowCount = context.getApplicationContext().getContentResolver().update(Aware_Settings.CONTENT_URI, setting, Aware_Settings.SETTING_ID + "=" + qry.getInt(qry.getColumnIndex(Aware_Settings.SETTING_ID)), null);
+
+                    if (affectedRowCount == 0) {
+                        Log.e(TAG, "Couldn't update setting in provider");
+                    }
+
                     if (Aware.DEBUG) Log.d(Aware.TAG, "Updated: " + key + "=" + value);
                 }
+                else {
+                    Log.e(TAG, "Didn't update DEVICE_ID in settings provider as it's already defined with the same value!");
+                }
             } catch (SQLiteException e) {
-                if (Aware.DEBUG) Log.d(TAG, e.getMessage());
+                if (Aware.DEBUG) Log.d(TAG, "SQLiteException: " + e.getMessage());
             } catch (SQLException e) {
-                if (Aware.DEBUG) Log.d(TAG, e.getMessage());
+                if (Aware.DEBUG) Log.d(TAG, "SQException: " + e.getMessage());
             }
             //insert
         } else {
             try {
-                context.getApplicationContext().getContentResolver().insert(Aware_Settings.CONTENT_URI, setting);
+                Uri newUri = context.getApplicationContext().getContentResolver().insert(Aware_Settings.CONTENT_URI, setting);
+                if (newUri == null) {
+                    Log.e(TAG, "Couldn't insert setting in provider");
+                }
                 if (Aware.DEBUG) Log.d(Aware.TAG, "Added: " + key + "=" + value);
             } catch (SQLiteException e) {
                 if (Aware.DEBUG) Log.d(TAG, e.getMessage());
@@ -1678,7 +1693,10 @@ public class Aware extends Service {
             String protocol = study_uri.getScheme();
             List<String> path_segments = study_uri.getPathSegments();
 
-            if (path_segments.size() > 0) {
+            if (path_segments.size() <= 0) {
+                Log.e(TAG, "JoinStudy#onHandleIntent Couldn't parse the study url into multiple chunk to be able to retrieve the original root URL of its http api.");
+            }
+            else if (path_segments.size() > 0) {
                 String study_api_key = path_segments.get(path_segments.size() - 1);
                 String study_id = path_segments.get(path_segments.size() - 2);
 
@@ -1686,20 +1704,27 @@ public class Aware extends Service {
                 if (protocol.equals("https")) {
                     SSLManager.handleUrl(getApplicationContext(), full_url, true);
 
+                    // Wait until we have the certificate downloaded.
+                    // @warning can trigger an infinite loop!
+                    // @todo fix that!
                     while(!SSLManager.hasCertificate(getApplicationContext(), study_uri.getHost())) {
-                        //wait until we have the certificate downloaded
+                        // ...
                     }
 
                     try {
                         request = new Https(SSLManager.getHTTPS(getApplicationContext(), full_url)).dataGET(full_url.substring(0, full_url.indexOf("/index.php")) + "/index.php/webservice/client_get_study_info/" + study_api_key, true);
                     } catch (FileNotFoundException e) {
                         request = null;
+                        Log.e(TAG, "JoinStudy#onHandleIntent FileNotFoundException - probably the SSL certificate on local disk - should not happen except no space left on device.");
                     }
                 } else {
                     request = new Http().dataGET(full_url.substring(0, full_url.indexOf("/index.php")) + "/index.php/webservice/client_get_study_info/" + study_api_key, true);
                 }
 
-                if (request != null) {
+                if (request == null) {
+                    Log.e(TAG, "JoinStudy#onHandleIntent HTTP request object hasn't be instanciated due to a previous error.");
+                }
+                else {
                     if (request.equals("[]")) return;
 
                     try {
@@ -1707,6 +1732,12 @@ public class Aware extends Service {
 
                         if (DEBUG)
                             Log.d(TAG, "Study info: " + studyInfo.toString(5));
+
+                        // Check data sent to request.
+                        String deviceId = Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID);
+                        if (deviceId == null || deviceId.isEmpty()) {
+                            Log.e(TAG, "JoinStudy#onHandleIntent DEVICE_ID is not specified while trying to connect to the study");
+                        }
 
                         //Request study settings
                         Hashtable<String, String> data = new Hashtable<>();
@@ -1745,6 +1776,14 @@ public class Aware extends Service {
 
                         if (study_config.getJSONObject(0).has("message")) {
                             Toast.makeText(getApplicationContext(), study_config.getJSONObject(0).getString("message"), Toast.LENGTH_LONG).show();
+                            // Log error in case of message.
+                            if (study_config.getJSONObject(0).getString("message").equals("I don't know who you are.")) {
+                                Log.e(TAG, "JoinStudy#onHandeIntent server answer to is: \"I don't know who you are.\" - probably due to missing DEVICE_ID parameter.");
+                            }
+                            else {
+                                Log.e(TAG, "JoinStudy#onHandeIntent server answer to is: " + study_config.getJSONObject(0).getString("message"));
+                            }
+
                             return;
                         }
 
@@ -1891,6 +1930,8 @@ public class Aware extends Service {
 
     @Override
     public void onDestroy() {
+        Log.d("AW", "onDestroy");
+
         super.onDestroy();
 
         IS_CORE_RUNNING = false;
@@ -2594,6 +2635,8 @@ public class Aware extends Service {
      * @param context
      */
     public static void stopAWARE(Context context) {
+        Log.d("AW", "stopAWARE");
+
         if (context == null) return;
 
         Intent aware = new Intent(context, Aware.class);

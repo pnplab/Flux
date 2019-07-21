@@ -8,13 +8,8 @@
  * Setup screen. User set a password that sets up & activates the study.
  */
 
-import type { State as AppState } from '../../crossplatform-model/memory-db/types';
-import { onboarding } from '../../crossplatform-model/memory-db/actions';
-
 import React, { PureComponent } from 'react';
-import NetInfo from "@react-native-community/netinfo";
-import { connect } from 'react-redux';
-
+import NetInfo from '@react-native-community/netinfo';
 import CheckWifiView from './CheckWifiView';
 
 // Configure types.
@@ -28,7 +23,7 @@ type State = {
 // Configure component logic.
 export default class CheckWifiController extends PureComponent<Props, State> {
 
-    constructor(props) {
+    constructor(props: Props) {
         super(props);
 
         this.state = {
@@ -82,17 +77,3 @@ export default class CheckWifiController extends PureComponent<Props, State> {
     }
 
 }
-
-// // Bind comoponent to redux.
-// const mapStateToProps = (state: AppState /*, ownProps*/) => ({
-
-// });
-
-// const mapDispatchToProps = {
-//     confirmNetwork: onboarding.confirmNetwork
-// };
-
-// export default connect(
-//   mapStateToProps,
-//   mapDispatchToProps
-// )(CheckWifiController);

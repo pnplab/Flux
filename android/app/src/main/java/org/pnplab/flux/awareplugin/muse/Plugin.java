@@ -10,18 +10,21 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 
-// import com.aware.Accelerometer;
 import com.aware.Aware;
 import com.aware.Aware_Preferences;
-// import com.aware.Screen;
 import com.aware.utils.Aware_Plugin;
-import com.choosemuse.libmuse.*;
+import com.choosemuse.libmuse.Eeg;
+import com.choosemuse.libmuse.LibmuseVersion;
+import com.choosemuse.libmuse.Muse;
+import com.choosemuse.libmuse.MuseArtifactPacket;
+import com.choosemuse.libmuse.MuseDataListener;
+import com.choosemuse.libmuse.MuseDataPacket;
+import com.choosemuse.libmuse.MuseDataPacketType;
+import com.choosemuse.libmuse.MuseManagerAndroid;
 
-// import android.os.SystemClock;
 import android.util.Log;
 
 import java.lang.ref.WeakReference;
-// import java.util.List;
 import android.os.Binder;
 import android.os.IBinder;
 
@@ -214,7 +217,7 @@ public class Plugin extends Aware_Plugin {
         return START_STICKY;
     }
 
-    // start/stop record with autoconnnect to first available muse
+    // start/cancelOrDisconnect record with autoconnnect to first available muse
     /*
     public void startRecording() {
         manager.startListening();
@@ -223,7 +226,7 @@ public class Plugin extends Aware_Plugin {
         manager.stopListening();
     }
     */
-    // start/stop record without autoconnnect
+    // start/cancelOrDisconnect record without autoconnnect
     public void startRecording(Muse muse) {
         muse.registerDataListener(dataListener, MuseDataPacketType.EEG);
     }
@@ -306,7 +309,7 @@ public class Plugin extends Aware_Plugin {
                         m.execute();
                         SystemClock.sleep(100);
                     }
-                    // @todo stop on disconnect event
+                    // @todo cancelOrDisconnect on disconnect event
                     // @todo thread safety
                 }
             }).start();

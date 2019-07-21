@@ -15,6 +15,7 @@ class GraphManager {
         let db = await realm;
 
         // Write data.
+        // @note db.write is synchronous!
         db.write(() => {
 
             // Create new form entry.

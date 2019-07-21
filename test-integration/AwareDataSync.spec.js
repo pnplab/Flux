@@ -4,6 +4,8 @@
 // @warning This file connects to a moved built version of Flux, which means 
 //      the test code can be out of sync with the tested code.
 
+/* eslint no-process-env: "off" */
+
 import OnboardingPOM from './Onboarding.pom';
 
 // Set 60min timeout, as there is a very long waiting time set to sync data!
@@ -20,14 +22,15 @@ const driver = ((isDeviceFarm) => {
     }
     // Local test run.
     else {
-	const cwd = process.cwd();
+        const cwd = process.cwd();
         const appPath = `${cwd}/../build/release/app-universal-release.apk`;
-        console.log('Setup tests locally.');
+        console.log('Setup tests locally on emulator.');
         console.log(`path: ${appPath}`)
         const EmulatorDriver = require('./EmulatorDriver').default;
         
         // @todo use argv[1] w/ default instead of plain value for apk path
-        return new EmulatorDriver(appPath);
+        const useDevice = false;
+        return new EmulatorDriver(appPath, useDevice);
     }
 })(typeof process.env.DEVICEFARM_DEVICE_NAME !== 'undefined');
 
@@ -128,27 +131,27 @@ describe('Flux', () => {
             await finishOnboarding.next();
         });
 
-        test("Wifi is enabled", async () => {
+        test('Wifi is enabled', async () => {
             expect(_isWifiEnabled).toBeTruthy();
         });
 
-        test("Permissions have been granted", async () => {
+        test('Permissions have been granted', async () => {
             expect(_havePermissionsBeenGranted).toBeTruthy();
         });
 
-        test("Aware has been started & study has been joined", async () => {
+        test('Aware has been started & study has been joined', async () => {
             expect(_hasAwareStarted).toBeTruthy();
         });
 
-        test("Sync has been finishhed", async () => {
+        test('Sync has been finishhed', async () => {
             expect(_hasSyncFinished).toBeTruthy();
         });
 
-        test("Sync data log have been received", async () => {
+        test('Sync data log have been received', async () => {
             expect(_syncedDataInfo).toBeDefined();
         });
 
-        test("All synced tables are tested", async () => {
+        test('All synced tables are tested', async () => {
             let untestedTables = _syncedDataInfo.map(d => d.table).filter(table => tables.indexOf(table) === -1);
 
             console.info(`====== UNTESTED TABLES =======`);

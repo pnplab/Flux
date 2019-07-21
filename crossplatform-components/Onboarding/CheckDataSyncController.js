@@ -47,10 +47,7 @@ export default class CheckDataSyncController extends PureComponent<Props, State>
 
     async componentDidMount() {
         // // @debug 
-        // if (typeof process.env.FLUX_ENCRYPTION_KEY === 'undefined') {
-        //     throw new Error('process.env.FLUX_ENCRYPTION_KEY is undefined!');
-        // }
-        // let encryptionKey = process.env.FLUX_ENCRYPTION_KEY;
+        // let encryptionKey = FLUX_ENCRYPTION_KEY;
         // let participantId = 'yoh';
         
         // // let deviceId = DeviceInfo.getUniqueID();

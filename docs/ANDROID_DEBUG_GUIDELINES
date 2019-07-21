@@ -1,5 +1,11 @@
 # Basic configuration
 
+## Undefined process.env var in js code
+
+Don't forget to flush cache (`react-native start --reset-cache`)!
+In case of `./gradlew assembleRelease`, run `./gradlew clean` & use export prior to env-variable-prefixed bash command!
+CLI command in package.json have been configured to avoid cache issue and other pitfalls.
+
 ## Test run no launch issue
 
 Appium log:
@@ -33,9 +39,18 @@ org.gradle.jvmargs=-Xms128m -Xmx2048m -XX:+CMSClassUnloadingEnabled
 
 Also, make sure you set the proper keystore (see react-native official doc, cf. `https://facebook.github.io/react-native/docs/signed-apk-android`).
 
+## Gradle: Execution failed for task ':processDebugManifest'
+Make sure you've loaded an env (`source dev.env` for instance). Also, if 
+you're using Android Studio, make sure you loaded it through console and 
+sourced the env as well before running the build!
+
 # Android Studio - Project Structure Issue:
 
-## In case of graddle sync issue unrelated to user defect.
+## Missing env variable xxx
+
+Source env file and relaunch android studio using CLI.
+
+## In case of graddle sync issue unrelated to user defect. ie. Unsupported Modules Detected. Compilation is not supported for following modules...
 - close android studio
 - $ rm -r android/.idea android/*.iml
 - open back android studio & reimport project

@@ -6,21 +6,16 @@
  * time.
  */
 
-import type { State as AppState } from '../../crossplatform-model/memory-db/types';
-
 import React, { PureComponent } from 'react';
-import { connect } from 'react-redux';
 
 import type { Question } from '../../crossplatform-model/immutable-db/QuestionType';
 import Questions from '../../crossplatform-model/immutable-db/QuestionData';
-import { submitSurveyTaskForm, enableRestingStateTask, openRestingStateTask } from '../../crossplatform-model/memory-db/actions'
 
 import SurveyTaskView from './SurveyTaskLeanView';
-import AwareManager from '../../crossplatform-model/native-db/AwareManager';
 
 // Configure types.
 type Props = {
-    onSubmit: (number, { [questionId: string]: number }) => void,
+    onSubmit: (msTimestamp: number, values: { [questionId: string]: number }) => void,
 };
 type State = {
     
@@ -38,7 +33,7 @@ export default class SurveyTaskController extends PureComponent<Props, State> {
         
     };
 
-    constructor(props) {
+    constructor(props: Props) {
         super(props);
         
         this.state = {
@@ -49,13 +44,17 @@ export default class SurveyTaskController extends PureComponent<Props, State> {
         this.values = {};
     }
 
-    onValue = (questionId, value) => {
+    onValue = (questionId: string, value: number) => {
         // Store question's value.
         this.values[questionId] = value;
     }
 
     onSubmit = () => {
-        this.props.onSubmit(this.values);
+        // Get current timestamp to date the form.
+        const currentTimestamp = new Date().getTime();
+
+        // Forward submission to components' user.
+        this.props.onSubmit(currentTimestamp, this.values);
     }
 
     render() {

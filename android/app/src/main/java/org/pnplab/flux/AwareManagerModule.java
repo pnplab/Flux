@@ -1,10 +1,12 @@
 package org.pnplab.flux;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -32,6 +34,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -68,26 +71,28 @@ public class AwareManagerModule extends ReactContextBaseJavaModule {
         context.unregisterReceiver(this.syncEventListener);
     }
 
+    @NotNull
     @Override
     public String getName() {
         return "AwareManager";
     }
 
+    @SuppressLint("ApplySharedPref")
     @ReactMethod
-    public void startAware(String deviceId, String encryptionKey) {
+    public void startAware(String deviceId) {
         Context context = getReactApplicationContext().getApplicationContext();
 
-        // Set db encryption key (the key can be modified through script).
-        DatabaseHelper.DB_ENCRYPTION_KEY = encryptionKey;
-
+        // Log aware entries.
         Aware.DEBUG = BuildConfig.DEBUG;
+        Aware.setSetting(context, Aware_Preferences.DEBUG_FLAG, BuildConfig.DEBUG);
 
+        // Start aware.
         if (!Aware.IS_CORE_RUNNING) {
             Intent aware = new Intent(context, Aware.class);
             context.startService(aware);
         }
 
-        Aware.setSetting(context, Aware_Preferences.DEBUG_FLAG, BuildConfig.DEBUG);
+        // Ask user to enable accessibility service and ignore battery optimisation.
         Applications.isAccessibilityServiceActive(context);
         Aware.isBatteryOptimizationIgnored(context, context.getPackageName());
 

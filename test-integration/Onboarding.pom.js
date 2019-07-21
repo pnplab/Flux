@@ -1,5 +1,7 @@
 import wd from 'wd';
 
+/* eslint no-process-env: "off" */
+
 // Every method of this class moves the device toward next onboarding steps.
 // `await driver.setImplicitWaitTimeout(implicitWaitTimeout);` has to be set
 // manually before starting using the methods.
@@ -26,18 +28,18 @@ class OnboardingPageObjectModel {
         return {
             fill: async () => {
                 // deviceIdInput
-                let deviceIdInput = await driver.elementByAccessibilityId('DeviceIdInput, ');
+                let deviceIdInput = await driver.elementByAccessibilityId('auth-deviceid, ');
                 await deviceIdInput.click();
                 await deviceIdInput.sendKeys(deviceId);
 
                 // studyPasswordInput
-                let studyCodeInput = await driver.elementByAccessibilityId('StudyCodeInput, ');
+                let studyCodeInput = await driver.elementByAccessibilityId('auth-password, ');
                 await studyCodeInput.click();
                 await studyCodeInput.sendKeys(studyCode);
             },
             next: async () => {
                 // Next button
-                let nextButton = await driver.elementByAccessibilityId('AuthNextButton, ');
+                let nextButton = await driver.elementByAccessibilityId('auth-submit, ');
                 await nextButton.click();
             }
         };

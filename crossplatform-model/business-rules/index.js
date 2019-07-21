@@ -1,1 +1,1 @@
-export { * as SurveyTaskSchedule } from './SurveyTaskScheduleRules';
+export * as SurveyTaskSchedule from './SurveyTaskScheduleRules';

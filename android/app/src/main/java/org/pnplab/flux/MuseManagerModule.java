@@ -135,7 +135,7 @@ public class MuseManagerModule extends ReactContextBaseJavaModule {
 
                 // Set connected muse to a Singleton in appState so it can be accessed from anywhere
                 connectedMuse = muse;
-                // @warning We stop listening from JS code. This is mandatory!
+                // @warning We cancelOrDisconnect listening from JS code. This is mandatory!
                 // stopListening();
 
                 // Only need to execute this code if in React Native app to send info about connected Muse

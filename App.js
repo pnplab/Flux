@@ -4,22 +4,27 @@
  *
  * @format
  * @flow
- * @lint-ignore-every XPLATJSCOPYRIGHT1
  */
 
-import React, { Component } from 'react';
+import React from 'react';
+import type { ComponentType } from 'react';
 import { Alert } from 'react-native';
 
 import AwareManager from './crossplatform-model/native-db/AwareManager';
+import Menu from './crossplatform-components/Menu';
+import type { MenuButtonName } from './crossplatform-components/Menu';
 
 // import Router from './crossplatform-components/Router';
 import { triggerUpdateIfNeeded } from './Updater.js';
+import { DEV, FLUX_AUTO_UPDATE } from './config';
 
 import {
     App,
+    AppLoader,
     Onboarding, Auth, CheckWifi, CheckPermissions, CheckPhenotyping, SurveyTaskOnboarding, RestingStateTaskOnboarding, CheckDataSync, OnboardingEnd,
     Home, 
-    SurveyTask
+    SurveyTask,
+    RestingStateTask
 } from './crossplatform-components';
 
 // -- About routing
@@ -55,120 +60,367 @@ import {
 // Disable yellow box (conosle.warn popups inside the app). It breaks
 // integration testing as it sometimes prevent button sitting underneath the
 // yellow boxes to be clicked.
-console.disableYellowBox = true;
+// $FlowFixMe
+// console.disableYellowBox = true;
 
+/* eslint-disable react/display-name, indent */
+
+// Converts the App's goTo function (which takes a component as an input) into
+// Menu's callback function (which takes a string as an input).
+type GoToFnType = (ComponentType<any>) => void;
+type OnMenuButtonClickedFnType = (buttonName: MenuButtonName) => void;
+type GoToFnMenuAdapterType = (goToFn: GoToFnType) => OnMenuButtonClickedFnType;
+const goToFnMenuAdapter: GoToFnMenuAdapterType = function(goToFn: GoToFnType): OnMenuButtonClickedFnType {
+    // Generate the correct onButtonClicked callback function using the goToFn
+    // one.
+    return function(buttonName: MenuButtonName): void {
+        // Convert the button name (as a string) into component one (as a 
+        // component type). The call the goToFn function with the right
+        // parameter.
+        switch (buttonName) {
+            case 'home':
+                goToFn(Home);
+                break;
+            case 'graphs':
+                throw new Error('Menu button not implemented yet!');
+            case 'info':
+                throw new Error('Menu button not implemented yet!');
+            case 'notifications':
+                throw new Error('Menu button not implemented yet!');
+        }
+    };
+};
+
+// Sets up the app components' dataflow.
 export default () => 
-    <App index={Onboarding}>
+    <App index={AppLoader}>
     {
-
-        /* * * App * * */
-        ({ 
+        ({
+            // Method to switch between displayed components.
             goTo,
 
-            // Aware setup methods & vars.
+            // These methods sets up and passes user settings inbetween App's
+            // components. Notably used by the AppLoader at app initialisation.
+            setUserSettings,
+            userSettings,
+
+            // `setAndStoreUserSettings` stores the app configuration into
+            // local db.
+            setAndStoreUserSettings,
+
+            // Aware startup methods.
             startAware,
             joinAwareStudy,
+
+            // `hasAwareStudyBeenJoined` is only used by onboarding to know
+            // when the user can go to the next onboarding step.
             hasAwareStudyBeenJoined,
 
-            // Survey methods
+            // storeSurvey store the survey both remotely (through Aware) and 
+            // locally (for graphs).
             storeSurvey,
-            setHomeScreenMode,
-        }) => 
-        /* / / App / / */
 
+            // ...no need for storeRestingState as this is done in the java
+            // side (cf. comments bellow at the RestingStateTask component).
+        }) => 
         <>
+            <AppLoader
+                onUserNotYetRegistered={
+                    () => {
+                        // Log current state.
+                        console.info('User not yet registered.');
+
+                        // Launch onboarding so the user can configurs the app
+                        // settings.
+                        goTo(Onboarding);
+                    }
+                }
+                onUserAlreadyRegistered={
+                    async (userSettings) => {
+                        // Log current state.
+                        console.info(`
+                            User retrieved with
+                            studyModality=${userSettings.studyModality}
+                            awareDeviceId=${userSettings.awareDeviceId}
+                            awareStudyUrl=${userSettings.awareStudyUrl}
+                            lastSubmittedSurveyTaskTimestamp=${userSettings.lastSubmittedSurveyTaskTimestamp}
+                            lastSubmittedRestingStateTaskTimestamp=${userSettings.lastSubmittedRestingStateTaskTimestamp}.
+                        `.replace(/ {4}/g, ''));
+
+                        // Share the loaded user settings with the rest of the
+                        // app.
+                        setUserSettings(userSettings);
+
+                        // Go to the home screen as app is loaded.
+                        goTo(Home);
+
+                        // Start and setup aware background service.
+                        // Probably unnecesseray, since aware should be kept
+                        // launched independently from the app, restarted on 
+                        // crash, and even restarted automatically at phone
+                        // boot. But for safety..
+                        await startAware(userSettings.awareDeviceId || 'byp0auth');
+                        await joinAwareStudy(userSettings.awareStudyUrl);
+                    }
+                }
+            />
 
             <Onboarding index={Auth}>
             {
-
-                /* * * Onboarding * * */
                 ({
+                    // Method to move across the onboarding steps.
                     goToStep,
+                    
+                    /* ...the attributes bellow are used to communicate 
+                       inbetween onboarding's components... */
+                    
+                    // Study modality. Used to define the behavior of the app
+                    // (eg. whether the user has to do either daily or weekly
+                    // tasks).
+                    setStudyModality,
+                    studyModality,
 
                     // Device id, set at auth, needed to start aware.
-                    setDeviceId,
-                    deviceId, 
+                    setAwareDeviceId,
+                    awareDeviceId,
+
+                    // Study id, set at auth, needed to parameter the app
+                    // behavior.
+                    setAwareStudyUrl,
+                    awareStudyUrl
                 }) =>
-                /* / / Onboarding / / */
-
                 <>
+                    <Auth
+                        onStepFinished={
+                            (studyModality, awareDeviceId, awareStudyUrl) => {
+                                // Set study values temporarily so they can be 
+                                // used to start aware in CheckPhenotyping
+                                // step and then stored locally in
+                                // OnboardingEnd step.
+                                setStudyModality(studyModality);
+                                setAwareDeviceId(awareDeviceId);
+                                setAwareStudyUrl(awareStudyUrl);
 
-                    <Auth onStepFinished={ (studyId, deviceId) => setDeviceId(deviceId) & goToStep(CheckWifi) } />
+                                // Go to next onboarding step.
+                                goToStep(CheckWifi);
+                            }
+                        }
+                    />
 
-                    <CheckWifi onStepFinished={ () => goToStep(CheckPermissions) } />
+                    <CheckWifi
+                        onStepFinished={
+                            () => {
+                                // Go to next onboarding step.
+                                goToStep(CheckPermissions);
+                            }
+                        }
+                    />
 
-                    <CheckPermissions onStepFinished={ () => goToStep(CheckPhenotyping) } />
+                    <CheckPermissions
+                        onStepFinished={
+                            () => {
+                                // Go to next onboarding step.
+                                goToStep(CheckPhenotyping);
+                            }
+                        }
+                    />
 
                     <CheckPhenotyping
-                        hasAwareStudyBeenJoined={ hasAwareStudyBeenJoined }
-                        onStartAwareClicked={ async () => 
-                            await startAware(deviceId || 'byp0auth') &
-                            await joinAwareStudy()
+                        hasAwareStudyBeenJoined={hasAwareStudyBeenJoined}
+                        onStartAwareClicked={
+                            async () => {
+                                // Start aware and join study.
+                                await startAware(awareDeviceId || 'byp0auth');
+                                await joinAwareStudy(awareStudyUrl);
+                            }
                         }
-                        onStepFinished={ () => goToStep(SurveyTaskOnboarding) }
+                        onStepFinished={
+                            () => {
+                                // Go to next onboarding step.
+                                goToStep(SurveyTaskOnboarding);
+                            }
+                        }
                     />
 
                     <SurveyTaskOnboarding
-                        onStartTaskClicked={ () => goToStep(SurveyTask) }
-                        onStepBypassed={ () => storeSurvey({ fake: 0.1, fake2: 0.6, fake3: 0.4 }) & goToStep(RestingStateTaskOnboarding) }
+                        onStartTaskClicked={
+                            () => {
+                                // Go to next onboarding step.
+                                goToStep(SurveyTask);
+                            }
+                        }
+                        onStepBypassed={
+                            () => {
+                                // We provide a way to bypass this task as it's
+                                // hard to develop a good e2e test for this one
+                                // (screen scrolling fails in appium for some
+                                // reason).
+
+                                // Store fake survey values remotely so we can 
+                                // check if the sync as occured correctly in 
+                                // the CheckDataSync step.
+                                storeSurvey({ fake: 0.1, fake2: 0.6, fake3: 0.4 });
+
+                                // Go to next onboarding step.
+                                goToStep(RestingStateTaskOnboarding);
+                            }
+                        }
                     />
 
-                    <SurveyTask onSubmit={ (values) => storeSurvey(values) & goToStep(RestingStateTaskOnboarding) } />
+                    <SurveyTask
+                        onSubmit={ 
+                            (msTimestamp, values) => {
+                                // Store survey values remotely so we can check
+                                // if the sync as occured correctly in the
+                                // CheckDataSync step.
+                                storeSurvey(values);
 
-                    <RestingStateTaskOnboarding onStepFinished={ () => goToStep(CheckDataSync) } />
+                                // Go to next onboarding step.
+                                goToStep(RestingStateTaskOnboarding);
+                            }
+                        }
+                    />
 
-                    <CheckDataSync onStepFinished={() => goToStep(OnboardingEnd) } />
+                    <RestingStateTaskOnboarding
+                        onStartTask={
+                            () => {
+                                // Go to next onboarding step.
+                                goToStep(RestingStateTask);
+                            }
+                        }
+                        onBypassTask={
+                            () => {
+                                // We provide a way to bypass this task as the
+                                // required Muse eeg devices are not available
+                                // from AWS Device Farm for e2e
+                                // continuous-deployment testing.
 
-                    <OnboardingEnd onStepFinished={ () => goTo(Home) } />
+                                // Go to next onboarding step.
+                                goToStep(CheckDataSync);
+                            }
+                        }
+                    />
 
+                    <RestingStateTask
+                        onTaskFinished={
+                            () => {
+                                // ...data are stored through java's code.
+
+                                // Go to next onboarding step.
+                                goToStep(CheckDataSync);
+                            }
+                        }
+                    />
+
+                    <CheckDataSync
+                        onStepFinished={
+                            () => {
+                                // Go to next onboarding step.
+                                goToStep(OnboardingEnd);
+                            }
+                        }
+                    />
+
+                    <OnboardingEnd
+                        onStepFinished={
+                            () => {
+                                // Set user settings as they will be usefull
+                                // for Home to know which task to display and
+                                // store them in local db.
+                                setAndStoreUserSettings({ studyModality, awareDeviceId, awareStudyUrl });
+
+                                // Go to Home as app's onboarding is over.
+                                goTo(Home);
+                            }
+                        }
+                    />
                 </>
             }
             </Onboarding>
 
-            <Home defaultMode={'SurveyTask'} />
+            <Home
+                studyModality={userSettings && userSettings.studyModality}
+                lastSubmittedSurveyTimestamp={userSettings && userSettings.lastSubmittedSurveyTimestamp}
+                lastSubmittedRestingStateTaskTimestamp={userSettings && userSettings.lastSubmittedRestingStateTaskTimestamp}
+                onStartSurveyTask={
+                    () => {
+                        // Go to Survey task.
+                        goTo(SurveyTask);
+                    }
+                }
+                onStartRestingStateTask={
+                    () => {
+                        // Go to Resting State task.
+                        goTo(RestingStateTask);
+                    }
+                }
+                menuComponent={<Menu activeButton="home" onButtonClicked={goToFnMenuAdapter(goTo)} />}
+            />
 
-            <SurveyTask onSubmit={ (values) => storeSurvey(values) & setHomeScreenMode('RestingStateTask') } />
+            <SurveyTask
+                onSubmit={
+                    (msTimestamp, values) => {
+                        // Store survey to Aware for server sync and locally in
+                        // realm for graphs
+                        storeSurvey(values);
 
-            {/*
-            <PrepareRestingStateTask />
-            <RestingStateTask />
-            <Graphs menu="symptoms" />
-            <SymptomGraph />
-            */}
+                        // Store task timestamp so we don't allow user to do it
+                        // again through Home screen.
+                        setAndStoreUserSettings({ lastSubmittedSurveyTaskTimestamp: msTimestamp });
 
+                        // Switch to home screen as task is finished.
+                        goTo(Home);
+                    }
+                }
+            />
+
+            <RestingStateTask
+                onTaskPostponed={
+                    () => {
+                        // Switch to home screen.
+                        goTo(Home);
+                    }
+                }
+                onTaskFinished={
+                    (msTimestamp) => {
+                        // ...resting state eeg data are already stored inside aware through java code (bound from
+                        // RestingStateTask component's code). Can't be done any other way due to high frequency 
+                        // real time constraints of eeg recording.
+
+                        // Store task timestamp so we don't allow user to do it
+                        // again through Home screen.
+                        setAndStoreUserSettings({ lastSubmittedRestingStateTaskTimestamp: msTimestamp });
+
+                        // Switch to home screen as task is finished.
+                        goTo(Home);
+                    }
+                }
+            />
         </>
     }
     </App>;
+/* eslint-enable react/display-name, indent */
 
-// @note `AwareManager.startAware()` is set in the StudySchemaAdapter
-// @todo rename StudySchemaAdapter to InitAppSchemaAdapter.
-
-// Add aware-related debugging tools to dev menu
-if (__DEV__ || !__DEV__) {
+// Add aware-related debugging tools to dev menu.
+if (DEV || !DEV) {
     const DevMenu = require('react-native-dev-menu');
 
     DevMenu.addItem('aware: device id', async () => {
         let deviceId = await AwareManager.getDeviceId();
 
         Alert.alert(
-          'AWARE Device ID',
-          deviceId,
-          [
-            { text: 'OK' },
-          ],
+            'AWARE Device ID',
+            deviceId,
+            [
+                { text: 'OK' },
+            ],
         );
-
     });
 
     DevMenu.addItem('aware: sync', () => AwareManager.syncData());
 }
 
-// Check environment variables.
-if (typeof process.env.FLUX_ENCRYPTION_KEY === 'undefined') {
-    throw new Error('FLUX_ENCRYPTION_KEY must be set! Don\'t forget to flush cache (`react-native start --reset-cache`)! In case of `./gradlew assembleRelease`, run `./gradlew clean` & use export prior to env-variable-prefixed bash command!');
-}
-
-// Automatically update the app when released
-if (typeof process.env.FLUX_AUTO_UPDATE !== 'undefined' && process.env.FLUX_AUTO_UPDATE == true) {
+// Automatically update the app when released.
+if (typeof FLUX_AUTO_UPDATE !== 'undefined' && FLUX_AUTO_UPDATE === 'true') {
     triggerUpdateIfNeeded();
 }

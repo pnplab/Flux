@@ -6,77 +6,127 @@
  * time.
  */
 
-import type { State as AppState } from '../../crossplatform-model/memory-db/types';
-
 import React, { PureComponent } from 'react';
-import { connect } from 'react-redux';
+import type { Element } from 'react';
 
-import HomeView from './HomeView';
-import { startSurveyTask, openRestingStateTask } from '../../crossplatform-model/memory-db/actions';
+import DailyTasksPolicy from './DailyTasksPolicy';
+import WeeklyTasksPolicy from './WeeklyTasksPolicy';
+
+import Layout from '../Layout';
+import HomeNoTaskView from './HomeNoTaskView';
+import HomeSurveyTaskView from './HomeSurveyTaskView';
+import HomeRestingStateTaskView from './HomeRestingStateTaskView';
 
 // Configure types.
 type Props = {
-    // The surveys can only be filled at certain times, depending on the study !
-    +isSurveyTaskAvailable: boolean,
-    +isRestingStateTaskAvailable: boolean,
-    // Go to the survey's route.
-    +startSurveyTask: () => Void,
-    +openRestingStateTask: () => Void
+    +studyModality: 'daily' | 'weekly',
+    +lastSubmittedSurveyTimestamp: ?number,
+    +lastSubmittedRestingStateTaskTimestamp: ?number,
+    +onStartSurveyTask: () => void,
+    +onStartRestingStateTask: () => void,
+    +menuComponent: Element<any>
 };
 type State = {
+    // Undefined means the controller has not loaded yet the informations
+    // required to do the processing.
+    +suggestedTask: Task
 };
+export type Task = 'NO_TASK'
+    | 'SURVEY_TASK'
+    | 'RESTING_STATE_TASK';
 
 // Configure component logic.
-class HomeController extends PureComponent<Props, State> {
+export default class HomeController extends PureComponent<Props, State> {
 
-    static defaultProps = {
-
-    };
-
-    constructor(props) {
+    constructor(props: Props) {
         super(props);
 
         this.state = {
-
+            suggestedTask: this.getSuggestedTask()
         };
+    }
+    
+    _intervalId = null;
 
-        this.onStartSurveyTaskClicked = this.onStartSurveyTaskClicked.bind(this);
-        this.onOpenRestingStateTaskClicked = this.onOpenRestingStateTaskClicked.bind(this);
+    componentDidMount() {
+        // Refresh the screen every second (only if needed) in case the current
+        // time changes thus making the underlying policy output change (ie. 
+        // the home screen no longer suggest a survey task because the user is 
+        // no longer inside the allowed schedule to participate to the task).
+        // @note Would be probably more optimal to use a setTimeout and only 
+        //       refresh when needed but the optimization seems unnecessary as 
+        //       this is only a foreground operation.
+        this._intervalId = setInterval(() => {
+            let suggestedTask = this.getSuggestedTask();
+            this.setState({ suggestedTask });
+        }, 1000);
     }
 
-    onStartSurveyTaskClicked() {
-        this.props.startSurveyTask();
-    }
-
-    onOpenRestingStateTaskClicked() {
-        this.props.openRestingStateTask();
+    componentWillUnmount() {
+        // Clear interval.
+        clearInterval(this._intervalId);
     }
 
     render() {
+        let innerView;
+
+        switch(this.state.suggestedTask) {
+        case 'NO_TASK':
+            innerView = <HomeNoTaskView />;
+            break;
+        case 'SURVEY_TASK':
+            innerView = <HomeSurveyTaskView onStartTaskClicked={this.props.onStartSurveyTask} />;
+            break;
+        case 'RESTING_STATE_TASK':
+            innerView = <HomeRestingStateTaskView onStartTaskClicked={this.props.onStartRestingStateTask} />;
+            break;
+        default:
+            throw new Error('Unexpected suggested task for home controller');
+        }
+
         return (
-            <HomeView 
-                isSurveyTaskAvailable={this.props.isSurveyTaskAvailable}
-                isRestingStateTaskAvailable={this.props.isRestingStateTaskAvailable}
-                onStartSurveyTaskClicked={this.onStartSurveyTaskClicked}
-                onOpenRestingStateTaskClicked={this.onOpenRestingStateTaskClicked}
-            />
+            <Layout menuComponent={this.props.menuComponent}>
+                {innerView}
+            </Layout>
         );
     }
 
+    getSuggestedTask = (): Task => {
+        // Pick the right policy based on component's attributes.
+        let policy = undefined;
+        switch (this.props.studyModality) {
+        case 'daily':
+            policy = DailyTasksPolicy;
+            break;
+        case 'weekly':
+            policy = WeeklyTasksPolicy;
+            break;
+        default:
+            throw new Error('Unexpected policy set from user\'s study modality');
+        }
+
+        // Retrieve policy arguments from component's attributes.
+        // @note we could retrieve them from db here or from model instead of 
+        //       passing them down, thus improving separation of concerns,
+        //       but that would cause a flicker at component loading thus
+        //       making the app less responsive. Also, passing attributes
+        //       through props make the component more testable.
+        let lastSubmittedSurveyTimestamp = this.props.lastSubmittedSurveyTimestamp;
+        let hasAtLeastOneSurveyBeenSubmitted = typeof lastSubmittedSurveyTimestamp === 'undefined' ? false : true;
+        let lastSubmittedRestingStateTaskTimestamp = this.props.lastSubmittedSurveyTimestamp;
+        let hasAtLeastOneRestingStateTaskBeenSubmitted = typeof lastSubmittedRestingStateTaskTimestamp === 'undefined' ? false : true;
+
+        // Apply policy to retrieve what to display on home screen (ie. a 
+        // survey task, a resting state task or simply nothing).
+        let suggestedTask = policy(
+            hasAtLeastOneSurveyBeenSubmitted,
+            lastSubmittedSurveyTimestamp,
+            hasAtLeastOneRestingStateTaskBeenSubmitted,
+            lastSubmittedRestingStateTaskTimestamp
+        );
+
+        // Return result.
+        return suggestedTask;
+    }
+
 }
-
-// Bind comoponent to redux.
-const mapStateToProps = (state: AppState /*, ownProps*/) => ({
-    isSurveyTaskAvailable: state.isSurveyTaskAvailable,
-    isRestingStateTaskAvailable: state.isRestingStateTaskAvailable
-});
-
-const mapDispatchToProps = {
-    startSurveyTask,
-    openRestingStateTask
-};
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(React.memo(HomeController));

@@ -1,0 +1,16 @@
+Warning, breakpoint don't hit when code coverage is done.
+Use debugger; statement instead.
+See `https://github.com/jest-community/vscode-jest/issues/400` and
+`https://github.com/microsoft/vscode/issues/60187`.
+
+Warning, inside visual studio code on OSX, for some reason (I feel like it was
+after conda install), jest path stopped working. Thus having errors such as 
+`Exception raised: Process failed: spawn jest ENOENT` and `env: node: No such
+file or directory`.
+The following workaround works `https://github.com/jest-community/vscode-jest/issues/105#issuecomment-469971991`
+but requires to install vsc cli command first. To install `code` cli command,
+see `https://stackoverflow.com/questions/29955500/code-not-working-in-command-line-for-visual-studio-code-on-osx-mac`.
+
+
+
+Exception raised: Process failed: spawn jest ENOENT

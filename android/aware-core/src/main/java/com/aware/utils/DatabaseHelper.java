@@ -2,6 +2,7 @@
 package com.aware.utils;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 
 import net.sqlcipher.database.SQLiteDatabase;
@@ -15,6 +16,7 @@ import androidx.core.content.PermissionChecker;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.aware.BuildConfig;
 import com.aware.R;
 
 import org.json.JSONArray;
@@ -63,7 +65,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Load sqlcipher external lib.
         SQLiteDatabase.loadLibs(context);
 
-        if (DB_ENCRYPTION_KEY.equals("passwordChangeMe")) {
+        // Set db encryption key (the key can be modified through script).
+        // Register the encryption key raw within class code as the key must live through app's
+        // lifecycle in case any service using db is restarted (a potential - not as esthitic -
+        // alternative would be to use shared preferences). In this situation, this method wont
+        // be called.
+        // - Android will restart sticky services automatically after phone booting, without going
+        //   through javascript code.
+        // - Android can kill and restart background services at any time in order to manage
+        //   battery/memory/cpu consumption as well.
+        DB_ENCRYPTION_KEY = BuildConfig.AWARE_ENCRYPTION_KEY;
+
+        // Assess the key has been setRenamedColumns.
+        if (DB_ENCRYPTION_KEY == null || DB_ENCRYPTION_KEY.equals("passwordChangeMe")) {
             throw new RuntimeException("DatabaseHelper#DB_ENCRYPTION_KEY must be set! Flux: Note this exeption is sometimes triggered because aware hasn't been started yet.");
         }
     }

@@ -5,24 +5,26 @@
  * This screen should only be shown if app has not been authorized yet !
  */
 
-import type { State as AppState } from '../../crossplatform-model/memory-db/types';
-
+import type { ComponentType } from 'react';
 import React, { Component } from 'react';
 import { isFragment } from 'react-is';
-import AwareManager from '../../crossplatform-model/native-db/AwareManager';
 
 // Configure types.
 type Props = {
-    +children: () => Array<React.Component>,
-    +index: React.ComponentType
+    +children: ({ [key: string]: any }) => Component < {}, {} >,
+    +index: ComponentType<{}>
 };
 type State = {
+    shownComponentType: ComponentType<{}>,
+    studyModality?: String,
+    awareDeviceId?: String,
+    awareStudyUrl?: String,
 };
 
 // Configure component logic.
 export default class OnboardingController extends Component<Props, State> {
 
-    constructor(props) {
+    constructor(props: Props) {
         super(props);
 
         this.state = {
@@ -36,10 +38,17 @@ export default class OnboardingController extends Component<Props, State> {
             goToStep: (componentType) => this.setState({ shownComponentType: componentType }),
 
             // Store aware info data from auth step until aware start step.
-            setDeviceId: (deviceId) => this.setState({ deviceId }),
-            setStudyId: (studyId) => this.setState({ studyId }),
-            deviceId: this.state.deviceId,
-            studyId: this.state.studyId,
+            setAwareDeviceId: (awareDeviceId) => this.setState({ awareDeviceId }),
+            awareDeviceId: this.state.awareDeviceId,
+            setAwareStudyUrl: (awareStudyUrl) => this.setState({ awareStudyUrl }),
+            awareStudyUrl: this.state.awareStudyUrl,
+
+            // Store study modality from auth step until onboarding end step
+            // (where study modality and other details will be registered so
+            // the user gets the app in the correct state (eg. without
+            // onboarding step) next time he starts it).
+            setStudyModality: (studyModality) => this.setState({ studyModality }),
+            studyModality: this.state.studyModality,
         });
 
         // Retrieve returned fragment's children as an array
@@ -57,16 +66,3 @@ export default class OnboardingController extends Component<Props, State> {
     }
 
 }
-
-// // Bind comoponent to redux.
-// const mapStateToProps = (state: AppState /*, ownProps*/) => ({
-
-// });
-
-// const mapDispatchToProps = {
-// };
-
-// export default connect(
-//   mapStateToProps,
-//   mapDispatchToProps
-// )(OnboardingController);

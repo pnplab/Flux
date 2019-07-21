@@ -8,34 +8,41 @@
  * Setup screen. User set a password that sets up & activates the study.
  */
 
-import type { State as AppState } from '../../crossplatform-model/memory-db/types';
-
+import { STUDY_URL } from '../../config';
 import React, { PureComponent } from 'react';
-import { connect } from 'react-redux';
-
-import { onboarding } from '../../crossplatform-model/memory-db/actions'
 import AuthView from './AuthView';
-
-const DEFAULT_ACTIVATION_PASSWORD = '4wc2uw';
 
 // Configure types.
 type Props = {
-    +onStepFinished: (string, string) => void,
+    +onStepFinished: (string, string, string) => void,
 };
 type State = {
-    currentPassword?: string,
-    currentDeviceId?: string,
+    +currentPassword: string,
+    +currentDeviceId: string,
     error?: string
+};
+
+type Study = {
+    +modality: string,
+    +password: string,
+    +awareStudyUrl: string
+}
+const DAILY_TASK_STUDY: Study = {
+    modality: 'daily',
+    password: '4wc2uw',
+    awareStudyUrl: STUDY_URL
+};
+
+const WEEKLY_TASK_STUDY: Study = {
+    modality: 'weekly',
+    password: 'f32bts',
+    awareStudyUrl: STUDY_URL
 };
 
 // Configure component logic.
 export default class AuthController extends PureComponent<Props, State> {
 
-    static defaultProps = {
-        activationPassword: DEFAULT_ACTIVATION_PASSWORD
-    };
-
-    constructor(props) {
+    constructor(props: Props) {
         super(props);
 
         this.state = {
@@ -66,13 +73,29 @@ export default class AuthController extends PureComponent<Props, State> {
         //     return;
         // }
 
-        if (this.state.currentPassword !== this.props.activationPassword) {
+        // Check password is correct.
+        if (this.state.currentPassword !== DAILY_TASK_STUDY.password && this.state.currentPassword !== WEEKLY_TASK_STUDY.password) {
             this.setState({ error: 'code d\'accès erroné' });
             return;
         }
+        
+        // Retrieve study from typed password.
+        let study: Study;
+        if (this.state.currentPassword == DAILY_TASK_STUDY.password) {
+            study = DAILY_TASK_STUDY;
+        }
+        else if (this.state.currentPassword == WEEKLY_TASK_STUDY.password) {
+            study = WEEKLY_TASK_STUDY;
+        }
+        else {
+            // Should never happen has password have been checked to match one
+            // of the study just a few lines above.
+            throw new Error('Study not found at auth. It should have been found based on typed password.');
+        }
+
         // Trigger initialization on success.
         this.setState({ error: undefined });
-        this.props.onStepFinished(this.state.currentPassword, this.state.currentDeviceId);
+        this.props.onStepFinished(study.modality, this.state.currentDeviceId, study.awareStudyUrl);
     }
 
     render() {
@@ -92,17 +115,3 @@ export default class AuthController extends PureComponent<Props, State> {
     }
 
 }
-
-// // Bind comoponent to redux.
-// const mapStateToProps = (state: AppState /*, ownProps*/) => ({
-
-// });
-
-// const mapDispatchToProps = {
-//     auth: onboarding.auth
-// };
-
-// export default connect(
-//   mapStateToProps,
-//   mapDispatchToProps
-// )(AuthController);

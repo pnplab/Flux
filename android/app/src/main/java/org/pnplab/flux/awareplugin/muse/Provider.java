@@ -71,12 +71,12 @@ public class Provider extends ContentProvider {
             EEGMuse_Data._ID + " integer primary key autoincrement," +
                     EEGMuse_Data.TIMESTAMP + " integer default 0," + // 8bit -- @warning may causes issue on update
                     EEGMuse_Data.DEVICE_ID + " text default ''," +
-                    // EEGMuse_Data.NAME + " text default ''," +
+                    // MuseEegData.NAME + " text default ''," +
                     EEGMuse_Data.EEG1 + " real default 0," +
                     EEGMuse_Data.EEG2 + " real default 0," +
                     EEGMuse_Data.EEG3 + " real default 0," +
                     EEGMuse_Data.EEG4 + " real default 0";
-    // EEGMuse_Data.PICTURE + " blob default null";
+    // MuseEegData.PICTURE + " blob default null";
 
     /**
      * Share the fields with AWARE so we can replicate the table schema on the server
@@ -126,12 +126,12 @@ public class Provider extends ContentProvider {
         eegMuseHash.put(EEGMuse_Data._ID, EEGMuse_Data._ID);
         eegMuseHash.put(EEGMuse_Data.TIMESTAMP, EEGMuse_Data.TIMESTAMP);
         eegMuseHash.put(EEGMuse_Data.DEVICE_ID, EEGMuse_Data.DEVICE_ID);
-        //eegMuseHash.put(EEGMuse_Data.NAME, EEGMuse_Data.NAME);
+        //eegMuseHash.put(MuseEegData.NAME, MuseEegData.NAME);
         eegMuseHash.put(EEGMuse_Data.EEG1, EEGMuse_Data.EEG1);
         eegMuseHash.put(EEGMuse_Data.EEG2, EEGMuse_Data.EEG2);
         eegMuseHash.put(EEGMuse_Data.EEG3, EEGMuse_Data.EEG3);
         eegMuseHash.put(EEGMuse_Data.EEG4, EEGMuse_Data.EEG4);
-        //eegMuseHash.put(EEGMuse_Data.PICTURE, EEGMuse_Data.PICTURE);
+        //eegMuseHash.put(MuseEegData.PICTURE, MuseEegData.PICTURE);
 
         return true;
     }

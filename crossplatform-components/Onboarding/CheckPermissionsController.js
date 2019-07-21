@@ -8,11 +8,7 @@
  * Setup screen. User set a password that sets up & activates the study.
  */
 
-import type { State as AppState } from '../../crossplatform-model/memory-db/types';
-import { onboarding } from '../../crossplatform-model/memory-db/actions';
-
 import React, { PureComponent } from 'react';
-import { connect } from 'react-redux';
 import { PermissionsAndroid } from 'react-native';
 
 import CheckPermissionsView from './CheckPermissionsView';
@@ -36,6 +32,7 @@ type State = {
 // Configure component logic.
 export default class CheckPermissionsController extends PureComponent<Props, State> {
 
+    /* eslint-disable quotes */
     permissions = [
         {
             name: 'write-external-storage',
@@ -91,6 +88,7 @@ export default class CheckPermissionsController extends PureComponent<Props, Sta
             permission: PermissionsAndroid.PERMISSIONS.READ_SMS
         }
     ];
+    /* eslint-enable quotes */
 
     // List permission names for ulterior motive.
     permissionNames = this
@@ -112,7 +110,7 @@ export default class CheckPermissionsController extends PureComponent<Props, Sta
     highlightPermTitle = (p) =>
         this.permissions.indexOf(p) <= this.permissionNames.indexOf(this.state.currentPermissionName);
 
-    constructor(props) {
+    constructor(props: Props) {
         super(props);
 
         this.state = {
@@ -221,17 +219,3 @@ export default class CheckPermissionsController extends PureComponent<Props, Sta
     }
 
 }
-
-// // Bind comoponent to redux.
-// const mapStateToProps = (state: AppState /*, ownProps*/) => ({
-
-// });
-
-// const mapDispatchToProps = {
-//     confirmPermissions: onboarding.confirmPermissions
-// };
-
-// export default connect(
-//   mapStateToProps,
-//   mapDispatchToProps
-// )(CheckPermissionsController);

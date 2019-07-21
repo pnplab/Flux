@@ -57,6 +57,7 @@
 		247EFFA944C34D4F9E8E7297 /* rubicon-icon-font.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 10437AC206AC46379498F7B9 /* rubicon-icon-font.ttf */; };
 		738D967D4DA7490794F2884C /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 71A9BC701A2D479EB34CC03F /* SimpleLineIcons.ttf */; };
 		7EF9C3F1DB744A0AB3C104E7 /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B123467B483242229A240136 /* Zocial.ttf */; };
+		C2789A3A8F854E80901BADA9 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = E13F5302D7424E6794F666A6 /* libz.tbd */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -382,6 +383,7 @@
 		10437AC206AC46379498F7B9 /* rubicon-icon-font.ttf */ = {isa = PBXFileReference; name = "rubicon-icon-font.ttf"; path = "../node_modules/native-base/Fonts/rubicon-icon-font.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		71A9BC701A2D479EB34CC03F /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; name = "SimpleLineIcons.ttf"; path = "../node_modules/native-base/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		B123467B483242229A240136 /* Zocial.ttf */ = {isa = PBXFileReference; name = "Zocial.ttf"; path = "../node_modules/native-base/Fonts/Zocial.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		E13F5302D7424E6794F666A6 /* libz.tbd */ = {isa = PBXFileReference; name = "libz.tbd"; path = "usr/lib/libz.tbd"; sourceTree = SDKROOT; fileEncoding = undefined; lastKnownFileType = sourcecode.text-based-dylib-definition; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -410,6 +412,7 @@
 				832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */,
 				00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */,
 				139FDEF61B0652A700C62182 /* libRCTWebSocket.a in Frameworks */,
+				C2789A3A8F854E80901BADA9 /* libz.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -562,6 +565,7 @@
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
 				2D16E6891FA4F8E400B85C8A /* libReact.a */,
+				E13F5302D7424E6794F666A6 /* libz.tbd */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -672,6 +676,14 @@
 			name = Resources;
 			sourceTree = "<group>";
 			path = "";
+		};
+		BE3632401FFC44AD94F82413 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			path = Application;
+			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 

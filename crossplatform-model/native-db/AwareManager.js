@@ -4,6 +4,7 @@
 
 import { Platform, NativeModules, PermissionsAndroid } from 'react-native';
 import { DeviceEventEmitter } from 'react-native';
+import { STUDY_URL, SYNCED_TABLES } from '../../config';
 
 class AwareManager {
 
@@ -69,14 +70,8 @@ class AwareManager {
     }
 
     startAware(deviceId: string) {
-        // Ensure encryption key has been set through process' env variable.
-        if (typeof process.env.FLUX_ENCRYPTION_KEY === 'undefined') {
-            throw new Error('process.env.FLUX_ENCRYPTION_KEY is undefined!');
-        }
-        const encryptionKey = process.env.FLUX_ENCRYPTION_KEY;
-
         // @warning Permissions must be received first before calling !
-        this._awareManager.startAware(deviceId, encryptionKey);
+        this._awareManager.startAware(deviceId);
     }
 
     stopAware() {
@@ -90,10 +85,7 @@ class AwareManager {
         // We thus retrieve it manually.
         
         // Retrieve synced table array from environment.
-        if (typeof process.env.SYNCED_TABLES === 'undefined') {
-            throw new Error('process.env.SYNCED_TABLES is undefined!');
-        }
-        const syncedTablesString = process.env.SYNCED_TABLES;
+        const syncedTablesString = SYNCED_TABLES;
         const syncedTables = JSON.parse(syncedTablesString);
 
         // Return the value.
@@ -195,10 +187,7 @@ class AwareManager {
         }
 
         // Retrieve server from study id parameter.
-        if (typeof process.env.STUDY_URL === 'undefined') {
-            throw new Error('Undefined STUDY_URL in env!');
-        }
-        const studyUrl = process.env.STUDY_URL;
+        const studyUrl = STUDY_URL;
         const [, serverUrl] = studyUrl.match(/^(https?:\/\/[^\/]+)\/.*/);
 
         // Retrieve sync data checkup.
@@ -227,10 +216,7 @@ class AwareManager {
     //     }
 
     //     // Retrieve server from study id parameter.
-    //     if (typeof process.env.STUDY_URL === 'undefined') {
-    //         throw new Error('Undefined STUDY_URL in env!');
-    //     }
-    //     const studyUrl = process.env.STUDY_URL;
+    //     const studyUrl = STUDY_URL;
     //     const [, serverUrl] = studyUrl.match(/^(https?:\/\/[^\/]+)\/.*/);
 
     //     // Retrieve sync data checkup.

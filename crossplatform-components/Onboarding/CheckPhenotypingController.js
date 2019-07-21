@@ -8,12 +8,7 @@
  * Setup screen. User set a password that sets up & activates the study.
  */
 
-import type { State as AppState } from '../../crossplatform-model/memory-db/types';
-import { onboarding } from '../../crossplatform-model/memory-db/actions';
-import AwareManager from '../../crossplatform-model/native-db/AwareManager';
-
 import React, { PureComponent } from 'react';
-import { connect } from 'react-redux';
 
 import CheckPhenotypingView from './CheckPhenotypingView';
 
@@ -28,7 +23,7 @@ type State = {
 
 // Configure component logic.
 export default class CheckPhenotypingController extends PureComponent<Props, State> {
-    constructor(props) {
+    constructor(props: Props) {
         super(props);
 
         this.state = {
@@ -50,20 +45,3 @@ export default class CheckPhenotypingController extends PureComponent<Props, Sta
     }
 
 }
-
-// // Bind comoponent to redux.
-// const mapStateToProps = (state: AppState /*, ownProps*/) => ({
-//     studyId: state.onboarding.studyId,
-//     deviceId: state.onboarding.deviceId,
-//     hasAwareStudyBeenJoined: state.onboarding.hasAwareStudyBeenJoined
-// });
-
-// const mapDispatchToProps = {
-//     initializeStudy: onboarding.initializeStudy,
-//     onAwareStarted: onboarding.onAwareStarted
-// };
-
-// export default connect(
-//   mapStateToProps,
-//   mapDispatchToProps
-// )(CheckPhenotypingController);

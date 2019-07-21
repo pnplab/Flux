@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="org.pnplab.flux" >
+
+    <!-- android:minSdkVersion="18" seems to be what's needed for uiautomator -->
+    <!-- android:minSdkVersion="21" seems to be what's needed for apk split - which is somehow -->
+    <uses-sdk
+        android:minSdkVersion="18"
+        tools:overrideLibrary="androidx.test.uiautomator:uiautomator:2.2.0"/>
+</manifest>

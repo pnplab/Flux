@@ -81,6 +81,10 @@ project.ext.react = [
 
 apply from: "../../node_modules/react-native/react.gradle"
 
+project.ext.sentryCli = [
+    logLevel: "debug"
+]
+
 /**
  * Set this to true to create two separate APKs instead of one:
  *   - An APK that only works on ARM devices
@@ -89,7 +93,8 @@ apply from: "../../node_modules/react-native/react.gradle"
  * Upload all the APKs to the Play Store and people will download
  * the correct one based on the CPU architecture of their device.
  */
-def enableSeparateBuildPerCPUArchitecture = true
+// @warning `true` value breaks robolectric -- see https://github.com/robolectric/robolectric/issues/4942
+def enableSeparateBuildPerCPUArchitecture = false
 
 /**
  * Run Proguard to shrink the Java bytecode in release builds.
@@ -108,6 +113,41 @@ def useIntlJsc = false
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
+    sourceSets {
+        main {
+            java.srcDirs = ['src/main/java']
+        }
+        test {
+            java.srcDirs = ['src/test/java']
+        }
+        androidTest {
+            java.srcDirs = ['src/androidTest/java']
+
+            project.ext.react = [
+                entryFile: "index.js"
+            ]
+
+            // Instrumentation testing generates an additional apk containing the tests along with
+            // the traditional, tested apk.
+            //
+            // For some reason,
+            // - Muse .so is copied to the test instrumentation apk (but only the muse, not other
+            //   dependencies).
+            // - The log (once test are launched) defines instrumentation apk abi as null, instead
+            //   of x86 when opened with emulator.
+            // - The instrumentation apk refuses to install on the x86 emulator, except if we
+            //   exclude the armeabi-v7a libmuse from it (muse doesn't have a x86 version .so).
+            //   That's weird because under any condition should the instrumentation relate to
+            //   armeabi-v7a under the current setup.
+            //
+            // The following option weirdly allow instrumentation apk to be installed on the x86
+            // emulator.
+            packagingOptions {
+                exclude 'lib/armeabi-v7a/libmuse_android.so'
+            }
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -119,6 +159,15 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+
+        // Add project-specific config values (eg. credentials and so on).
+        // buildConfigField "String", "AWARE_ENCRYPTION_KEY", System.getenv("DB_ENCRYPTION_KEY") -- Set within aware-core.gradle
+        manifestPlaceholders = [
+            BUGSNAG_API_KEY: System.getenv("BUGSNAG_API_KEY"),
+            BUGSNAG_DETECT_NDK_CRASHES: System.getenv("BUGSNAG_DETECT_NDK_CRASHES")
+        ]
+        // Add STUDY_URL but only for unit test as the STUDY_URL config is passed from JS through JAVA.
+        buildConfigField "String", "STUDY_URL", "\"" + System.getenv("STUDY_URL") + "\""
 
         // Enabling multidex support.
         multiDexEnabled true
@@ -151,29 +200,59 @@ android {
         resValue "string", "provider_timezones", android.defaultConfig.applicationId + ".provider.timezone"
         resValue "string", "provider_traffic", android.defaultConfig.applicationId + ".provider.traffic"
         resValue "string", "provider_wifi", android.defaultConfig.applicationId + ".provider.wifi"
-        
+
+        // @warning `ndk - abiFilters` and `splits - abi` are conflicting configuration blocks ! Do
+        // not use together (and both are in the present source file ! hopefully one is commented).
+        // Unfortunately, this is unlikely to show an error except if `splits - abi - universalApk`
+        // is set to false. It will just not produce the expected output.
+        // See `https://stackoverflow.com/questions/49518003/not-able-to-update-android-studio-3-1-conflicting-configuration-armeabi-v7a?rq=1`
         ndk {
-            abiFilters 'armeabi-v7a', 'x86'
+           abiFilters 'armeabi-v7a', 'x86'
+        }
+
+        // Robolectric
+        useLibrary 'android.test.runner'
+        useLibrary 'android.test.base'
+        useLibrary 'android.test.mock'
+        testOptions {
+            unitTests {
+                includeAndroidResources = true
+            }
         }
 
         // Detox
-        testBuildType System.getProperty('testBuildType', 'debug')  // This will later be used to control the test apk build type
-        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        // testBuildType System.getProperty('testBuildType', 'debug')  // This will later be used to control the test apk build type
+
+        // Setup the instrumentation runner for Robolectric, UIAutomator and Detox.
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // @warning `ndk - abiFilters` and `splits - abi` are conflicting configuration blocks ! Do
+    // not use together (and both are in the present source file ! hopefully one is commented).
+    // Unfortunately, this is unlikely to show an error except if `splits - abi - universalApk`
+    // is set to false. It will just not produce the expected output.
+    // See `https://stackoverflow.com/questions/49518003/not-able-to-update-android-studio-3-1-conflicting-configuration-armeabi-v7a?rq=1`
+    // @warning This option splits apk package effectively for app apk but does not for androidTest.
+    // Anyway, we don't need split androidTest apk as split is mostly interesting for optimizing
+    // user phone's disk space and tests are not embedded into users' devices.
     splits {
         abi {
+            // Reset included arch list.
             reset()
+
+            // Enable splited apks.
             enable enableSeparateBuildPerCPUArchitecture
-            universalApk true  // If true, also generate a universal APK
-            // universalApk true
-            // @note realmdb not ready for arm64 yet! Thus app crashes on 
+
+            // Enable universal apk.
+            universalApk true
+
+            // @note realmdb not ready for arm64 yet! Thus app crashes on
             //       linking! latest realm version now supports it but we dont
-            //       need 64bit support yet anyway.
+            //       need 64bit support yet anyway. cf. `https://github.com/realm/realm-js/issues/2221`.
             // @todo update realmdb to latest version to support 64bit and try
             //       arm64-v8a again (muse wont probably work). Do the same
             //       w/ abiFilters!
-            include 'armeabi-v7a', 'x86' //, "arm64-v8a", "x86_64"
+            include 'x86', 'armeabi-v7a' //, "arm64-v8a", "x86_64"
         }
     }
 
@@ -192,7 +271,6 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
-
     }
 
     buildTypes {
@@ -223,12 +301,13 @@ android {
             // proguardFile "${rootProject.projectDir}/../node_modules/detox/android/detox/proguard-rules-app.pro"
         }
     }
+
     // applicationVariants are e.g. debug, release
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
             // For each separate APK per architecture, set a unique version code as described here:
             // https://developer.android.com/studio/build/configure-apk-splits.html
-            def versionCodes = ["armeabi-v7a":1, "x86":2, "arm64-v8a": 3, "x86_64": 4]
+            def versionCodes = ["armeabi-v7a": 1, "x86": 2, "arm64-v8a": 3, "x86_64": 4]
             def abi = output.getFilter(OutputFile.ABI)
             if (abi != null) {  // null for the universal-debug, universal-release variants
                 output.versionCodeOverride =
@@ -244,19 +323,21 @@ configurations.all {
 }
 
 dependencies {
+    implementation project(':bugsnag-react-native')
+    // implementation project(':@sentry/react-native')
     implementation project(':react-native-fs')
     implementation project(':react-native-appupdate')
     implementation project(':react-native-dev-menu')
     implementation project(':lottie-react-native')
     implementation project(':react-native-svg')
     implementation project(':react-native-device-info')
-    implementation project(':react-native-video')
+    implementation project(':react-native-video') // @warning v4 was incompatible w/ androidx! v5 req!
     implementation project(':react-native-fluidic-slider')
     implementation project(':react-native-vector-icons')
     implementation project(':realm')
     implementation project(':react-native-linear-gradient')
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation 'androidx.appcompat:appcompat:^1.0.0'
+    implementation 'androidx.appcompat:appcompat:^1.1.0'
     implementation "com.facebook.react:react-native:+"  // From node_modules
 
     implementation project(':aware-core')
@@ -270,9 +351,44 @@ dependencies {
     implementation "com.google.firebase:firebase-messaging:17.3.4"
     implementation "me.leolin:ShortcutBadger:1.1.21@aar" // use badge for notifications
 
+    // Android REPL client
+    // @warning DebugPort crashes the app at phone reboot w/
+    // java.lang.RuntimeException: Unable to get provider jwf.debugport.DebugPortContentProvider: java.lang.IllegalStateException: Not allowed to start service Intent { act=jwf.debugp
+    // ort.ACTION_INIT cmp=org.pnplab.flux/jwf.debugport.DebugPortService }: app is in background uid UidRecord{6c89c41 u0a172 RCVR idle procs:1 seq(0,0,0)}
+    // debugImplementation 'com.github.jasonwyatt.Android-DebugPort:lib:2.1.0'
+    // releaseImplementation 'com.github.jasonwyatt.Android-DebugPort:lib-noop:2.1.0'
+
+    // Robolectric
+    // testImplementation 'junit:junit:4.12'
+    testImplementation 'androidx.test:runner:1.2.0'
+    testImplementation 'androidx.test:rules:1.2.0'
+    testImplementation 'androidx.test.ext:junit:1.1.1'
+    testImplementation 'org.robolectric:robolectric:4.3'
+    // androidTestImplementation 'androidx.test:runner:1.2.0'
+    // androidTestImplementation 'androidx.test:rules:1.2.0'
+    // androidTestImplementation 'org.robolectric:robolectric:4.3'
+
+    // UIAutomator (used only to test android notifications). See related spec files for why.
+    // Setup tutorial here: `https://developer.android.com/training/testing/ui-testing/uiautomator-testing`.
+    // androidTestImplementation 'androidx.test:runner:1.2.0'
+    // androidTestImplementation 'androidx.test:rules:1.2.0'
+
+    androidTestImplementation 'androidx.test:core:1.2.0'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test:rules:1.2.0'
+    androidTestImplementation 'androidx.test:rules:1.2.0'
+    androidTestImplementation 'androidx.annotation:annotation:1.2.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
+    // weird: still no c++ so lib although muse does.
+    // androidTestImplementation  "com.facebook.react:react-native:+"  // From node_modules
+    // Fixes INSTALL_FAILED_NO_MATCHING_ABIS cf. `https://stackoverflow.com/questions/47855548/install-failed-no-matching-abis-when-instrumented-testing`
+    // actually not.. :'(
+    // androidTestImplementation 'commons-io:commons-io:2.4'
+
     // Detox
-    //androidTestImplementation('com.wix:detox:+') { transitive = true }
-    //androidTestImplementation 'junit:junit:4.12'
+    // androidTestImplementation('com.wix:detox:+') { transitive = true }
+    // androidTestImplementation 'junit:junit:4.12'
 
     // @note might be useful to add support libraries as in (https://github.com/denzilferreira/aware-client/blob/master/aware-tests/build.gradle)
     // -> implementation "com.android.support:gridlayout-v7:$support_libs"

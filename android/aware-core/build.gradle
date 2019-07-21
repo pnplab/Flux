@@ -13,6 +13,9 @@ android {
         targetSdkVersion target_sdk
         minSdkVersion minimum_sdk
 
+        // Add project-specific config values (eg. credentials and so on).
+        buildConfigField "String", "AWARE_ENCRYPTION_KEY", '"' + System.getenv("FLUX_ENCRYPTION_KEY") + '"'
+
         resValue "string", "provider_accelerometer", "com.aware.provider.accelerometer"
         resValue "string", "provider_applications", "com.aware.provider.applications"
         resValue "string", "provider_aware", "com.aware.provider.aware"
