@@ -26,17 +26,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 
-// @warning
-// Both Aware and Muse API have no error handling mechanism. As such, it is no possible to know
-// when something fails.
-//
-// The Muse API will log an exception (without rethrowing it), be
-// particulary watchful about reading exception with tag `Binder` as they likely come from the C++
-// binder part of muse API. Thus, *the only way to know an error has happened is to watch for
-// Logcat*. They sometimes are logged with warning tag instead of Error. Same goes with the Aware
-// API.
-//
-// On Aware, it's sometimes just not possible to know if an error has happened.
+// @warning Both Aware and Muse API have no error handling mechanism!
+// Therefore it is sometimes not possible to know when something fails.
+// The Muse API will log an exception (without rethrowing it), be especially watchful about reading
+// logged exception containing the tag `Binder` as they likely come from the C++ binder part of
+// muse API. Thus, *the only way to know an error has happened is to watch for Logcat*. The API
+// errors are sometimes logged with warning tag instead of Error.
+// Same goes with the Aware API! On Aware, it's sometimes just not possible to know if an error has
+// happened.
 public class MainApplication extends Application implements ReactApplication {
 
     private PermissionManager permissionManager;
