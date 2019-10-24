@@ -10,6 +10,13 @@ import { STUDY_URL } from '../config'; // this is mocked through config - so tru
 // @note test renderer must be required after react-native.
 import { render, fireEvent, flushMicrotasksQueue } from 'react-native-testing-library';
 
+// Fixes `ReferenceError: You are trying to `import` a file after the Jest
+// environment has been torn down.`. Appearing among other things s when using 
+// animated components (such as somes in `native-base`, so as many places in 
+// our interface). see `https://github.com/facebook/jest/issues/4359` and
+// `https://github.com/facebook/jest/issues/6434`.
+jest.useFakeTimers();
+
 describe.only('Onboarding Auth Step', () => {
 
     it('should trigger onAuthSucceeded with daily study modality given the right password', () => {
