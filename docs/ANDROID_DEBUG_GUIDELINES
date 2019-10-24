@@ -44,6 +44,12 @@ Make sure you've loaded an env (`source dev.env` for instance). Also, if
 you're using Android Studio, make sure you loaded it through console and 
 sourced the env as well before running the build!
 
+https://github.com/react-native-community/cli/issues/230#issuecomment-546098190
+
+# Issue with `npx react-native ugprade`
+
+See `https://github.com/react-native-community/cli/issues/230#issuecomment-546098190`.
+
 # Android Studio - Project Structure Issue:
 
 ## Missing env variable xxx

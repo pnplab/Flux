@@ -92,7 +92,7 @@ const goToFnMenuAdapter: GoToFnMenuAdapterType = function(goToFn: GoToFnType): O
 };
 
 // Sets up the app components' dataflow.
-export default () => 
+export default (): React$Node => 
     <App index={AppLoader}>
     {
         ({

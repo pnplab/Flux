@@ -13,12 +13,12 @@ buildscript {
         minSdkVersion = 19 // @note 16 -> 19 because of Aware minSdkVersion requirements.
         compileSdkVersion = 28
         targetSdkVersion = 28
-        supportLibVersion = "28.0.0"
         kotlin_version = "1.3.30" // For aware-core & Detox
     }
     repositories {
         google()
         jcenter()
+        maven { url 'https://jitpack.io' }
     }
     dependencies {
         // Tried to use Android Studio beta chanel with AGL 3.5.0-rc03 to address Robelectric issue https://github.com/robolectric/robolectric/issues/4942 - was 3.4.2

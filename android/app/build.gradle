@@ -76,7 +76,8 @@ import com.android.build.OutputFile
  */
 
 project.ext.react = [
-    entryFile: "index.js"
+    entryFile: "index.js",
+    enableHermes: false,  // clean and rebuild if changing
 ]
 
 apply from: "../../node_modules/react-native/react.gradle"
@@ -102,13 +103,26 @@ def enableSeparateBuildPerCPUArchitecture = false
 def enableProguardInReleaseBuilds = true
 
 /**
- * Use international variant JavaScriptCore
- * International variant includes ICU i18n library and necessary data allowing to use
- * e.g. Date.toLocaleString and String.localeCompare that give correct results
- * when using with locales other than en-US.
- * Note that this variant is about 6MiB larger per architecture than default.
+ * The preferred build flavor of JavaScriptCore.
+ *
+ * For example, to use the international variant, you can use:
+ * `def jscFlavor = 'org.webkit:android-jsc-intl:+'`
+ *
+ * The international variant includes ICU i18n library and necessary data
+ * allowing to use e.g. `Date.toLocaleString` and `String.localeCompare` that
+ * give correct results when using with locales other than en-US.  Note that
+ * this variant is about 6MiB larger per architecture than default.
  */
-def useIntlJsc = false
+def jscFlavor = 'org.webkit:android-jsc:+'
+
+/**
+ * Whether to enable the Hermes VM.
+ *
+ * This should be set on project.ext.react and mirrored here.  If it is not set
+ * on project.ext.react, JavaScript will not be compiled to Hermes Bytecode
+ * and the benefits of using Hermes will therefore be sharply reduced.
+ */
+def enableHermes = project.ext.react.get("enableHermes", false);
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -313,6 +327,7 @@ android {
                 output.versionCodeOverride =
                         versionCodes.get(abi) * 1048576 + defaultConfig.versionCode
             }
+
         }
     }
 }
@@ -393,11 +408,12 @@ dependencies {
     // @note might be useful to add support libraries as in (https://github.com/denzilferreira/aware-client/blob/master/aware-tests/build.gradle)
     // -> implementation "com.android.support:gridlayout-v7:$support_libs"
 
-    // JSC from node_modules
-    if (useIntlJsc) {
-        implementation 'org.webkit:android-jsc-intl:+'
+    if (enableHermes) {
+        def hermesPath = "../../node_modules/hermes-engine/android/";
+        debugImplementation files(hermesPath + "hermes-debug.aar")
+        releaseImplementation files(hermesPath + "hermes-release.aar")
     } else {
-        implementation 'org.webkit:android-jsc:+'
+        implementation jscFlavor
     }
 }
 
@@ -411,15 +427,3 @@ task copyDownloadableDepsToLibs(type: Copy) {
 apply plugin: 'com.google.gms.google-services'
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
-
-// configurations.all {
-//     resolutionStrategy.eachDependency { details ->
-//         def requested = details.requested
-//         if (requested.group == 'com.android.support') {
-//             if (!requested.name.startsWith("multidex")) {
-//                 details.useVersion "${rootProject.ext.supportLibVersion}"
-//             }
-//          }
-//
-//        }
-// }

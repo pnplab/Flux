@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "yarn": "PATH=\"/System/Library/Frameworks/Python.framework/Versions/2.7/bin/:$PATH\" yarn",
+    "postinstall": "sed -i -- 's/class Icon extends PureComponent {/class Icon extends PureComponent {constructor(props) { super(props) }/g' node_modules/react-native-vector-icons/lib/create-icon-set.js; sed -i -- 's/class Icon extends PureComponent {/class Icon extends PureComponent {constructor(props) { super(props) }/g' node_modules/react-native-vector-icons/lib/create-icon-set.js; # see https://github.com/oblador/react-native-vector-icons/issues/1046#issuecomment-546112745",
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "release": "source prod.env && npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/ && cp -rv assets/* android/app/src/main/assets/ && cd android && ./gradlew assembleRelease -x bundleReleaseJsAndAssets; cd ..",
     "release:install": "adb -d install android/app/build/outputs/apk/release/app-release.apk",
@@ -44,9 +45,9 @@
     "memoize-one": "5.0.0",
     "moment": "^2.24.0",
     "native-base": "2.12.1",
-    "react": "16.8.6",
-    "react-is": "16.8.6",
-    "react-native": "0.60.0-rc.2",
+    "react": "16.9.0",
+    "react-is": "16.11.0",
+    "react-native": "0.61.2",
     "react-native-appupdate": "1.1.2",
     "react-native-dev-menu": "2.0.2",
     "react-native-device-info": "0.26.4",
@@ -101,15 +102,15 @@
     "@semantic-release/npm": "5.1.4",
     "@semantic-release/release-notes-generator": "7.1.4",
     "babel-plugin-transform-inline-environment-variables": "0.4.3",
-    "eslint": "5.14.1",
-    "eslint-plugin-flowtype": "3.4.2",
-    "eslint-plugin-react": "7.12.4",
-    "flow-bin": "^0.103.0",
-    "jest": "^25.0.0",
-    "jetifier": "^1.4.0",
-    "metro-react-native-babel-preset": "^0.56.0",
+    "eslint": "6.5.1",
+    "eslint-plugin-flowtype": "4.3.0",
+    "eslint-plugin-react": "7.16.0",
+    "flow-bin": "0.105.0",
+    "jest": "25.0.0",
+    "jetifier": "1.4.0",
+    "metro-react-native-babel-preset": "0.56.0",
     "react-native-testing-library": "^1.11.1",
-    "react-test-renderer": "16.6.3",
+    "react-test-renderer": "16.9.0",
     "semantic-release": "15.13.3",
     "wd": "1.11.1"
   },
@@ -140,18 +141,6 @@
     ],
     "moduleNameMapper": {
       "styled-components": "<rootDir>/node_modules/styled-components/native/dist/styled-components.native.cjs.js"
-    },
-    "haste": {
-      "defaultPlatform": "android",
-      "platforms": [
-        "android",
-        "ios",
-        "native"
-      ],
-      "hasteImplModulePath": "<rootDir>/node_modules/react-native/jest/hasteImpl.js",
-      "providesModuleNodeModules": [
-        "react-native"
-      ]
     },
     "collectCoverage": true,
     "collectCoverageFrom": [
