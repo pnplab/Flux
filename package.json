@@ -4,14 +4,13 @@
   "private": true,
   "scripts": {
     "yarn": "PATH=\"/System/Library/Frameworks/Python.framework/Versions/2.7/bin/:$PATH\" yarn",
-    "postinstall": "sed -i -- 's/class Icon extends PureComponent {/class Icon extends PureComponent {constructor(props) { super(props) }/g' node_modules/react-native-vector-icons/lib/create-icon-set.js; sed -i -- 's/class Icon extends PureComponent {/class Icon extends PureComponent {constructor(props) { super(props) }/g' node_modules/react-native-vector-icons/lib/create-icon-set.js; # see https://github.com/oblador/react-native-vector-icons/issues/1046#issuecomment-546112745",
+    "postinstall": "npx jetify",
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "release": "source prod.env && npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/ && cp -rv assets/* android/app/src/main/assets/ && cd android && ./gradlew assembleRelease -x bundleReleaseJsAndAssets; cd ..",
     "release:install": "adb -d install android/app/build/outputs/apk/release/app-release.apk",
     "release:install:e": "adb -e install android/app/build/outputs/apk/release/app-release.apk && adb -e shell monkey -p org.pnplab.flux 1",
     "test:prepare": "echo \"First use \\`yarn release\\`\"; mkdir ../build; mkdir ../build/release; \\cp android/app/build/outputs/apk/release/app-universal-release.apk ../build/release/",
     "test": "echo \"Having a device connected through usb has for some reason made the app unable to be launched on the emulator. Make sure to have built the app through yarn release or have it currently installed through ie. yarn emulator:debug\" ; jest --clearCache && source dev.env && jest test-integration",
-    "postinstall": "npx jetify",
     "serve": "source dev.env ; ngrok_url=$(curl --silent http://127.0.0.1:4040/api/tunnels | jq -r '.tunnels[] | select(.proto==\"https\") | .public_url')/$NGROK_STUDY_POSTFIX ; export STUDY_URL=${ngrok_url:-$STUDY_URL} ; echo \"STUDY_URL=${STUDY_URL}\" ; npx react-native start --reset-cache",
     "emulator:debug": "adb -e reverse tcp:8081 tcp:8081 ; source dev.env ; ngrok_url=$(curl --silent http://127.0.0.1:4040/api/tunnels | jq -r '.tunnels[] | select(.proto==\"https\") | .public_url')/$NGROK_STUDY_POSTFIX; export STUDY_URL=${ngrok_url:-$STUDY_URL} ; echo \"STUDY_URL=${STUDY_URL}\" ; npx react-native bundle --platform android --dev true --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/ && cd android && ./gradlew assembleDebug -x bundleReleaseJsAndAssets && adb -e install app/build/outputs/apk/debug/app-debug.apk && adb -e shell monkey -p org.pnplab.flux 1 && cd ..",
     "emulator:debug:install": "adb -e reverse tcp:8081 tcp:8081 ; adb -e uninstall org.pnplab.flux ; source dev.env && cd android && adb -e install app/build/outputs/apk/debug/app-debug.apk && adb -e shell monkey -p org.pnplab.flux 1 && cd ..",
@@ -152,9 +151,7 @@
       "<rootDir>/crossplatform-components/Home/HomeController.js",
       "<rootDir>/crossplatform-components/Onboarding/AuthController.js"
     ],
-    "transform": {
-      "^.+\\.js$": "<rootDir>/node_modules/react-native/jest/preprocessor.js"
-    }
+    "transform": {}
   },
   "detox": {
     "specs": "./test-detox",
