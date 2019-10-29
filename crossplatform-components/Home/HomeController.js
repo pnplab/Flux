@@ -8,6 +8,7 @@
 
 import React, { PureComponent } from 'react';
 import type { Element } from 'react';
+import { View } from 'react-native';
 
 import DailyTasksPolicy from './DailyTasksPolicy';
 import WeeklyTasksPolicy from './WeeklyTasksPolicy';
@@ -40,6 +41,11 @@ export default class HomeController extends PureComponent<Props, State> {
 
     constructor(props: Props) {
         super(props);
+
+        // Check studyModality is set correctly.
+        if (!['daily', 'weekly'].includes(this.props.studyModality)) {
+            throw new Error('studyModality should be defined as daily or weekly in <Home>');
+        }
 
         this.state = {
             suggestedTask: this.getSuggestedTask()
@@ -85,9 +91,11 @@ export default class HomeController extends PureComponent<Props, State> {
         }
 
         return (
-            <Layout menuComponent={this.props.menuComponent}>
-                {innerView}
-            </Layout>
+            <View accessibilityLabel="home">
+                <Layout menuComponent={this.props.menuComponent}>
+                    {innerView}
+                </Layout>
+            </View>
         );
     }
 
