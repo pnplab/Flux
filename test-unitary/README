@@ -1,9 +1,9 @@
-Warning, breakpoint don't hit when code coverage is done.
+@warning, breakpoint don't hit when code coverage is done.
 Use debugger; statement instead.
 See `https://github.com/jest-community/vscode-jest/issues/400` and
 `https://github.com/microsoft/vscode/issues/60187`.
 
-Warning, inside visual studio code on OSX, for some reason (I feel like it was
+@warning, inside visual studio code on OSX, for some reason (I feel like it was
 after conda install), jest path stopped working. Thus having errors such as 
 `Exception raised: Process failed: spawn jest ENOENT` and `env: node: No such
 file or directory`.
@@ -11,6 +11,6 @@ The following workaround works `https://github.com/jest-community/vscode-jest/is
 but requires to install vsc cli command first. To install `code` cli command,
 see `https://stackoverflow.com/questions/29955500/code-not-working-in-command-line-for-visual-studio-code-on-osx-mac`.
 
-
-
-Exception raised: Process failed: spawn jest ENOENT
+@warning, latest version (2.4.1) of vsc-coverage-gutters is broken and coverage
+doesn't appear. Downgrade to version 2.4.0 ! `https://github.com/ryanluker/vscode-coverage-gutters/releases/tag/v2.4.0`.
+cf. for how to `https://github.com/ryanluker/vscode-coverage-gutters/issues/244#issuecomment-545989241`.
