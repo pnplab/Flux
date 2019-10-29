@@ -1,5 +1,10 @@
 # Basic configuration
 
+## Failure to install dependencies through `yarn`
+error /Users/bims1/Documents/github/Flux 2/node_modules/weak-napi: Command failed.
+`clang: error: no such file or directory: '2/node_modules/node-addon-api'`
+=> Make sure you have no space in your path !!
+
 ## Undefined process.env var in js code
 
 Don't forget to flush cache (`react-native start --reset-cache`)!
