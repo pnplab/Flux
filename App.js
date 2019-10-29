@@ -323,11 +323,11 @@ export default (): React$Node =>
 
                     <OnboardingEnd
                         onStepFinished={
-                            () => {
-                                // Set user settings as they will be usefull
+                            async () => {
+                                // Set user settings as they will be useful
                                 // for Home to know which task to display and
                                 // store them in local db.
-                                setAndStoreUserSettings({ studyModality, awareDeviceId, awareStudyUrl });
+                                await setAndStoreUserSettings({ studyModality, awareDeviceId, awareStudyUrl });
 
                                 // Go to Home as app's onboarding is over.
                                 goTo(Home);
@@ -359,14 +359,14 @@ export default (): React$Node =>
 
             <SurveyTask
                 onSubmit={
-                    (msTimestamp, values) => {
+                    async (msTimestamp, values) => {
                         // Store survey to Aware for server sync and locally in
                         // realm for graphs
                         storeSurvey(values);
 
                         // Store task timestamp so we don't allow user to do it
                         // again through Home screen.
-                        setAndStoreUserSettings({ lastSubmittedSurveyTaskTimestamp: msTimestamp });
+                        await setAndStoreUserSettings({ lastSubmittedSurveyTaskTimestamp: msTimestamp });
 
                         // Switch to home screen as task is finished.
                         goTo(Home);
@@ -382,14 +382,14 @@ export default (): React$Node =>
                     }
                 }
                 onTaskFinished={
-                    (msTimestamp) => {
+                    async (msTimestamp) => {
                         // ...resting state eeg data are already stored inside aware through java code (bound from
                         // RestingStateTask component's code). Can't be done any other way due to high frequency 
                         // real time constraints of eeg recording.
 
                         // Store task timestamp so we don't allow user to do it
                         // again through Home screen.
-                        setAndStoreUserSettings({ lastSubmittedRestingStateTaskTimestamp: msTimestamp });
+                        await setAndStoreUserSettings({ lastSubmittedRestingStateTaskTimestamp: msTimestamp });
 
                         // Switch to home screen as task is finished.
                         goTo(Home);
