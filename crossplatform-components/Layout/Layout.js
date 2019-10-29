@@ -14,8 +14,6 @@ type Props = {
 };
 
 const Layout = (props: Props) => {
-    debugger;
-    
     // Check menuComponent element.
     if (!React.isValidElement(props.menuComponent)) {
         throw new Error('menuComponent should be a react element.');
