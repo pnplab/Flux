@@ -17,16 +17,18 @@ import UserManager from '../crossplatform-model/persistent-db/UserManager'; // O
 import { STUDY_URL } from '../config'; // this is mocked through config - so true values are in `/test-mocks/config.mock.js` :)
 
 // @note test renderer must be required after react-native.
-import { render, flushMicrotasksQueue } from 'react-native-testing-library';
+import { render, flushMicrotasksQueue, debug } from 'react-native-testing-library';
+
+import AuthPOM from './Auth.pom';
 
 // Fixes `ReferenceError: You are trying to `import` a file after the Jest
-// environment has been torn down.`. Appearing among other things s when using 
+// environment has been torn down.`. Appearing among other things when using
 // animated components (such as somes in `native-base`, so as many places in 
 // our interface). see `https://github.com/facebook/jest/issues/4359` and
 // `https://github.com/facebook/jest/issues/6434`.
 jest.useFakeTimers();
 
-describe('App', () => {
+describe('<App>', () => {
 
     afterEach(async () => {
         // Reset mocked realmjs db between tests.
@@ -40,7 +42,7 @@ describe('App', () => {
         db.__reset__();
     });
 
-    it('checks root <App /> component doesn\'t throw', async () => {
+    it('shouldn\'t throw when rendered', async () => {
         // Render the root component.
         render(<App />);
         
@@ -55,76 +57,127 @@ describe('App', () => {
         expect(true);
     });
 
-    it('redirects to Onboarding if user has not yet been register', async () => {
-        // Given user has not been registered yet.
-        // ...nothing needs to be set, this is the initial setup.
+    describe('<AppLoader>', () => {
 
-        // When the root component is displayed.
-        // @note A11y stands for Accessibility.
-        const { queryByA11yLabel } = render(<App />);
+        it('should redirect to <Onboarding> if the user has not yet been register', async () => {
+            // Given user has not been registered yet.
+            // ...nothing needs to be set, this is the initial setup.
 
-        // Once user settings have been loaded.
-        await flushMicrotasksQueue();
+            // When the root component is displayed.
+            // @note A11y stands for Accessibility.
+            const { queryByA11yLabel } = render(<App />);
 
-        // Then, it should display the onboarding component.
-        const displayedComponent = queryByA11yLabel('onboarding-auth');
-        expect(displayedComponent).not.toBeUndefined();
-        expect(displayedComponent).not.toBeNull();
+            // Once user settings have been loaded.
+            await flushMicrotasksQueue();
+
+            // Then, it should display the onboarding component.
+            const displayedComponent = queryByA11yLabel('onboarding-auth');
+            expect(displayedComponent).not.toBeUndefined();
+            expect(displayedComponent).not.toBeNull();
+        });
+
+        it('should redirect to <Home> (no task suggested) if the user has been registered (and we\'re out of the task schedule)', async () => {
+            // Given we're outside task schedule.
+            const outOfTaskScheduleMsTimestamp = moment('2019-05-17 13:00', 'YYYY-MM-DD HH:mm').valueOf();
+            const dateNowMockFn = jest
+                .spyOn(Date, 'now')
+                .mockImplementation(
+                    () => outOfTaskScheduleMsTimestamp
+                );
+
+            // Given user has already been registered.
+            await UserManager.setupUser('daily', 'TEST_DEVICE_ID', STUDY_URL);
+
+            // When the root component is displayed.
+            const { queryByA11yLabel } = render(<App />);
+
+            // Once user settings have been loaded.
+            await flushMicrotasksQueue();
+
+            // Then, it should display the home component.
+            const displayedComponent = queryByA11yLabel('home-notask');
+            expect(displayedComponent).not.toBeUndefined();
+            expect(displayedComponent).not.toBeNull();
+
+            // Restore date for next tests.
+            dateNowMockFn.mockRestore();
+        });
+
+        it('should redirect to <Home> (survey task suggested) if the user has been registered (and we\'re inside the task schedule)', async () => {
+            // Given we're outside task schedule.
+            const withinTaskScheduleMsTimestamp = moment('2019-05-21 19:15', 'YYYY-MM-DD HH:mm').valueOf();
+            const dateNowMockFn = jest
+                .spyOn(Date, 'now')
+                .mockImplementation(
+                    () => withinTaskScheduleMsTimestamp
+                );
+
+            // Given user has already been registered.
+            await UserManager.setupUser('daily', 'TEST_DEVICE_ID', STUDY_URL);
+
+            // When the root component is displayed.
+            const { queryByA11yLabel } = render(<App />);
+
+            // Once user settings have been loaded.
+            await flushMicrotasksQueue();
+
+            // Then, it should display the home component.
+            const displayedComponent = queryByA11yLabel('home-surveytask');
+            expect(displayedComponent).not.toBeUndefined();
+            expect(displayedComponent).not.toBeNull();
+
+            // Restore date for next tests.
+            dateNowMockFn.mockRestore();
+        });
+
     });
 
-    it('redirects to Home (no task suggested) if user has been registered (and we\'re out of the task schedule)', async () => {
-        // Given we're outside task schedule.
-        const outOfTaskScheduleMsTimestamp = moment('2019-05-17 13:00', 'YYYY-MM-DD HH:mm').valueOf();
-        const dateNowMockFn = jest
-            .spyOn(Date, 'now')
-            .mockImplementation(
-                () => outOfTaskScheduleMsTimestamp
-            );
+    describe('<Onboarding>', () => {
 
-        // Given user has already been registered.
-        await UserManager.setupUser('daily', 'TEST_DEVICE_ID', STUDY_URL);
-        
-        // When the root component is displayed.
-        const { queryByA11yLabel } = render(<App />);
-        
-        // Once user settings have been loaded.
-        await flushMicrotasksQueue();
+        describe('<Auth>', () => {
 
-        // Then, it should display the home component.
-        const displayedComponent = queryByA11yLabel('home-notask');
-        expect(displayedComponent).not.toBeUndefined();
-        expect(displayedComponent).not.toBeNull();
+            it('should redirect to <Home> when the user authentificates using the `371olh` test-scenario password', async () => {
+                try {
+                    // Given no user has been setup yet.
+                    // ...nothing needs to be set, this is the initial setup.
 
-        // Restore date for next tests.
-        dateNowMockFn.mockRestore();
+                    // Given the root component is displayed.
+                    const app = render(<App />);
+                    const authPOM = new AuthPOM(app);
+
+                    // Once empty user settings have been loaded and <AppLoader>
+                    // has redirect the App to the <Auth> component.
+                    await flushMicrotasksQueue();
+
+                    // When the user type authentificates with any random device id
+                    // and the `371olh` password.
+                    authPOM.setDeviceId('testdevice');
+                    authPOM.setPassword('371olh');
+                    authPOM.submit();
+
+                    // Once user settings have been stored.
+                    // await waitForElement(() => app.getByA11yLabel('home'));
+                    await flushMicrotasksQueue();
+                    // debug.deep(app);
+
+                    // Then user should be redirected to the <Home> component  
+                    // instead of continuing through the onboarding process.
+                    const home = app.getByA11yLabel('home');
+                    expect(home).toEqual(expect.anything());
+
+                    // Then aware should not launched.
+                    // @todo
+                }
+                catch(e) {
+                    console.error(e);
+                    throw e;
+                }
+            });
+
+        });
+
     });
 
-    it('redirects to Home (survey task suggested) if user has been registered (and we\'re inside the task schedule)', async () => {
-        // Given we're outside task schedule.
-        const withinTaskScheduleMsTimestamp = moment('2019-05-21 19:15', 'YYYY-MM-DD HH:mm').valueOf();
-        const dateNowMockFn = jest
-            .spyOn(Date, 'now')
-            .mockImplementation(
-                () => withinTaskScheduleMsTimestamp
-            );
-
-        // Given user has already been registered.
-        await UserManager.setupUser('daily', 'TEST_DEVICE_ID', STUDY_URL);
-
-        // When the root component is displayed.
-        const { queryByA11yLabel } = render(<App />);
-
-        // Once user settings have been loaded.
-        await flushMicrotasksQueue();
-
-        // Then, it should display the home component.
-        const displayedComponent = queryByA11yLabel('home-surveytask');
-        expect(displayedComponent).not.toBeUndefined();
-        expect(displayedComponent).not.toBeNull();
-
-        // Restore date for next tests.
-        dateNowMockFn.mockRestore();
-    });
 
     xit('should enable navigation from Home to Notifications', () => {
 

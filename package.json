@@ -128,7 +128,7 @@
       "<rootDir>/test-mocks/config.mock"
     ],
     "testMatch": [
-      "<rootDir>/test-unitary/Auth.spec.js"
+      "<rootDir>/test-unitary/*.spec.js"
     ],
     "testPathIgnorePatterns": [
       "<rootDir>/node_modules/",
@@ -144,6 +144,9 @@
     "collectCoverage": true,
     "collectCoverageFrom": [
       "<__FIRST_COMPLETE_REFACTORING__rootDir>/crossplatform-*/**/*.{js,jsx}",
+      "<rootDir>/App.js",
+      "<rootDir>/Utils.js",
+      "<rootDir>/crossplatform-components/AppController.js",
       "<rootDir>/crossplatform-components/Home/DailyTasksPolicy.js",
       "<rootDir>/crossplatform-components/Home/WeeklyTasksPolicy.js",
       "<rootDir>/crossplatform-components/Menu/Menu.js",

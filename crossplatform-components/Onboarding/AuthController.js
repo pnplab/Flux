@@ -10,34 +10,40 @@
 
 import { STUDY_URL } from '../../config';
 import React, { PureComponent } from 'react';
+import { unswallow } from '../../Utils';
+import type { $UnswallowedFn } from '../../Utils';
 import AuthView from './AuthView';
 
 // Configure types.
 type Props = {
-    +onStepFinished: (string, string, string) => void,
+    +onAuthSucceeded: (string, string, string) => void,
+    +onStartTest?: (string) => void
 };
 type State = {
     +currentPassword: string,
     +currentDeviceId: string,
-    error?: string
+    +error?: string
 };
 
+// Studies setup parameters with password.
+// If you need to generate a new password, you can use the following shell
+// command: `LC_ALL=C tr -dc 'a-z0-9' </dev/urandom | head -c 6`.
 type Study = {
     +modality: string,
     +password: string,
     +awareStudyUrl: string
-}
+};
 const DAILY_TASK_STUDY: Study = {
     modality: 'daily',
     password: '4wc2uw',
     awareStudyUrl: STUDY_URL
 };
-
 const WEEKLY_TASK_STUDY: Study = {
     modality: 'weekly',
     password: 'f32bts',
     awareStudyUrl: STUDY_URL
 };
+const TEST_SCENARIO_PASSWORD: string = '371olh';
 
 // Configure component logic.
 export default class AuthController extends PureComponent<Props, State> {
@@ -45,12 +51,30 @@ export default class AuthController extends PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
 
+        // Check the correct properties were called.
+        if (typeof props.onAuthSucceeded !== 'function') {
+            throw new Error('<Auth> `onAuthSucceeded` property should be a function.');
+        }
+        if (typeof props.onStartTest !== 'undefined' && typeof props.onStartTest !== 'function') {
+            throw new Error('<Auth> `onStartTest` property should be a function or be undefined.');
+        }
+
+        // Set the initial state.
         this.state = {
             currentPassword: '',
             currentDeviceId: '',
             error: undefined,
         };
+
+        // Ensure uncaught exception within callback properties are logged and 
+        // not swallowed by a potential the async keyword.
+        this.onAuthSucceeded = unswallow(this.props.onAuthSucceeded);
+        this.onStartTest = unswallow(this.props.onStartTest);
     }
+
+    // Wrapped user-defined callbacks with async error handler.
+    onAuthSucceeded: $UnswallowedFn<Props, 'onAuthSucceeded'>;
+    onStartTest: $UnswallowedFn<Props, 'onStartTest'>;
 
     onPasswordChanged = (password: string) => {
         this.setState({ currentPassword: password });
@@ -73,29 +97,36 @@ export default class AuthController extends PureComponent<Props, State> {
         //     return;
         // }
 
-        // Check password is correct.
-        if (this.state.currentPassword !== DAILY_TASK_STUDY.password && this.state.currentPassword !== WEEKLY_TASK_STUDY.password) {
+        // The password can either be a study access password or a password
+        // used to generate different application setup for testing purpose. 
+        switch (this.state.currentPassword) {
+        // If the typed password has been generated in order to setup a testing
+        // scenario, trigger the `onStartTest` callback.
+        case TEST_SCENARIO_PASSWORD:
+            if (typeof this.onStartTest !== 'function') {
+                throw new Error('Component <Auth> does not have an onStartTest attribute.');
+            }
+            else {
+                this.onStartTest(this.state.currentDeviceId);
+            }
+            break;
+        // Otherwise, it's probably been generated to access a study.
+        case DAILY_TASK_STUDY.password:
+            // Trigger initialization on success.
+            this.setState({ error: undefined });
+            this.onAuthSucceeded(DAILY_TASK_STUDY.modality, this.state.currentDeviceId, DAILY_TASK_STUDY.awareStudyUrl);
+            break;
+        case WEEKLY_TASK_STUDY.password:
+            // Trigger initialization on success.
+            this.setState({ error: undefined });
+            this.onAuthSucceeded(WEEKLY_TASK_STUDY.modality, this.state.currentDeviceId, WEEKLY_TASK_STUDY.awareStudyUrl);
+            break;
+        // If the password is simply incorrect, display an error.
+        default:
             this.setState({ error: 'code d\'accès erroné' });
-            return;
-        }
-        
-        // Retrieve study from typed password.
-        let study: Study;
-        if (this.state.currentPassword == DAILY_TASK_STUDY.password) {
-            study = DAILY_TASK_STUDY;
-        }
-        else if (this.state.currentPassword == WEEKLY_TASK_STUDY.password) {
-            study = WEEKLY_TASK_STUDY;
-        }
-        else {
-            // Should never happen has password have been checked to match one
-            // of the study just a few lines above.
-            throw new Error('Study not found at auth. It should have been found based on typed password.');
+            break;
         }
 
-        // Trigger initialization on success.
-        this.setState({ error: undefined });
-        this.props.onStepFinished(study.modality, this.state.currentDeviceId, study.awareStudyUrl);
     }
 
     render() {

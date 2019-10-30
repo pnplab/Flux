@@ -53,7 +53,7 @@ describe('<Home>', () => {
         // Hide react-native's console.error warning about uncaught thrown
         // exceptions.
         jest.spyOn(console, 'error');
-        global.console.error.mockImplementation(() => { })
+        global.console.error.mockImplementation(() => { });
 
         // Given unexpected study modality (anything else than daily or weekly).
         renderFn = () => {

@@ -194,38 +194,23 @@ export default class AppController extends PureComponent<Props, State> {
         let configKeyCount = Object.keys(config).length;
         if (configKeyCount === 3 && typeof config.studyModality !== 'undefined' && typeof config.awareDeviceId !== 'undefined' && typeof config.awareStudyUrl !== 'undefined') {
             let { studyModality, awareDeviceId, awareStudyUrl } = config;
-            try {
-                await UserManager.setupUser(studyModality, awareDeviceId, awareStudyUrl);
-            }
-            catch (e) {
-                throw e;
-            }
+            await UserManager.setupUser(studyModality, awareDeviceId, awareStudyUrl);
         }
         // Register last survey task timestamp so home controller know which
         // task to suggest.
         else if (configKeyCount === 1 && typeof config.lastSubmittedSurveyTaskTimestamp !== 'undefined') {
             let { lastSubmittedSurveyTaskTimestamp } = config;
-            try {
-                await UserManager.setLastSubmittedSurveyTaskTimestamp(lastSubmittedSurveyTaskTimestamp);
-            }
-            catch (e) {
-                throw e;
-            }
+            await UserManager.setLastSubmittedSurveyTaskTimestamp(lastSubmittedSurveyTaskTimestamp);
         }
         // Register last survey task timestamp so home controller know which
         // task to suggest.
         else if (configKeyCount === 1 && typeof config.lastSubmittedRestingStateTaskTimestamp !== 'undefined') {
             let { lastSubmittedRestingStateTaskTimestamp } = config;
-            try {
-                await UserManager.setLastSubmittedRestingStateTaskTimestamp(lastSubmittedRestingStateTaskTimestamp);
-            }
-            catch (e) {
-                throw e;
-            }
+            await UserManager.setLastSubmittedRestingStateTaskTimestamp(lastSubmittedRestingStateTaskTimestamp);
         }
         // Throw an exception if an unexpected use of the method is made.
         else {
-            throw new Error('Invalid config object for user settings');
+            throw new Error('Invalid config object for user settings.');
         }
 
         // Propagate user settings to the app.

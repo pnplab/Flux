@@ -191,7 +191,7 @@ export default (): React$Node =>
                 }) =>
                 <>
                     <Auth
-                        onStepFinished={
+                        onAuthSucceeded={
                             (studyModality, awareDeviceId, awareStudyUrl) => {
                                 // Set study values temporarily so they can be 
                                 // used to start aware in CheckPhenotyping
@@ -203,6 +203,28 @@ export default (): React$Node =>
 
                                 // Go to next onboarding step.
                                 goToStep(CheckWifi);
+                            }
+                        }
+                        onStartTest={
+                            async (deviceId: string) => {
+                                // Bypass onboarding process, aware loading and
+                                // go straightly to the Home component instead.
+                                // Useful for integration testing scenari which
+                                // don't need Aware. For instance, notification
+                                // testing.
+
+                                // We need to set the study modality in user
+                                // settings. It is mandatory for Home component
+                                // as Home needs to know which task to suggest
+                                // to the user.
+                                await setAndStoreUserSettings({
+                                    studyModality: 'daily',
+                                    awareDeviceId: deviceId,
+                                    awareStudyUrl: 'http://we-do-not-use/aware-study/because-testing-mode'
+                                });
+
+                                // Then we can go to the Home component.
+                                goTo(Home);
                             }
                         }
                     />
