@@ -45,6 +45,8 @@ export default class CheckDataSyncController extends PureComponent<Props, State>
         };
     }
 
+    _unlistenSyncEvents: () => void;
+
     async componentDidMount() {
         // // @debug 
         // let encryptionKey = FLUX_ENCRYPTION_KEY;
@@ -94,9 +96,17 @@ export default class CheckDataSyncController extends PureComponent<Props, State>
         //     check data onboarding process as automatic sync will never be
         //     resumed !!! This is dirty-patched by launch-time method call in
         //     StudySchemaAdapter in the meanwhile.
+        //     ===> EDIT: now the onboarding process has to be restarted from
+        //          scratch if the OnboardingEnd step hasn't finished. Could 
+        //          come with another flaw in case of crash after aware 
+        //          loading: user shouldn't be able to restart aware and thus
+        //          pass that step. Have to check and validate that!
         AwareManager.enableMandatoryBatteryForSync();
         AwareManager.enableMandatoryWifiForSync();
         AwareManager.enableAutomaticSync();
+
+        // Unlisten to sync events.
+        this._unlistenSyncEvents();
     }
 
     onTableSyncStarted = ({ table, rowCount }) => {
@@ -288,11 +298,6 @@ export default class CheckDataSyncController extends PureComponent<Props, State>
         // @todo verify server sync is succesful first.
         this.setState({ currentStep: 'SYNC_DONE' })
     };
-
-    componentWillUnmount() {
-        // Unlisten to sync events.
-        this._unlistenSyncEvents();
-    }
 
     // Sync data to the server
     onSyncData = async () => {
