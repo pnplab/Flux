@@ -13,7 +13,7 @@ jest.mock('../crossplatform-model/native-db/AwareManager', () => {
         joinStudy: jest.fn(() => Promise.resolve()), // @todo setDeviceId
         // storeSurvey: jest.fn(),
         syncData: jest.fn(() => Promise.resolve()),
-        // listenSyncEvents: jest.fn(() => Promise.resolve()),
+        listenSyncEvents: jest.fn(() => () => { /* unlisten function */ }),
         getDeviceId: jest.fn(() => Promise.resolve('TEST_DEVICE_ID')),
         // getSyncedDataCheckupForTable: jest.fn(() => Promise.resolve()),
         enableAutomaticSync: jest.fn(),

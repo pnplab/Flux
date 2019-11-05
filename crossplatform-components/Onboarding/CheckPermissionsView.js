@@ -12,8 +12,7 @@ import { Container, Content, Title, Button, Form, Item, Label, Input, CircleButt
 type Perm = {| +name: string, +title: string, +description: string |};
 type Props = {
     +list: Array<Perm>,
-    +current: 
-          'write-external-storage' 
+    +current: 'write-external-storage' 
         | 'get-accounts' 
         | 'access-fine-location' 
         | 'access-coarse-location' 
@@ -29,7 +28,7 @@ type Props = {
 };
 
 const CheckPermissionsView = ({ list, displayPerm, displayDescr, highlightPermTitle, isPermissionGranted, onRequestPermission, onSubmit }: Props) => 
-    <Container>
+    <Container accessibilityLabel="checkpermissions">
         <R3Container>
             <R3Header>
                 <Title>Gestion des Permissions</Title>
@@ -70,12 +69,13 @@ const CheckPermissionsView = ({ list, displayPerm, displayDescr, highlightPermTi
                 {
                     onRequestPermission &&
                     /* @warning accessibilityLabel of both Submit & Request button have to get the same name or
-                       integration testing doesn't work for some reason (didn't investigate). */
-                    <CircleButton type="validate" color="blue" onPress={onRequestPermission} accessibilityLabel="RequestPermissionsButton" />
+                       integration testing doesn't work for some reason (didn't investigate). 
+                       @warning the above comment/rule is broken - should check if appium tests still works. */
+                    <CircleButton type="validate" color="blue" onPress={onRequestPermission} accessibilityLabel="checkpermissions-request" />
                 }
                 {
                     onSubmit &&
-                    <CircleButton type="next" color="green" onPress={onSubmit} accessibilityLabel="CheckPermissionsNextButton" />
+                    <CircleButton type="next" color="green" onPress={onSubmit} accessibilityLabel="checkpermissions-next" />
                 }
             </R3Footer>
         </R3Container>

@@ -66,8 +66,8 @@ export default class AuthController extends PureComponent<Props, State> {
             error: undefined,
         };
 
-        // Ensure uncaught exception within callback properties are logged and 
-        // not swallowed by a potential the async keyword.
+        // Ensure uncaught exception within potential async callback properties
+        // are logged and not swallowed by promise.
         this.onAuthSucceeded = unswallow(this.props.onAuthSucceeded);
         this.onStartTest = unswallow(this.props.onStartTest);
     }

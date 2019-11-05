@@ -18,8 +18,7 @@ type Props = {
     +onStepFinished: () => void
 };
 type State = {
-    +currentPermissionName: 
-          'write-external-storage' 
+    +currentPermissionName: 'write-external-storage' 
         | 'get-accounts' 
         | 'access-fine-location' 
         | 'access-coarse-location' 

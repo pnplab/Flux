@@ -15,7 +15,7 @@ type Props = {
 };
 
 const OnboardingSurveyTaskView = ({ onStartTaskClicked, onStepBypassed }: Props) => 
-    <Container>
+    <Container accessibilityLabel="onboarding_surveytask">
         <R3Container>
             <R3Header>
                 <Title>Présentation: Questionnaire</Title>
@@ -24,7 +24,7 @@ const OnboardingSurveyTaskView = ({ onStartTaskClicked, onStepBypassed }: Props)
                 <Text>Présentation de la tâche de survey...</Text>
             </R3Content>
             <R3Footer>
-                <CircleButton type="next" color="green" onPress={onStartTaskClicked} onLongPress={onStepBypassed} delayLongPress={7000} accessibilityLabel="StartSurveyTaskButton" />
+                <CircleButton type="next" color="green" onPress={onStartTaskClicked} onLongPress={onStepBypassed} delayLongPress={7000} accessibilityLabel="onboarding_surveytask-start_task" />
             </R3Footer>
         </R3Container>
     </Container>;

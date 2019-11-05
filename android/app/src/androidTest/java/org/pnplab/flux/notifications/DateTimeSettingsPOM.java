@@ -160,7 +160,7 @@ public class DateTimeSettingsPOM {
         period = period.minusMonths(monthDiff);
         int dayDiff = period.getDays();
 
-        // Log
+        // Log.
         Log.i("TAG", dateStr + " " + targetDate.toString() + " " + monthDiff + " " + targetDate.getDayOfMonth());
 
         // Cycle through months.
@@ -256,7 +256,7 @@ public class DateTimeSettingsPOM {
      * @throws RemoteException
      * @throws UiObjectNotFoundException
      */
-    public void closeSettings() throws RemoteException, UiObjectNotFoundException {
+    public void closeSettingsAndReturnToHome() throws RemoteException, UiObjectNotFoundException {
         // Close settings.
         device.pressRecentApps();
         UiObject app = new UiObject(new UiSelector().description("Settings Date & time"));

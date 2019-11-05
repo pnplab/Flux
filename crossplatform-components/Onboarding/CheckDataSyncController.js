@@ -18,6 +18,8 @@ import CheckDataSyncView from './CheckDataSyncView';
 
 // Configure types.
 type Props = {
+    +onStepFinished: () => void,
+    +onBypassTask: () => void,
 };
 type State = {
     +currentStep: 'TEXT' | 'SYNC_ONGOING' | 'SYNC_DONE' | 'SYNC_ERROR',
@@ -306,8 +308,15 @@ export default class CheckDataSyncController extends PureComponent<Props, State>
     }
 
     // Go to next step when the user pushes the submit button!
-    goToNextStep = () => {
+    onStepFinished = () => {
         this.props.onStepFinished();
+    }
+
+    // Avoid sync and go directly to next step when the user long presses the
+    // submit button! Great for the integration tests which don't need data
+    // sync to be tested.
+    onBypassTask = () => {
+        this.props.onBypassTask();
     }
 
     render() {
@@ -316,7 +325,8 @@ export default class CheckDataSyncController extends PureComponent<Props, State>
                 currentStep={this.state.currentStep}
                 syncStatus={this.state.syncStatus}
                 onSyncData={this.onSyncData}
-                onNextClicked={this.goToNextStep}
+                onNextClicked={this.onStepFinished}
+                onBypassTask={this.onBypassTask}
             />
         );
     }

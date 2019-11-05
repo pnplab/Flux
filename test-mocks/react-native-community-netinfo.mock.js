@@ -6,10 +6,13 @@
 
 jest.mock('@react-native-community/netinfo', () => {
     return {
+        getConnectionInfo: jest.fn(async () => 'wifi'),
         getCurrentConnectivity: jest.fn(),
         isConnectionMetered: jest.fn(),
         addListener: jest.fn(),
         removeListeners: jest.fn(),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
         isConnected: {
             fetch: () => {
                 return Promise.resolve(true);

@@ -121,6 +121,7 @@
       "<rootDir>/test-mocks/react-native-firebase.mock",
       "<rootDir>/test-mocks/react-native-dev-menu.mock",
       "<rootDir>/test-mocks/react-native-fs.mock",
+      "<rootDir>/test-mocks/react-native-permissions-android.mock",
       "<rootDir>/test-mocks/react-native-community-netinfo.mock",
       "<rootDir>/test-mocks/realm.mock",
       "<rootDir>/test-mocks/BugReporter.mock",
@@ -128,7 +129,7 @@
       "<rootDir>/test-mocks/config.mock"
     ],
     "testMatch": [
-      "<rootDir>/test-unitary/*.spec.js"
+      "<rootDir>/test-unitary/**/*.spec.js"
     ],
     "testPathIgnorePatterns": [
       "<rootDir>/node_modules/",
@@ -152,6 +153,7 @@
       "<rootDir>/crossplatform-components/Menu/Menu.js",
       "<rootDir>/crossplatform-components/Layout/Layout.js",
       "<rootDir>/crossplatform-components/Home/HomeController.js",
+      "<rootDir>/crossplatform-components/Onboarding/OnboardingController.js",
       "<rootDir>/crossplatform-components/Onboarding/AuthController.js"
     ],
     "transform": {}

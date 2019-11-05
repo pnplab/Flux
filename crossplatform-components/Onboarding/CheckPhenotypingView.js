@@ -14,7 +14,7 @@ type Props = {
 };
 
 const CheckPhenotypingView = ({ onActivateAware, onNext }: Props) => 
-    <Container>
+    <Container accessibilityLabel="checkphenotyping">
         <R3Container>
             <R3Header>
                 <Title>Activation des Senseurs</Title>
@@ -24,11 +24,11 @@ const CheckPhenotypingView = ({ onActivateAware, onNext }: Props) =>
             <R3Footer>
                 {
                     onActivateAware &&
-                    <CircleButton type="validate" color="blue" onPress={onActivateAware} accessibilityLabel="StartAwareButton" />
+                    <CircleButton type="validate" color="blue" onPress={onActivateAware} accessibilityLabel="checkphenotyping-startaware" />
                 }
                 {
                     onNext &&
-                    <CircleButton type="next" color="green" onPress={onNext} accessibilityLabel="CheckPhenotypingNextButton" />
+                    <CircleButton type="next" color="green" onPress={onNext} accessibilityLabel="checkphenotyping-next" />
                 }
             </R3Footer>
         </R3Container>
