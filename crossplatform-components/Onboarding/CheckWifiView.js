@@ -15,7 +15,7 @@ type Props = {
 };
 
 const CheckWifiView = ({ status, onSubmit }: Props) => 
-    <Container>
+    <Container accessibilityLabel="checkwifi">
         <EnableCenteredContent>
             <Title>Connection Internet</Title>
             <MainView>
@@ -48,7 +48,7 @@ const CheckWifiView = ({ status, onSubmit }: Props) =>
                 }
             </MainView>
             <ButtonView>
-                <CircleButton type="next" success={status === 'wifi'} disabled={status !== 'wifi' && status !== 'cellular'} onPress={e => onSubmit()} accessibilityLabel="CheckWifiNextButton" />
+                <CircleButton type="next" success={status === 'wifi'} disabled={status !== 'wifi' && status !== 'cellular'} onPress={e => onSubmit()} accessibilityLabel="checkwifi-next" />
             </ButtonView>
         </EnableCenteredContent>
     </Container>;

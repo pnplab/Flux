@@ -19,7 +19,7 @@ type Props = {
 };
 
 const AuthView = (props: Props) => 
-    <Container accessibilityLabel="onboarding-auth">
+    <Container accessibilityLabel="auth">
         {/* @note native-base `Content` replaces KeyboardAvoidingView! */}
         <EnableCenteredContent>
             <Title>Flux</Title>

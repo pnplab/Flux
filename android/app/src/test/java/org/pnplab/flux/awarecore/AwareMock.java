@@ -22,9 +22,10 @@ public class AwareMock extends Aware {
         super();
     }
 
-    // We need to implement binder in Aware service in order to be able to use JUnit ServiceTestRule
-    // to launch the service synchronously and thus make it testable. This is optional when we use
-    // Robolectric setupService instead.
+    // We need to implement binder in Aware service in order to be able to use
+    // JUnit ServiceTestRule to launch the service synchronously and thus make
+    // it testable. This is optional when we use Robolectric setupService
+    // instead thus (what we do, but I didn't remove the code for some reason).
 
     @Override
     public IBinder onBind(Intent intent) {

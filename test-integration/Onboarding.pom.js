@@ -53,7 +53,7 @@ class OnboardingPageObjectModel {
                 try {
                     // @warning @todo Ensure button only appears when wifi is
                     // enabled (maybe the button is always shown but disabled).
-                    await driver.elementByAccessibilityId('CheckWifiNextButton, ');
+                    await driver.elementByAccessibilityId('checkwifi-next, ');
                     return true;
                 }
                 catch (e) {
@@ -61,7 +61,7 @@ class OnboardingPageObjectModel {
                 }
             },
             next: async () => {
-                let nextButton = await driver.elementByAccessibilityId('CheckWifiNextButton, ');
+                let nextButton = await driver.elementByAccessibilityId('checkwifi-next, ');
                 await nextButton.click();
             }
         }
@@ -78,7 +78,7 @@ class OnboardingPageObjectModel {
                 await driver.setImplicitWaitTimeout(1000);
                 let havePermissionsAlreadyBeenAccepted = undefined;
                 try {
-                    await driver.elementByAccessibilityId('CheckPermissionsNextButton, ');
+                    await driver.elementByAccessibilityId('checkpermissions-next, ');
                     havePermissionsAlreadyBeenAccepted = true;
                 }
                 catch (e) {
@@ -91,7 +91,7 @@ class OnboardingPageObjectModel {
                 // regular end-user workflow.
                 if (!havePermissionsAlreadyBeenAccepted) {
                     try {
-                        let checkPermissionsButton = await driver.elementByAccessibilityId('RequestPermissionsButton, ');
+                        let checkPermissionsButton = await driver.elementByAccessibilityId('checkpermissions-request, ');
                         await checkPermissionsButton.click();
                     }
                     catch (e) {
@@ -102,7 +102,7 @@ class OnboardingPageObjectModel {
             },
             havePermissionsBeenGranted: async () => {
                 try {
-                    await driver.elementByAccessibilityId('CheckPermissionsNextButton, ');
+                    await driver.elementByAccessibilityId('checkpermissions-next, ');
                     return true;
                 }
                 catch (e) {
@@ -111,7 +111,7 @@ class OnboardingPageObjectModel {
             },
             next: async () => {
                 // Go to next step.
-                let nextButton = await driver.elementByAccessibilityId('CheckPermissionsNextButton, ');
+                let nextButton = await driver.elementByAccessibilityId('checkpermissions-next, ');
                 await nextButton.click();
             }
         }
@@ -122,12 +122,12 @@ class OnboardingPageObjectModel {
 
         return {
             start: async () => {
-                let startAwareButton = await driver.elementByAccessibilityId('StartAwareButton, ');
+                let startAwareButton = await driver.elementByAccessibilityId('checkphenotyping-startaware, ');
                 await startAwareButton.click();
             },
             awaitAwareLaunch : async () => {
                 try {
-                    await driver.elementByAccessibilityId('CheckPhenotypingNextButton, ');
+                    await driver.elementByAccessibilityId('checkphenotyping-next, ');
                 }
                 catch (e) {
 
@@ -135,7 +135,7 @@ class OnboardingPageObjectModel {
             },
             hasAwareStarted: async() => {
                 try {
-                    await driver.elementByAccessibilityId('CheckPhenotypingNextButton, ');
+                    await driver.elementByAccessibilityId('checkphenotyping-next, ');
                     return true;
                 }
                 catch (e) {
@@ -144,7 +144,7 @@ class OnboardingPageObjectModel {
                 }
             },
             next: async () => {
-                let nextButton = await driver.elementByAccessibilityId('CheckPhenotypingNextButton, ');
+                let nextButton = await driver.elementByAccessibilityId('checkphenotyping-next, ');
                 await nextButton.click();
             }
         }
@@ -156,7 +156,7 @@ class OnboardingPageObjectModel {
         return {
             bypass: async () => {
                 // Survey Task - Long press on start task button to bypass it.
-                let startTaskButton = await driver.elementByAccessibilityId('StartSurveyTaskButton, ');
+                let startTaskButton = await driver.elementByAccessibilityId('onboarding_surveytask-start_task, ');
                 let action = new wd.TouchAction(driver);
                 action
                     .longPress({el: startTaskButton})
@@ -173,7 +173,7 @@ class OnboardingPageObjectModel {
         return {
             bypass: async () => {
                 // Survey Task - Long press on start task button to bypass it.
-                let StartRestingStateTaskButton = await driver.elementByAccessibilityId('StartRestingStateTaskButton, ');
+                let StartRestingStateTaskButton = await driver.elementByAccessibilityId('onboarding_restingstatetask-start_task, ');
                 let action = new wd.TouchAction(driver);
                 action
                     .longPress({el: StartRestingStateTaskButton})
@@ -201,7 +201,7 @@ class OnboardingPageObjectModel {
             },
             triggerSync: async () => {
                 // Start syncing data.
-                let syncButton = await driver.elementByAccessibilityId('SyncButton, ');
+                let syncButton = await driver.elementByAccessibilityId('check_data_sync-sync, ');
                 await syncButton.click();
             },
             awaitSync: async () => {
@@ -209,7 +209,7 @@ class OnboardingPageObjectModel {
                 try {
                     // Allow 5 minutes for data sync to occurs
                     await driver.setImplicitWaitTimeout(1000 * 60 * 5);
-                    await driver.elementByAccessibilityId('CheckDataSyncNextButton, ');
+                    await driver.elementByAccessibilityId('check_data_sync-next, ');
                     await driver.setImplicitWaitTimeout(implicitWaitTimeout);
                 }
                 catch (e) {
@@ -219,7 +219,7 @@ class OnboardingPageObjectModel {
             },
             hasSyncFinished: async () => {
                 try {
-                    await driver.elementByAccessibilityId('CheckDataSyncNextButton, ');
+                    await driver.elementByAccessibilityId('check_data_sync-next, ');
                     return true;
                 }
                 catch (e) {
@@ -260,7 +260,7 @@ class OnboardingPageObjectModel {
             },
             next: async () => {
                 // Go to next step. 
-                let nextButton = await driver.elementByAccessibilityId('CheckDataSyncNextButton, ');
+                let nextButton = await driver.elementByAccessibilityId('check_data_sync-next, ');
                 await nextButton.click();
             }
         }
@@ -271,7 +271,7 @@ class OnboardingPageObjectModel {
 
         return {
             next: async () => {
-                let nextButton = await driver.elementByAccessibilityId('OnboardingEndNextButton, ');
+                let nextButton = await driver.elementByAccessibilityId('onboarding_end-next, ');
                 await nextButton.click();
             }
         }

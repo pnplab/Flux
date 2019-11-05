@@ -1,8 +1,6 @@
 package org.pnplab.flux.awarecore;
 
-import android.content.ContentProvider;
 import android.content.Context;
-import android.content.pm.ProviderInfo;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Looper;
@@ -21,7 +19,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.pnplab.flux.BuildConfig;
 import org.pnplab.flux.TestApplication;
 import org.pnplab.flux.shadows.AwareShadow;
 import org.pnplab.flux.shadows.SQLiteClosableShadow;
@@ -30,7 +27,6 @@ import org.robolectric.Robolectric;
 import org.robolectric.android.controller.ContentProviderController;
 import org.robolectric.annotation.Config;
 import org.robolectric.annotation.LooperMode;
-import org.robolectric.shadows.ShadowContentResolver;
 import org.robolectric.shadows.ShadowEnvironment;
 import org.robolectric.shadows.ShadowLog;
 import org.robolectric.shadows.ShadowLooper;
@@ -52,16 +48,19 @@ import static org.robolectric.Shadows.shadowOf;
     },
     instrumentedPackages = { "net.sqlcipher.database", "com.aware" }
 )
-public class TestJoinStudy {
+public class JoinStudySpec {
 
-    @Rule
-    public final ServiceTestRule serviceRule = new ServiceTestRule();
-
+    // @Rule
+    // public final ServiceTestRule serviceRule = new ServiceTestRule();
 
     // @note see `https://github.com/robolectric/robolectric/blob/master/robolectric/src/test/java/org/robolectric/shadows/ShadowServiceTest.java`
     // for robolectric service's shadow doc (mock).
 
-    // @warning Not possible to test directly aware services as sqlcipher is not compatible with robolectric! https://discuss.zetetic.net/t/how-to-hide-or-exclude-sqlcipher-from-robolectric/1782/3
+    // @warning Not possible to test directly aware services as sqlcipher is
+    // not compatible with robolectric!
+    // https://discuss.zetetic.net/t/how-to-hide-or-exclude-sqlcipher-from-robolectric/1782/3
+    // @edit hmmm, I think that's the reason why I developed those SQLite*
+    //     shadows. No longer sure my solution works.
 
     @Before
     public void setUp() throws Exception {

@@ -160,7 +160,7 @@ public class DateTimeSettingsPOM {
         period = period.minusMonths(monthDiff);
         int dayDiff = period.getDays();
 
-        // Log
+        // Log.
         Log.i("TAG", dateStr + " " + targetDate.toString() + " " + monthDiff + " " + targetDate.getDayOfMonth());
 
         // Cycle through months.
@@ -256,11 +256,19 @@ public class DateTimeSettingsPOM {
      * @throws RemoteException
      * @throws UiObjectNotFoundException
      */
-    public void closeSettings() throws RemoteException, UiObjectNotFoundException {
+    public void closeSettingsAndReturnToHome() throws RemoteException, UiObjectNotFoundException {
         // Close settings.
         device.pressRecentApps();
-        UiObject app = new UiObject(new UiSelector().description("Settings Date & time"));
-        app.swipeUp(100);
+        try {
+            UiObject app = new UiObject(new UiSelector().description("Settings Date & time"));
+            app.swipeUp(100);
+        }
+        catch (UiObjectNotFoundException exc) {
+            // Tell user to ignore the warning and restart the device. Probably
+            // an android bug. Restarting device has proven effective with me
+            // while restarting tests did not.
+            throw new UiObjectNotFoundException("App Settings Date & time not found. If the app is appearing on screen but is shown blank, this probably happens because of a bug in android. You should restart your device.");
+        }
 
         // Return to home screen (quit recent app panel).
         device.pressHome();

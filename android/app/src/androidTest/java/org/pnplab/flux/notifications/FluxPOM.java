@@ -15,12 +15,10 @@ import androidx.test.uiautomator.Until;
 public class FluxPOM {
     private final UiDevice device;
     private final long timeout;
-    public final FluxOnboardingPOM onboarding;
 
     public FluxPOM(UiDevice device, long timeout) {
         this.device = device;
         this.timeout = timeout;
-        this.onboarding = new FluxOnboardingPOM(device, timeout);
     }
 
     public void launchApp() {
@@ -46,6 +44,33 @@ public class FluxPOM {
 
         // Wait for the app to appear.
         device.wait(Until.hasObject(By.pkg(APP_PACKAGE_NAME).depth(0)), timeout);
+    }
+
+    /**
+     * We should launch on <Auth> component. We sets up a special password made to bypass the
+     * onboarding process, ignore aware and go to <Home> component.
+     *
+     * @pre Must be on <Auth> part of the app (in onboarding).
+     *
+     * @throws UiObjectNotFoundException
+     */
+    public void openTestScenario() throws UiObjectNotFoundException {
+        // Wait for react-native to load initial view.
+        device.wait(Until.hasObject(By.desc("auth")), timeout);
+
+        // Set a random deviceId.
+        UiObject deviceIdField = new UiObject(new UiSelector().description("auth-deviceid"));
+        deviceIdField.setText("testDeviceId");
+
+        // Set up the special password to enter testing mode.
+        UiObject passwordField = new UiObject(new UiSelector().description("auth-password"));
+        passwordField.setText("371olh");
+
+        // Validate it all.
+        UiObject submitButton =  new UiObject(new UiSelector().description("auth-submit"));
+        submitButton.click();
+
+        // ...we should now be in <Home> component.
     }
 
     public void quitApp() throws RemoteException, UiObjectNotFoundException {

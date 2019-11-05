@@ -11,6 +11,7 @@ import type { ComponentType } from 'react';
 import { Alert } from 'react-native';
 
 import AwareManager from './crossplatform-model/native-db/AwareManager';
+import NotificationManager from './crossplatform-model/native-db/NotificationManager';
 import Menu from './crossplatform-components/Menu';
 import type { MenuButtonName } from './crossplatform-components/Menu';
 
@@ -21,7 +22,15 @@ import { DEV, FLUX_AUTO_UPDATE } from './config';
 import {
     App,
     AppLoader,
-    Onboarding, Auth, CheckWifi, CheckPermissions, CheckPhenotyping, SurveyTaskOnboarding, RestingStateTaskOnboarding, CheckDataSync, OnboardingEnd,
+    Onboarding,
+    Auth,
+    CheckWifi,
+    CheckPermissions,
+    CheckPhenotyping,
+    SurveyTaskOnboarding,
+    RestingStateTaskOnboarding,
+    CheckDataSync,
+    OnboardingEnd,
     Home, 
     SurveyTask,
     RestingStateTask
@@ -217,11 +226,21 @@ export default (): React$Node =>
                                 // settings. It is mandatory for Home component
                                 // as Home needs to know which task to suggest
                                 // to the user.
-                                await setAndStoreUserSettings({
+                                // We can use either 'setAndStoreUserSettings'
+                                // or 'setUserSettings'. We use the latter
+                                // because it prevents the next app launch to
+                                // try to start up with fake aware settings (
+                                // see <AppLoader>) and we don't need to be
+                                // able to store app state across app reload
+                                // for tests yet.
+                                await setUserSettings({
                                     studyModality: 'daily',
                                     awareDeviceId: deviceId,
                                     awareStudyUrl: 'http://we-do-not-use/aware-study/because-testing-mode'
                                 });
+                                
+                                // Setup scheduled notification.
+                                NotificationManager.schedule({ studyModality: 'daily' });
 
                                 // Then we can go to the Home component.
                                 goTo(Home);
@@ -336,6 +355,12 @@ export default (): React$Node =>
 
                     <CheckDataSync
                         onStepFinished={
+                            () => {
+                                // Go to next onboarding step.
+                                goToStep(OnboardingEnd);
+                            }
+                        }
+                        onBypassTask={
                             () => {
                                 // Go to next onboarding step.
                                 goToStep(OnboardingEnd);

@@ -7,11 +7,12 @@
 
 import type { ComponentType } from 'react';
 import React, { Component } from 'react';
+import { View } from 'react-native';
 import { isFragment } from 'react-is';
 
 // Configure types.
 type Props = {
-    +children: ({ [key: string]: any }) => Component < {}, {} >,
+    +children: ({ [key: string]: any }) => Component<{}, {}>,
     +index: ComponentType<{}>
 };
 type State = {
@@ -61,8 +62,15 @@ export default class OnboardingController extends Component<Props, State> {
         // Rertieve the component instance to display.
         const shownComponent = children.filter(child => child.type === shownComponentType)[0];
 
+        // Wrap shown component inside `onboarding` accessibilityLabel just for
+        // the sake of being able to test onboarding presence.
+        const wrappedShownComponent =
+            <View accessibilityLabel="onboarding">
+                {shownComponent}
+            </View>;
+
         // Display component.
-        return shownComponent;
+        return wrappedShownComponent;
     }
 
 }

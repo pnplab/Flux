@@ -20,11 +20,12 @@ type Props = {
     },
     +currentStep: 'TEXT' | 'SYNC_ONGOING' | 'SYNC_DONE' | 'SYNC_ERROR',
     +onSyncData: () => void,
-    +onNextClicked: () => void
+    +onNextClicked: () => void,
+    +onBypassTask: () => void
 };
 
-const CheckDataSyncView = ({ syncStatus, currentStep, onSyncData, onNextClicked }: Props) => 
-    <Container>
+const CheckDataSyncView = ({ syncStatus, currentStep, onSyncData, onNextClicked, onBypassTask }: Props) => 
+    <Container accessibilityLabel="check_data_sync">
         <R3Container>
             <R3Header>
                 <Title>Vérification de la synchronisation!</Title>
@@ -65,11 +66,11 @@ const CheckDataSyncView = ({ syncStatus, currentStep, onSyncData, onNextClicked 
             <R3Footer>
                 {
                     currentStep === 'TEXT' &&
-                    <CircleButton type="validate" color="blue" onPress={onSyncData} accessibilityLabel="SyncButton" />
+                    <CircleButton type="validate" color="blue" onPress={onSyncData} onLongPress={onBypassTask} accessibilityLabel="check_data_sync-sync" />
                 }
                 {
                     currentStep === 'SYNC_DONE' &&
-                    <CircleButton type="next" color="green" onPress={onNextClicked} accessibilityLabel="CheckDataSyncNextButton" />
+                    <CircleButton type="next" color="green" onPress={onNextClicked} accessibilityLabel="check_data_sync-next" />
                 }
             </R3Footer>
         </R3Container>
