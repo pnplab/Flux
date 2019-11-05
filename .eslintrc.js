@@ -23,6 +23,12 @@ module.exports =
     "flowtype"
   ],
   "rules": {
+    "no-trailing-spaces": [
+      "error", {
+        "skipBlankLines": false,
+        "ignoreComments": false
+      }
+    ],
     "indent": [
       "error",
       4,
