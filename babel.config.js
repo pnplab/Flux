@@ -17,24 +17,29 @@ module.exports = {
     ],
     plugins: [
         // babel@plugin-proposal-class-properties:
-        // 
+        //
         // The good: it fixes jest unit testing.
         // The bad: it breaks react native.
-        // 
+        //
         // Fixes `SyntaxError: <...>/node_modules/react-native/jest/mockComponent.js:
         // Support for the experimental syntax 'classProperties' isn't
         // currently enabled` when using jest. See
-        // `https://github.com/facebook/react-native/issues/21075`. Also 
+        // `https://github.com/facebook/react-native/issues/21075`. Also
         // fixes `Cannot read property 'default' of undefined [...] at new
         // Icon [...]` kind of errors cf. `https://github.com/facebook/react-native/issues/22437`.
         //
-        // Howver, it comes with bug `YellowBoxList Error when starting: 
-        // TypeError: undefined is not an object (evaluating 'props.getItem')` 
+        // However, it comes with bug `YellowBoxList Error when starting:
+        // TypeError: undefined is not an object (evaluating 'props.getItem')`.
         // cf. `https://github.com/facebook/react-native/issues/21154#issuecomment-439348692`.
-        '@babel/plugin-proposal-class-properties',
+        //
+        // Adding `@babel/plugin-transform-flow-strip-types` _before_
+        // `@babel/plugin-proposal-class-properties` has fixed both errors,
+        // see `https://github.com/facebook/react-native/issues/21154#issuecomment-477958260`.
         '@babel/plugin-transform-flow-strip-types',
-        // Transform your (developer's) env variables in plain string at 
-        // compile time so they can be kept readable in compiled source code 
+        '@babel/plugin-proposal-class-properties',
+
+        // Transform your (developer's) env variables in plain string at
+        // compile time so they can be kept readable in compiled source code
         // from the user's mobile app.
         [
             'transform-inline-environment-variables', {
