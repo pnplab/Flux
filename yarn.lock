@@ -9457,10 +9457,10 @@ react-native-dev-menu@2.0.2:
   resolved "https://registry.yarnpkg.com/react-native-dev-menu/-/react-native-dev-menu-2.0.2.tgz#96c7c7d4d5a5ec5c6f15031512523c3b6d54a32f"
   integrity sha512-dhV95nwc0rYqhBx8eropFJPWW7nyY8LgLsHUM44J6IG8Q5age0oqSg44JoE1lXtjGX+fTASwEvXNWsN0JYI0Kg==
 
-react-native-device-info@0.26.4:
-  version "0.26.4"
-  resolved "https://registry.yarnpkg.com/react-native-device-info/-/react-native-device-info-0.26.4.tgz#5d747fae91d5abceff2de5430ff92749a09c62dd"
-  integrity sha512-gQo/hSk26E/gK0W3QvkSv+mrBbceFszezxLfUriK3JbiUwvaOlXm6kru2jAu1XGJzfxo/JUO0Mc0lopqiPgw+A==
+react-native-device-info@2.1.2:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/react-native-device-info/-/react-native-device-info-2.1.2.tgz#5c553498e8930410aa65796b83f8f8c8fb9893b4"
+  integrity sha512-q14hVR0eLRXnKeRyKX4naydXstCWetCIL+K+vUqREGkVj6qKoBouKd2yd8AxBfyomQN4uP3XRT6hTCwErIj9Ew==
 
 react-native-drawer@2.5.1:
   version "2.5.1"
