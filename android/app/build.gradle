@@ -251,7 +251,7 @@ android {
         applicationId "org.pnplab.flux"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
+        versionCode 29
         versionName "1.0"
 
         // Add project-specific config values (eg. credentials and so on).
