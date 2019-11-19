@@ -92,6 +92,14 @@ $ cd android/
 $ ./gradlew assembleRelease -x bundleReleaseJsAndAssets
 ```
 
+# Execution failed for task ':app:processDebugManifest'
+
+First make sure you sourced an env file before running the command!
+
+Otherwise, probably a dependency issue.
+See `https://stackoverflow.com/questions/56644149/how-to-fix-execution-failed-for-task-appprocessdebugmanifest-in-react-native`
+See `https://github.com/facebook/react-native/issues/25294#issuecomment-503024749`
+
 # Remote js debugger fails & prevent the app from working: `Error: DeltaPatcher should receive a base Bundle when being initialized`
 
 Actually just a source code error, watch your `npx react-native start ...` result.

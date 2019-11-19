@@ -49,7 +49,7 @@
     "react-native": "0.61.2",
     "react-native-appupdate": "1.1.2",
     "react-native-dev-menu": "2.0.2",
-    "react-native-device-info": "0.26.4",
+    "react-native-device-info": "2.1.2",
     "react-native-firebase": "5.2.3",
     "react-native-fluidic-slider": "0.0.3",
     "react-native-linear-gradient": "2.5.3",
