@@ -21,14 +21,17 @@ buildscript {
         maven { url 'https://jitpack.io' }
     }
     dependencies {
-        // Tried to use Android Studio beta chanel with AGL 3.5.0-rc03 to address Robelectric issue https://github.com/robolectric/robolectric/issues/4942 - was 3.4.2
+        // Tried to use Android Studio beta chanel with AGL 3.5.0-rc03 to address Robelectric issue
+        // https://github.com/robolectric/robolectric/issues/4942 - was 3.4.2
         // -- However, 3.5.0-rc03 breaks realm plugin. Realm is fixed in unstable master branch but not yet released.
         // see https://github.com/realm/realm-js/commit/0648b9192fc67b7c94494617637c36cbe8372432 -
         // however yarn is unable to build it
-        // `npm_config_build_from_source=true yarn add realm#6211333a635d3fd202cb4b50e9b291a4c8ed8e3d` -- both with node 10 and 12.
+        // `npm_config_build_from_source=true yarn add realm#6211333a635d3fd202cb4b50e9b291a4c8ed8e3d`
+        // -- both with node 10 and 12.
         classpath 'com.android.tools.build:gradle:3.4.2'
         classpath 'com.google.gms:google-services:4.0.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jacoco:org.jacoco.core:0.8.2" // code coverage plugin impl. by android studio
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

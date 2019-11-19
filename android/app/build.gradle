@@ -124,6 +124,86 @@ def jscFlavor = 'org.webkit:android-jsc:+'
  */
 def enableHermes = project.ext.react.get("enableHermes", false);
 
+/**
+ * Implement jacoco code coverage for our app.
+ */
+apply plugin: 'jacoco'
+jacoco {
+    toolVersion = "0.8.2"
+}
+
+/**
+ * Implement jacoco code coverage for our robolectric tests as well.
+ *
+ * cf.
+ * Seen the code without reason from `https://karn.io/post/185280487143/android-code-coverage-using-jacoco.`
+ * Seen here `https://medium.com/@sergiygrechukha/android-ui-and-unit-tests-coverage-report-with-jacoco-and-sonarqube-1db5576f79b0`
+ * mentioning this is require for robolectric tests to work.
+ */
+tasks.withType(Test) {
+    jacoco.includeNoLocationClasses = true
+}
+
+/**
+ * Generate code coverage task.
+ *
+ * Adapted from
+ * https://medium.com/@rafael_toledo/unified-code-coverage-for-android-revisited-44789c9b722f
+ * https://medium.com/@sergiygrechukha/android-ui-and-unit-tests-coverage-report-with-jacoco-and-sonarqube-1db5576f79b0
+ * https://karn.io/post/185280487143/android-code-coverage-using-jacoco
+ */
+task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'createDebugCoverageReport']) {
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports for Debug build"
+
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+
+    // what to exclude from coverage report
+    // UI, "noise", generated classes, platform classes, etc.
+    def excludes = [
+            '**/R.class',
+            '**/R$*.class',
+            '**/*$ViewInjector*.*',
+            '**/BuildConfig.*',
+            '**/Manifest*.*',
+            '**/*Test*.*',
+            'android/**/*.*',
+            '**/*Fragment.*',
+            '**/*Activity.*',
+            // Retrolambda
+            '**/Lambda$*.class',
+            '**/Lambda.class',
+            '**/*Lambda.class',
+            '**/*Lambda*.class',
+            '**/*Lambda*.*',
+            '**/*Builder.*',
+            // Dagger2 generated code
+            '**/*_MembersInjector.class',
+            '**/*_MembersInjector*.*',
+            '**/*_*Factory*.*',
+            '**/*Component*.*',
+            '**/*Module*.*'
+    ]
+    // generated classes
+    classDirectories = fileTree(
+            dir: "$buildDir/intermediates/classes/debug",
+            excludes: excludes
+    ) + fileTree(
+            dir: "$buildDir/tmp/kotlin-classes/debug",
+            excludes: excludes
+    )
+
+    // sources
+    sourceDirectories = files([
+            android.sourceSets.main.java.srcDirs,
+            "$project.projectDir/src/main/java"
+    ])
+    executionData = fileTree(dir: project.buildDir, includes: ['jacoco/testDebugUnitTest.exec'])
+}
+
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
@@ -303,6 +383,9 @@ android {
 
             // Detox-specific additions to pro-guard
             proguardFile "${rootProject.projectDir}/../node_modules/detox/android/detox/proguard-rules-app.pro"
+
+            // Jacoco code coverage see `https://stackoverflow.com/questions/43871349/gradle-jacoco-could-not-find-method-jacocotestreport`.
+            testCoverageEnabled = false
         }
         debug {
             signingConfig signingConfigs.debug
@@ -313,6 +396,9 @@ android {
 
             // Detox-specific additions to pro-guard
             // proguardFile "${rootProject.projectDir}/../node_modules/detox/android/detox/proguard-rules-app.pro"
+
+            // Jacoco code coverage see `https://stackoverflow.com/questions/43871349/gradle-jacoco-could-not-find-method-jacocotestreport`.
+            testCoverageEnabled = true
         }
     }
 
@@ -338,6 +424,12 @@ configurations.all {
 }
 
 dependencies {
+    // @note because JUnit5 is built on Java 8 from the ground up, its
+    // instrumentation tests will only run on devices running Android 8.0 (API
+    // 26) or newer. Thus we keep `androidx.test.ext:junit` which points out
+    // to JUnit4.
+    // cf: `https://blog.stylingandroid.com/junit-5-getting-started/`
+
     implementation project(':bugsnag-react-native')
     // implementation project(':@sentry/react-native')
     implementation project(':react-native-fs')
