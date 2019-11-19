@@ -1,6 +1,20 @@
 # Basic configuration
 
+## `Cannot invoke method getErrorStream() on null object` at app launch project init and graddle sync
+
+This is a path issue due to @react-native-community/cli installed globally.
+See https://github.com/react-native-community/cli/issues/795#issuecomment-544909119.
+They propose to uninstall global installation.
+
+However, be sure to open android studio with `yarn androidstudio:debug` ! You
+have to to share shell ENV variables with android studio (such as study url)
+and wont have the issue if you do so.
+
+See all my posts (nuKs) on `https://github.com/facebook/react-native/issues/26929`
+for other potential reasons.
+
 ## Failure to install dependencies through `yarn`
+
 error /Users/bims1/Documents/github/Flux 2/node_modules/weak-napi: Command failed.
 `clang: error: no such file or directory: '2/node_modules/node-addon-api'`
 => Make sure you have no space in your path !!
