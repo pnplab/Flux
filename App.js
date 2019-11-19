@@ -31,7 +31,7 @@ import {
     RestingStateTaskOnboarding,
     CheckDataSync,
     OnboardingEnd,
-    Home, 
+    Home,
     SurveyTask,
     RestingStateTask
 } from './crossplatform-components';
@@ -50,11 +50,11 @@ import {
 //         necessarily rely on browser history, but can rely on mobile native
 //         mechanism for backward/forward navigation instead. See
 //         `https://github.com/respond-framework/rudy/blob/master/packages/rudy/docs/react-native.md`.
-//  
+//
 // @warning Rudy's documentation (the redux router) is partly out of date.
 
 // -- About theme and components
-// 
+//
 // @note We use native-base-theme library modified to use iOS style theme on
 //         both android & ios. The native-base-theme's theme is located in the
 //         `./crossplatform/theme` folder.
@@ -83,7 +83,7 @@ const goToFnMenuAdapter: GoToFnMenuAdapterType = function(goToFn: GoToFnType): O
     // Generate the correct onButtonClicked callback function using the goToFn
     // one.
     return function(buttonName: MenuButtonName): void {
-        // Convert the button name (as a string) into component one (as a 
+        // Convert the button name (as a string) into component one (as a
         // component type). The call the goToFn function with the right
         // parameter.
         switch (buttonName) {
@@ -101,7 +101,7 @@ const goToFnMenuAdapter: GoToFnMenuAdapterType = function(goToFn: GoToFnType): O
 };
 
 // Sets up the app components' dataflow.
-export default (): React$Node => 
+export default (): React$Node =>
     <App index={AppLoader}>
     {
         ({
@@ -125,13 +125,13 @@ export default (): React$Node =>
             // when the user can go to the next onboarding step.
             hasAwareStudyBeenJoined,
 
-            // storeSurvey store the survey both remotely (through Aware) and 
+            // storeSurvey store the survey both remotely (through Aware) and
             // locally (for graphs).
             storeSurvey,
 
             // ...no need for storeRestingState as this is done in the java
             // side (cf. comments bellow at the RestingStateTask component).
-        }) => 
+        }) =>
         <>
             <AppLoader
                 onUserNotYetRegistered={
@@ -165,7 +165,7 @@ export default (): React$Node =>
 
                         // Start and setup aware background service.
                         // Probably unnecesseray, since aware should be kept
-                        // launched independently from the app, restarted on 
+                        // launched independently from the app, restarted on
                         // crash, and even restarted automatically at phone
                         // boot. But for safety..
                         await startAware(userSettings.awareDeviceId || 'byp0auth');
@@ -179,10 +179,10 @@ export default (): React$Node =>
                 ({
                     // Method to move across the onboarding steps.
                     goToStep,
-                    
-                    /* ...the attributes bellow are used to communicate 
+
+                    /* ...the attributes bellow are used to communicate
                        inbetween onboarding's components... */
-                    
+
                     // Study modality. Used to define the behavior of the app
                     // (eg. whether the user has to do either daily or weekly
                     // tasks).
@@ -202,7 +202,7 @@ export default (): React$Node =>
                     <Auth
                         onAuthSucceeded={
                             (studyModality, awareDeviceId, awareStudyUrl) => {
-                                // Set study values temporarily so they can be 
+                                // Set study values temporarily so they can be
                                 // used to start aware in CheckPhenotyping
                                 // step and then stored locally in
                                 // OnboardingEnd step.
@@ -238,7 +238,7 @@ export default (): React$Node =>
                                     awareDeviceId: deviceId,
                                     awareStudyUrl: 'http://we-do-not-use/aware-study/because-testing-mode'
                                 });
-                                
+
                                 // Setup scheduled notification.
                                 NotificationManager.schedule({ studyModality: 'daily' });
 
@@ -297,8 +297,8 @@ export default (): React$Node =>
                                 // (screen scrolling fails in appium for some
                                 // reason).
 
-                                // Store fake survey values remotely so we can 
-                                // check if the sync as occured correctly in 
+                                // Store fake survey values remotely so we can
+                                // check if the sync as occured correctly in
                                 // the CheckDataSync step.
                                 storeSurvey({ fake: 0.1, fake2: 0.6, fake3: 0.4 });
 
@@ -309,7 +309,7 @@ export default (): React$Node =>
                     />
 
                     <SurveyTask
-                        onSubmit={ 
+                        onSubmit={
                             (msTimestamp, values) => {
                                 // Store survey values remotely so we can check
                                 // if the sync as occured correctly in the
@@ -431,7 +431,7 @@ export default (): React$Node =>
                 onTaskFinished={
                     async (msTimestamp) => {
                         // ...resting state eeg data are already stored inside aware through java code (bound from
-                        // RestingStateTask component's code). Can't be done any other way due to high frequency 
+                        // RestingStateTask component's code). Can't be done any other way due to high frequency
                         // real time constraints of eeg recording.
 
                         // Store task timestamp so we don't allow user to do it

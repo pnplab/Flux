@@ -1,6 +1,6 @@
 /**
  * @flow
- * 
+ *
  * Policy defining which task to suggest to the user depending on current time
  * and time of last task execution. This policy has been developed for studies
  * that ask the user to execute daily tasks.
@@ -9,7 +9,7 @@
 import moment from 'moment';
 
 // Policy's output type.
-export type Task = 'NO_TASK' 
+export type Task = 'NO_TASK'
     | 'SURVEY_TASK'
     | 'RESTING_STATE_TASK';
 
@@ -103,7 +103,7 @@ export function DailyTasksPolicy(
             let lastSubmittedRestingStateTaskMoment = moment(lastSubmittedRestingStateTaskTimestamp);
             let isLastSubmittedRestingStateTaskInsideOpeningSchedule = lastSubmittedRestingStateTaskMoment.isSameOrAfter(openingHour) && lastSubmittedRestingStateTaskMoment.isBefore(closingHour);
 
-            // The resting state task has still not been done by user, so 
+            // The resting state task has still not been done by user, so
             // we propose it.
             if (!isLastSubmittedRestingStateTaskInsideOpeningSchedule) {
                 return 'RESTING_STATE_TASK';

@@ -18,7 +18,7 @@ type Props = {
     +onSubmit: () => void
 };
 
-const AuthView = (props: Props) => 
+const AuthView = (props: Props) =>
     <Container accessibilityLabel="auth">
         {/* @note native-base `Content` replaces KeyboardAvoidingView! */}
         <EnableCenteredContent>
@@ -43,7 +43,7 @@ const AuthView = (props: Props) =>
             </InputView>
             {props.error &&
                 <ErrorView>
-                    <Text color="red" style={{position: 'absolute', textAlign: 'center', width: '100%'}}>{props.error}</Text>
+                    <Text color="red" style={{ position: 'absolute', textAlign: 'center', width: '100%' }}>{props.error}</Text>
                 </ErrorView>
             }
             <ButtonView>
@@ -89,7 +89,7 @@ const ErrorView = styled(View)`
 // appears.
 // const KeyboardAvoidingView_ = styled(KeyboardAvoidingView)
 //     .attrs({
-//         behavior: 'padding' 
+//         behavior: 'padding'
 //     })`
 //         flex: 1;
 

@@ -98,7 +98,7 @@ export default class AuthController extends PureComponent<Props, State> {
         // }
 
         // The password can either be a study access password or a password
-        // used to generate different application setup for testing purpose. 
+        // used to generate different application setup for testing purpose.
         switch (this.state.currentPassword) {
         // If the typed password has been generated in order to setup a testing
         // scenario, trigger the `onStartTest` callback.
@@ -107,19 +107,19 @@ export default class AuthController extends PureComponent<Props, State> {
                 throw new Error('Component <Auth> does not have an onStartTest attribute.');
             }
             else {
-                this.onStartTest(this.state.currentDeviceId);
+                this.onStartTest(this.state.currentDeviceId); // @warning may be async
             }
             break;
         // Otherwise, it's probably been generated to access a study.
         case DAILY_TASK_STUDY.password:
             // Trigger initialization on success.
             this.setState({ error: undefined });
-            this.onAuthSucceeded(DAILY_TASK_STUDY.modality, this.state.currentDeviceId, DAILY_TASK_STUDY.awareStudyUrl);
+            this.onAuthSucceeded(DAILY_TASK_STUDY.modality, this.state.currentDeviceId, DAILY_TASK_STUDY.awareStudyUrl); // @warning may be async
             break;
         case WEEKLY_TASK_STUDY.password:
             // Trigger initialization on success.
             this.setState({ error: undefined });
-            this.onAuthSucceeded(WEEKLY_TASK_STUDY.modality, this.state.currentDeviceId, WEEKLY_TASK_STUDY.awareStudyUrl);
+            this.onAuthSucceeded(WEEKLY_TASK_STUDY.modality, this.state.currentDeviceId, WEEKLY_TASK_STUDY.awareStudyUrl); // @warning may be async
             break;
         // If the password is simply incorrect, display an error.
         default:

@@ -14,7 +14,6 @@ import AwareManager from '../crossplatform-model/native-db/AwareManager';
 import GraphManager from '../crossplatform-model/persistent-db/GraphManager';
 import BugReporter from '../crossplatform-model/native-db/BugReporter';
 import UserManager from '../crossplatform-model/persistent-db/UserManager';
-import Layout from './Layout';
 
 // Configure types.
 type Props = {|
@@ -55,9 +54,9 @@ export default class AppController extends PureComponent<Props, State> {
             joinAwareStudy: this.joinAwareStudy,
             hasAwareStudyBeenJoined: this.state.hasAwareStudyBeenJoined,
 
-            // Register the app configuration into this single user settings. 
-            // These data are used to define the study modality (eg. daily or 
-            // weekly tasks for user, etc.) and aware settings (device id and 
+            // Register the app configuration into this single user settings.
+            // These data are used to define the study modality (eg. daily or
+            // weekly tasks for user, etc.) and aware settings (device id and
             // study url).
             userSettings: this.state.userSettings,
             setUserSettings: this.setUserSettings,
@@ -70,7 +69,7 @@ export default class AppController extends PureComponent<Props, State> {
         // Retrieve returned fragment's children as an array
         const fragmentChild = React.Children.only(childFunctionResult);
         const children = isFragment(fragmentChild) ? React.Children.toArray(fragmentChild.props.children) : [ fragmentChild ];
-        
+
         // Pick up the current component type to display.
         const activeComponentType = this.state.activeComponentType;
 
@@ -78,7 +77,7 @@ export default class AppController extends PureComponent<Props, State> {
         const shownComponent = children.filter(child => child.type === activeComponentType)[0];
 
         // Wrap component.
-        const wrappedComponent = 
+        const wrappedComponent =
             <StyleProvider style={getTheme()}>
                 <>
                     <StatusBar backgroundColor="#FAFAFA" barStyle="dark-content" />
@@ -98,7 +97,7 @@ export default class AppController extends PureComponent<Props, State> {
         BugReporter.notify('Storing survey.');
 
         // @note we use a redundant database architecture instead of a single
-        // source of thruth one because of the complexity of implementing 
+        // source of thruth one because of the complexity of implementing
         // abstraction binding between the native part for both android and iOS
         // and javascript. Indeed, we rely solely on Aware backend and its
         // inner mechanism for data synchronization with data that are out of
@@ -132,10 +131,10 @@ export default class AppController extends PureComponent<Props, State> {
 
         BugReporter.setDeviceId(awareDeviceId);
 
-        // Request aware's mandatory permission. Should do nothing as they 
+        // Request aware's mandatory permission. Should do nothing as they
         // already have been requested in onboarding step!
         // @todo redirect to onboarding request permission step if permissions
-        //    aren't granted! Must be checked outside this method as this one 
+        //    aren't granted! Must be checked outside this method as this one
         //    is only called during onboarding though.
         await AwareManager.requestPermissions();
 
@@ -151,7 +150,7 @@ export default class AppController extends PureComponent<Props, State> {
         // @warning @todo !!! Will make the app stuck if study fails !!!
         //                !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // @todo change url based on study.
-        
+
         // Join study.
         BugReporter.breadcrumb('Joining aware study...', 'log', {
             studyUrl: awareStudyUrl
