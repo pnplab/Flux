@@ -473,6 +473,8 @@ dependencies {
     testImplementation 'androidx.test:rules:1.2.0'
     testImplementation 'androidx.test.ext:junit:1.1.1'
     testImplementation 'org.robolectric:robolectric:4.3'
+    testImplementation 'org.mockito:mockito-core:2.+' // Mockito 3 uses Java 8.
+    // Truth is AssertJ-like google assertion library - we use this mainly so we can copy past from robolectric own's tests.
     // androidTestImplementation 'androidx.test:runner:1.2.0'
     // androidTestImplementation 'androidx.test:rules:1.2.0'
     // androidTestImplementation 'org.robolectric:robolectric:4.3'
@@ -489,6 +491,7 @@ dependencies {
     androidTestImplementation 'androidx.annotation:annotation:1.2.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
+    androidTestImplementation 'org.mockito:mockito-core:2.+' // Mockito 3 uses Java 8, thus I assume incompatible with device Below android 8 for implementation tests.
     // weird: still no c++ so lib although muse does.
     // androidTestImplementation  "com.facebook.react:react-native:+"  // From node_modules
     // Fixes INSTALL_FAILED_NO_MATCHING_ABIS cf. `https://stackoverflow.com/questions/47855548/install-failed-no-matching-abis-when-instrumented-testing`
