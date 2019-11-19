@@ -12,6 +12,8 @@ import com.rnfs.RNFSPackage;
 import com.airbnb.android.react.lottie.LottiePackage;
 import io.invertase.firebase.RNFirebasePackage;
 import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
+import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
+
 import com.brentvatne.react.ReactVideoPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.facebook.react.PackageList;
@@ -121,6 +123,7 @@ public class MainApplication extends Application implements ReactApplication {
                 // packages.add(new RNDevMenuPackage());
                 packages.add(new LottiePackage());
                 packages.add(new RNFirebasePackage());
+                packages.add(new RNFirebaseNotificationsPackage());
                 packages.add(new RNFirebaseMessagingPackage());
                 // packages.add(new SvgPackage());
                 // packages.add(new RNDeviceInfo());
