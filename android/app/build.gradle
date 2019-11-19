@@ -475,6 +475,7 @@ dependencies {
     testImplementation 'org.robolectric:robolectric:4.3'
     testImplementation 'org.mockito:mockito-core:2.+' // Mockito 3 uses Java 8.
     // Truth is AssertJ-like google assertion library - we use this mainly so we can copy past from robolectric own's tests.
+    testImplementation 'com.google.truth:truth:1.0'
     // androidTestImplementation 'androidx.test:runner:1.2.0'
     // androidTestImplementation 'androidx.test:rules:1.2.0'
     // androidTestImplementation 'org.robolectric:robolectric:4.3'
