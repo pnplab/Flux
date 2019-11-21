@@ -154,10 +154,12 @@ build:android:
         - echo fs.inotify.max_user_instances=524288 | tee -a /etc/sysctl.conf && sysctl -p
         - echo fs.inotify.max_user_watches=524288 | tee -a /etc/sysctl.conf && sysctl -p
         - echo fs.inotify.max_queued_events=524288 | tee -a /etc/sysctl.conf && sysctl -p
+        # @note python (v2) path required to fix https://github.com/node-ffi-napi/weak-napi/issues/22
         - yarn
     script:
-        # Those variables have to be set in gitlab ci/cd environment variables
-        # @note we need to add `-e` to expand `\n` into new lines in gitlab! 
+        # Those variables have to be set in gitlab ci/cd environment
+        # variables.
+        # @note we need to add `-e` to expand `\n` into new lines in gitlab!
         - echo -e "FLUX_RELEASE_STORE_FILE=flux-release-key.keystore\nFLUX_RELEASE_KEY_ALIAS=${FLUX_RELEASE_KEY_ALIAS}\nFLUX_RELEASE_STORE_PASSWORD=${FLUX_RELEASE_STORE_PASSWORD}\nFLUX_RELEASE_KEY_PASSWORD=${FLUX_RELEASE_KEY_PASSWORD}\nandroid.useAndroidX=true\nandroid.enableJetifier=true\nandroid.enableUnitTestBinaryResources=true\n\norg.gradle.jvmargs=-Xms128m -Xmx2048m -XX:+CMSClassUnloadingEnabled" > android/gradle.properties
         # Generated through `base64 -i android/app/flux-release-key.keystore -o <outfile>`
         - echo ${FLUX_RELEASE_KEY_KEYSTORE_B64} | base64 -d > android/app/flux-release-key.keystore

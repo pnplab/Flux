@@ -32,6 +32,10 @@ ENV NODE_DEL_PKGS="libstdc++"
 ENV NODE_RM_DIRS=/usr/include
 
 # Install nodejs
+# @note Line with `apk del` has been modified. We do not remove python.
+# Node-gyp indeed need python2 to run and is required by many js libraries.
+# See this issue `https://github.com/node-ffi-napi/weak-napi/issues/22` we've
+# encountered.
 RUN apk add --no-cache curl make gcc g++ python linux-headers binutils-gold gnupg libstdc++ && \
   for server in ipv4.pool.sks-keyservers.net keyserver.pgp.com ha.pool.sks-keyservers.net; do \
     gpg --keyserver $server --recv-keys \
@@ -59,16 +63,17 @@ RUN apk add --no-cache curl make gcc g++ python linux-headers binutils-gold gnup
     fi; \
     find /usr/lib/node_modules/npm -name test -o -name .bin -type d | xargs rm -rf; \
   fi && \
-  apk del curl make gcc g++ python linux-headers binutils-gold gnupg ${NODE_DEL_PKGS} && \
+  apk del curl make gcc g++ linux-headers binutils-gold gnupg ${NODE_DEL_PKGS} && \
   rm -rf ${NODE_RM_DIRS} /node-${NODE_VERSION}* /usr/share/man /tmp/* /var/cache/apk/* \
     /root/.npm /root/.node-gyp /root/.gnupg /usr/lib/node_modules/npm/man \
 	/usr/lib/node_modules/npm/doc /usr/lib/node_modules/npm/html /usr/lib/node_modules/npm/scripts
+
 
 # Install ruby
 RUN apk add --update --no-cache git ruby ruby-rdoc ruby-dev ruby-irb g++ make
 
 # Install required dependencies
-RUN apk add --no-cache --virtual=.build-dependencies wget unzip ca-certificates bash && \
+RUN apk add --no-cache --mirtual=.build-dependencies wget unzip ca-certificates bash && \
 	wget https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub -O /etc/apk/keys/sgerrand.rsa.pub && \
 	wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/${GLIBC_VERSION}/glibc-${GLIBC_VERSION}.apk -O /tmp/glibc.apk && \
 	wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/${GLIBC_VERSION}/glibc-bin-${GLIBC_VERSION}.apk -O /tmp/glibc-bin.apk && \
