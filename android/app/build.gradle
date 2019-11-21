@@ -258,6 +258,19 @@ android {
 
         // Add project-specific config values (eg. credentials and so on).
         // buildConfigField "String", "AWARE_ENCRYPTION_KEY", System.getenv("DB_ENCRYPTION_KEY") -- Set within aware-core.gradle
+        // Variable check is important to avoid undescriptive issues such as
+        // `Gradle: Execution failed for task ':processDebugManifest'`,
+        // especially since we're dealing with docker/CI stuffs that are
+        // tedious to debug.
+        if (System.getenv('BUGSNAG_API_KEY') == null) {
+           throw new GradleException("Please export 'BUGSNAG_API_KEY'")
+        }
+        if (System.getenv('BUGSNAG_DETECT_NDK_CRASHES') == null) {
+           throw new GradleException("Please export 'BUGSNAG_DETECT_NDK_CRASHES'")
+        }
+        if (System.getenv('STUDY_URL') == null) {
+           throw new GradleException("Please export 'STUDY_URL'")
+        }
         manifestPlaceholders = [
             BUGSNAG_API_KEY: System.getenv("BUGSNAG_API_KEY"),
             BUGSNAG_DETECT_NDK_CRASHES: System.getenv("BUGSNAG_DETECT_NDK_CRASHES")
