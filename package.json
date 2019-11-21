@@ -6,7 +6,7 @@
     "yarn": "PATH=\"/System/Library/Frameworks/Python.framework/Versions/2.7/bin/:$PATH\" yarn",
     "postinstall": "npx jetify",
     "start": "node node_modules/react-native/local-cli/cli.js start",
-    "release": "source prod.env && npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/ && cp -rv assets/* android/app/src/main/assets/ && cd android && ./gradlew assembleRelease -x bundleReleaseJsAndAssets; cd ..",
+    "release": "source prod.env && npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/assets/ && cd android && ./gradlew assembleRelease -x bundleReleaseJsAndAssets; cd ..",
     "release:install": "adb -d install android/app/build/outputs/apk/release/app-release.apk",
     "release:install:e": "adb -e install android/app/build/outputs/apk/release/app-release.apk && adb -e shell monkey -p org.pnplab.flux 1",
     "test:prepare": "echo \"First use \\`yarn release\\`\"; mkdir ../build; mkdir ../build/release; \\cp android/app/build/outputs/apk/release/app-universal-release.apk ../build/release/",
