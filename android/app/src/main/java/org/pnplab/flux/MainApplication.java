@@ -95,78 +95,74 @@ public class MainApplication extends Application implements ReactApplication {
 
             @Override
             protected List<ReactPackage> getPackages() {
-                // List<ReactPackage> list = new ArrayList<>(Arrays.asList(
-                //     new MainReactPackage(),
-                //     BugsnagReactNative.getPackage(),
-                //     new RNSentryPackage(),
-                //     new RNFSPackage(),
-                //     new RNAppUpdatePackage(),
-                //     new RNDevMenuPackage(),
-                //     new LottiePackage(),
-                //     new RNFirebasePackage(),
-                //     new RNFirebaseMessagingPackage(),
-                //     new SvgPackage(),
-                //     new RNDeviceInfo(),
-                //     new ReactVideoPackage(),
-                //     new AwareManagerPackage(),
-                //     new RNFluidicSliderPackage(),
-                //     new VectorIconsPackage(),
-                //     new RealmReactPackage(),
-                //     new LinearGradientPackage()
-                // ));
-
                 @SuppressWarnings("UnnecessaryLocalVariable")
                 List<ReactPackage> packages = new PackageList(this).getPackages();
+
+                // Auto linking is not implemented for our own packages.
+                packages.add(new AwareManagerPackage());
+
+                // Auto linking seems not to be implemented for these
+                // dependencies.
+                addPackageIfNotAutoLinked(packages, RNFSPackage.class);
+                addPackageIfNotAutoLinked(packages, LottiePackage.class);
+                addPackageIfNotAutoLinked(packages, LinearGradientPackage.class);
+                addPackageIfNotAutoLinked(packages, ReactVideoPackage.class);
+
+                // RNFirebase auto linking implementation had been troublesome
+                // and changed between version. We thus check if autolinking is
+                // implemented and provide our own linking if not. We'll be
+                // able to remove this once the ecosystem is a bit more stable.
+                // Currently it is implemented for the RNFirebasePackage class
+                // alone.
+                addPackageIfNotAutoLinked(packages, RNFirebasePackage.class);
+                addPackageIfNotAutoLinked(packages, RNFirebaseNotificationsPackage.class);
+                addPackageIfNotAutoLinked(packages, RNFirebaseMessagingPackage.class);
+
+                // Autolink seems to work for these:
                 // packages.add(new RNSentryPackage());
-                packages.add(new RNFSPackage());
                 // packages.add(new RNAppUpdatePackage());
                 // packages.add(new RNDevMenuPackage());
-                packages.add(new LottiePackage());
-                packages.add(new RNFirebasePackage());
-                packages.add(new RNFirebaseNotificationsPackage());
-                packages.add(new RNFirebaseMessagingPackage());
                 // packages.add(new SvgPackage());
                 // packages.add(new RNDeviceInfo());
-                packages.add(new ReactVideoPackage());
-                packages.add(new AwareManagerPackage());
-                // packages.add(new RNFluidicSliderPackage());
-                // packages.add(new VectorIconsPackage());
-                // packages.add(new RealmReactPackage());
-                packages.add(new LinearGradientPackage());
 
-                // Packages that cannot be autolinked yet can be added manually here, for example:
-                // packages.add(new MyReactNativePackage());
-
-                //return packages;
-
-                // Muse is only compatible with ARM v7 devices. We avoid launch-time errors on android
-                // emulator (which is x86 on osx) by adding the related android module conditionally.
-                if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.LOLLIPOP) {
-                    Log.e("Flux", "Android version incompatible with muse < LOLLIPOP " + android.os.Build.VERSION.SDK_INT);
+                // Muse is only compatible with ARM v7 devices. We avoid
+                // launch-time errors on android emulator (which is x86 on osx)
+                // by adding the related android module conditionally.
+                if (!isMuseCompatibleWithAndroidVersion()) {
+                    Log.e("Flux", "Muse API is incompatible with the android version. " + Build.VERSION.SDK_INT + " < LOLLIPOP");
+                }
+                else if (!isMuseCompatibleWithHardware()) {
+                    Log.e("Flux", "Muse API is incompatible with the hardware architecture.");
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) { // for Build.SUPPORTED_ABIS
+                        String supportedArchs = Arrays.toString(Build.SUPPORTED_ABIS);
+                        Log.e("Flux", "armeabi-v7a is not in " + supportedArchs);
+                    }
                 }
                 else {
-                    // @note List -> SUPPORTED_ABIS `https://developer.android.com/ndk/guides/abis`
-                    String[] archs = new String[0];
-                    archs = Build.SUPPORTED_ABIS;
-                    Log.d("Flux", Arrays.toString(archs));
-                    if (!Arrays.asList(archs).contains("armeabi-v7a")) {
-                        Log.e("Flux", "Hardware architecture incompatible with muse. armeabi-v7a is not supported.");
-                    }
-                    else {
-                        Log.i("Flux", "Muse appears to be compatible.");
+                    Log.i("Flux", "Muse API seems to be compatible with the current system.");
+                    // Try/catch block ensures muse linking is working! Indeed,
+                    // armeabi-v7a ABI appears on android-x86_64 but linking
+                    // still fails. This may simply be a build configuration
+                    // issue we can resolve (ie. the muse .so isn't packaged
+                    // inside the react-native x86_64 apk). Or something else.
+                    try {
+                        // Force-link muse.
+                        MuseManagerAndroid.getInstance();
 
-                        // Ensure muse linking is working! Indeed, armeabi-v7a ABI appears on android-x86_64 but linking still fails.
-                        // This may simply be a build configuration issue we can resolve (ie. the muse .so isn't packaged inside the
-                        // react-native x86_64 apk).
-                        try {
-                            MuseManagerAndroid.getInstance();
-                            packages.add(new org.pnplab.flux.restingstatetask.ReactPackage(permissionManager, processPriorityPromoter));
-                            // list.add(new MuseManagerPackage());
-                            // packages.add(new MuseManagerPackage());
-                        }
-                        catch (UnsatisfiedLinkError e) {
-                            Log.e("Flux", "Muse lib seems to appears to be supported, however linking has failed.");
-                        }
+                        // Add pkg.
+                        org.pnplab.flux.restingstatetask.ReactPackage pkg =
+                                new org.pnplab.flux
+                                        .restingstatetask
+                                        .ReactPackage(
+                                            permissionManager,
+                                            processPriorityPromoter
+                                        );
+
+                        packages.add(pkg);
+                    }
+                    catch (UnsatisfiedLinkError e) {
+                        Log.e("Flux", "Muse API linking has failed.");
+                        e.printStackTrace();
                     }
                 }
 
@@ -178,6 +174,55 @@ public class MainApplication extends Application implements ReactApplication {
                 return "index";
             }
         };
+
+    private boolean isMuseCompatibleWithAndroidVersion() {
+        // Not sure anymore this is req. for Muse or for `Build.SUPPORTED_ABIS`.
+        return android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.LOLLIPOP;
+    }
+
+    private boolean isMuseCompatibleWithHardware() {
+        // Check version is Lollipop in order to be able to use
+        // `Build.SUPPORTED_ABIS`.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            return false;
+        }
+        // Check current ABI is arm.
+        else {
+            // @note List -> SUPPORTED_ABIS `https://developer.android.com/ndk/guides/abis`
+            String[] archs = Build.SUPPORTED_ABIS;
+            boolean supportsArm7 = !Arrays
+                .asList(archs)
+                .contains("armeabi-v7a");
+            return supportsArm7;
+        }
+    }
+
+    private <T extends ReactPackage> void addPackageIfNotAutoLinked(List<ReactPackage> packages, Class<T> addedPackageClass) {
+        // Check if the package has been auto linked.
+        boolean hasPackage = false;
+        for (Object pkgItem: packages) {
+            if (addedPackageClass.isInstance(pkgItem)) {
+                hasPackage = true;
+                break;
+            }
+        }
+
+        // If the package has been auto linked, notify the developer he can
+        // remove it.
+        if (hasPackage) {
+            Log.d("Flux", "Autolinking is implemented for " + addedPackageClass.getName() + ". Manual link is obsolete.");
+        }
+        // If not, add the package.
+        else {
+            try {
+                packages.add(addedPackageClass.newInstance());
+            } catch (IllegalAccessException | InstantiationException e) {
+                Log.e("Flux", "Package " + addedPackageClass.getName() + " instantiation error.");
+                e.printStackTrace();
+            }
+        }
+    }
+
 
     @Override
     public ReactNativeHost getReactNativeHost() {
