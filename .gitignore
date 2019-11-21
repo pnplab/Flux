@@ -2,10 +2,11 @@
 # @warning Make sure all the `./backend` related ignored files are put into `./backend/.gitignore` since 
 # it is be used by `./scripts/backend/rsync.sh`.
 
-# Debug env
+# Environment files
 # @note we put it in .gitignore to avoid mistakly sharing google oauth api credentials.
 dev.env
 prod.env
+ci.env
 
 # OSX
 #
