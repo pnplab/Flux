@@ -435,10 +435,12 @@ android {
     }
 }
 
-// Prevent caching AWARE's master branch (which should be updated in case of new commit!)
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-}
+// Prevent caching AWARE's master branch (which should be updated in case of
+// new commit!).
+// @note no longer used since we've integrated aware source code in the repo.
+// configurations.all {
+//     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+// }
 
 dependencies {
     // @note because JUnit5 is built on Java 8 from the ground up, its
