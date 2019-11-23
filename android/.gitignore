@@ -3,5 +3,6 @@ app/src/main/assets/index.android.bundle
 gradle.properties
 app/flux-release-key.keystore
 app/google-services.json
+fastlane/credentials.json
 *.hprof
 captures/

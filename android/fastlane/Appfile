@@ -1,0 +1,2 @@
+json_key_file "fastlane/credentials.json" # Path to the json secret file - Follow https://github.com/fastlane/supply#setup to get one
+package_name "org.pnplab.flux" # e.g. com.krausefx.app

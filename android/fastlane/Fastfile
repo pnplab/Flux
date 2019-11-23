@@ -1,0 +1,130 @@
+# Customise this file, documentation can be found here:
+# https://github.com/fastlane/fastlane/tree/master/fastlane/docs
+# All available actions: https://docs.fastlane.tools/actions
+# can also be listed using the `fastlane actions` command
+
+# Change the syntax highlighting to Ruby
+# All lines starting with a # are ignored when running `fastlane`
+
+# If you want to automatically update fastlane if a new version is available:
+# update_fastlane
+
+# This is the minimum version number required.
+# Update this, if you use features of a newer version
+#
+# Do not use brew to install fastlane. Brew version is too hold to contain's
+# upload_to_play_store's track: internal parameter.
+# Use ruby gem! cf. https://github.com/fastlane/fastlane/issues/12117
+# You must upgrade ruby version first (which is why brew is outdated in the
+# first place)!
+# cf. https://hackernoon.com/the-only-sane-way-to-setup-fastlane-on-a-mac-4a14cb8549c8
+# Note ruby can be slow to install and look like it's hanging cf.
+# https://github.com/rbenv/ruby-build/issues/1064#issuecomment-289631295
+#
+# ```bash
+# $ brew install rbenv ruby-build
+# $ if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
+# $ rbenv init # Follow instructions!
+# $ rbenv install 2.4.1
+# $ rbenv global 2.4.1
+# $ sudo gem install fastlane -NV
+# $ fastlane --version
+# $ sudo bundle update
+# $ bundle exec fastlane internal
+# ```
+#
+# Fastlane + Gitlab tuto: https://about.gitlab.com/blog/2019/01/28/android-publishing-with-gitlab-and-fastlane/
+
+fastlane_version "2.137.0"
+
+default_platform :android
+
+platform :android do
+    before_all do
+        # ENV["SLACK_URL"] = "https://hooks.slack.com/services/..."
+    end
+
+    # before_all do
+    #     ensure_git_branch
+    #     ensure_git_status_clean
+    #     git_pull
+    # end
+    #
+    lane :build do
+        increment_version_code
+        sh('cd .. ; yarn release')
+    end
+    
+    desc 'Publish internal google play version.'
+    lane :internal do
+        # Build apk.
+        # gradle(task: 'assemble', build_type: 'Release')
+        # sh('cd .. ; yarn release')
+    
+        # Upload to store.
+        # upload_to_play_store
+        upload_to_play_store(
+            track: 'internal', # @warning need update https://github.com/fastlane/fastlane/issues/12117
+            apk: 'app/build/outputs/apk/release/app-release.apk'
+        )
+    
+        # slack(message: 'Successfully distributed a new beta build')
+    
+        # Generate the changelog based on commit messages since your last tag.
+        changelog_from_git_commits
+    end
+    
+    # https://docs.fastlane.tools/best-practices/continuous-integration/gitlab/#auto-incremented-build-number
+    # ios only
+    # lane :increment_build_number do
+    #     increment_build_number(build_number: ENV['CI_JOB_ID']) # versionName # versionCode
+    #     git_commit(path: ['./android/gradle.properties'], message: 'Bump versionCode')
+    #     push_to_git_remote
+    # end
+
+    lane :playstore do
+        # gradle(
+        #     task: 'assemble',
+        #     build_type: 'Release'
+        # )
+    
+    
+        # Upload app metadata from fastlane/metadata/android if you previously ran fastlane supply init
+        # Upload expansion files (obbs) found under the same directory as your APK as long as:
+        # They are identified by type as main or patch by containing main or patch in their file names
+        # There is at most one of each type
+        # Upload screenshots from fastlane/metadata/android if you previously ran screengrab
+        # Create a new production build
+        # Release the production build to all users
+        upload_to_play_store # Uploads the APK built in the gradle step above and releases it to all production users
+    
+    end
+
+    desc "Runs all the tests"
+    lane :test do
+        gradle(task: "test")
+    end
+
+    # You can define as many lanes as you want
+
+    after_all do |lane|
+        # This block is called, only if the executed lane was successful
+
+        # slack(
+        #     message: "Successfully deployed new App Update."
+        # )
+    end
+
+    error do |lane, exception|
+        # slack(
+        #     message: exception.message,
+        #     success: false
+        # )
+    end
+end
+
+# More information about multiple platforms in fastlane: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Platforms.md
+# All available actions: https://docs.fastlane.tools/actions
+
+# fastlane reports which actions are used
+# No personal data is sent or shared. Learn more at https://github.com/fastlane/enhancer

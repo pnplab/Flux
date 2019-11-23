@@ -250,11 +250,23 @@ android {
     }
 
     defaultConfig {
+        if (System.getenv('ANDROID_VERSION_CODE') == null) {
+           throw new GradleException("Please export number 'ANDROID_VERSION_CODE'")
+        }
+        if (System.getenv('ANDROID_VERSION_NAME') == null) {
+           throw new GradleException("Please export string 'ANDROID_VERSION_NAME'")
+        }
+
         applicationId "org.pnplab.flux"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 29
-        versionName "1.0"
+        // @note This must be the first v,e,r,s,i,o,n,C,o,d,e word instance in
+        // the file in order for the fastlane increment_version_code plugin to
+        // work.
+        versionCode 40
+        versionName "LOCAL_BUILD"
+        // versionCode System.getenv("ANDROID_VERSION_CODE")
+        // versionName System.getenv("ANDROID_VERSION_NAME")
 
         // Add project-specific config values (eg. credentials and so on).
         // buildConfigField "String", "AWARE_ENCRYPTION_KEY", System.getenv("DB_ENCRYPTION_KEY") -- Set within aware-core.gradle

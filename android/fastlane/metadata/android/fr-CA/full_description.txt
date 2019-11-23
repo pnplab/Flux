@@ -1,0 +1,3 @@
+Flux est une application de collecte de données à des fins de recherche scientifique. Les données récoltées incluent les senseurs du téléphone mobile, ainsi que des formulaires auto-rapportés et les données collectées par l'intermédiaire de l'appareil d'électroencéphalographie ambulatoire MUSE.
+
+L'accès à l'application requiert un mot de passe fourni dans le cadre d'un projet de recherche mené par le PNPLab, affilié au Centre de recherche de l'Institut universitaire en santé mentale de Montréal (Québec, Canada).

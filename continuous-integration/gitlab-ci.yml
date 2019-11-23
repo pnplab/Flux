@@ -137,9 +137,11 @@ build:android:
     tags:
         - docker
     image: registry.gitlab.com/pnplab/flux/android-builder:latest
-    variables:
+    variables: # env variables w/ non sensible data
         GRADLE_OUTPUT_PATH: android/app/build/outputs/apk/release/app-release.apk
         FLUX_AUTO_UPDATE: "false"
+        ANDROID_VERSION_CODE: ${CI_JOB_ID} # CI_JOB_ID is a number incr at every gitlab job.
+        ANDROID_VERSION_NAME: "v1.0"
     artifacts:
         name: ${APK_FILE}
         paths:
