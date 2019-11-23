@@ -316,9 +316,7 @@ android {
         // is set to false. It will just not produce the expected output.
         // See `https://stackoverflow.com/questions/49518003/not-able-to-update-android-studio-3-1-conflicting-configuration-armeabi-v7a?rq=1`
         ndk {
-            // @warning Supporting 64bit is now mandatory cf.
-            // https://developer.android.com/distribute/best-practices/develop/64-bit
-           abiFilters 'armeabi-v7a', 'x86', 'arm64-v8a', 'x86_64'
+           abiFilters 'armeabi-v7a', 'x86'
         }
 
         // Robolectric
@@ -363,9 +361,7 @@ android {
             // @todo update realmdb to latest version to support 64bit and try
             //       arm64-v8a again (muse wont probably work). Do the same
             //       w/ abiFilters!
-            // @warning Supporting 64bit is now mandatory cf.
-            // https://developer.android.com/distribute/best-practices/develop/64-bit
-            include 'x86', 'armeabi-v7a' , "arm64-v8a", "x86_64"
+            include 'x86', 'armeabi-v7a' //, "arm64-v8a", "x86_64"
         }
     }
 
