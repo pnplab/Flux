@@ -397,8 +397,8 @@ public class Communication extends Aware_Sensor {
 
         REQUIRED_PERMISSIONS.add(Manifest.permission.READ_CONTACTS);
         REQUIRED_PERMISSIONS.add(Manifest.permission.READ_PHONE_STATE);
-        // REQUIRED_PERMISSIONS.add(Manifest.permission.READ_CALL_LOG);
-        // REQUIRED_PERMISSIONS.add(Manifest.permission.READ_SMS);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_CALL_LOG);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_SMS);
 
         if (Aware.DEBUG) Log.d(TAG, "Communication service created!");
     }

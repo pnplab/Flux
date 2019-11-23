@@ -72,22 +72,20 @@ export default class CheckPermissionsController extends PureComponent<Props, Sta
                 `read-phone-state`.replace(/\s{4,}/g, ' '),
             permission: PermissionsAndroid.PERMISSIONS.READ_PHONE_STATE
         },
-        // Current LOG permission can't be applied due to new google play
-        // policies. Do something.
-        // {
-        //     name: 'read-call-log',
-        //     title: 'read-call-log',
-        //     description:
-        //         `read-call-log`.replace(/\s{4,}/g, ' '),
-        //     permission: PermissionsAndroid.PERMISSIONS.READ_CALL_LOG
-        // },
-        // {
-        //     name: 'read-sms',
-        //     title: 'read-sms',
-        //     description:
-        //         `read-sms`.replace(/\s{4,}/g, ' '),
-        //     permission: PermissionsAndroid.PERMISSIONS.READ_SMS
-        // }
+        {
+            name: 'read-call-log',
+            title: 'read-call-log',
+            description: 
+                `read-call-log`.replace(/\s{4,}/g, ' '),
+            permission: PermissionsAndroid.PERMISSIONS.READ_CALL_LOG
+        },
+        {
+            name: 'read-sms',
+            title: 'read-sms',
+            description: 
+                `read-sms`.replace(/\s{4,}/g, ' '),
+            permission: PermissionsAndroid.PERMISSIONS.READ_SMS
+        }
     ];
     /* eslint-enable quotes */
 

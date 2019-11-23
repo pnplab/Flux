@@ -37,10 +37,8 @@ class AwareManager {
                 PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
                 PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
                 PermissionsAndroid.PERMISSIONS.READ_PHONE_STATE,
-                // Current LOG permission can't be applied due to new google
-                // play policies. Do something.
-                // PermissionsAndroid.PERMISSIONS.READ_CALL_LOG,
-                // PermissionsAndroid.PERMISSIONS.READ_SMS,
+                PermissionsAndroid.PERMISSIONS.READ_CALL_LOG,
+                PermissionsAndroid.PERMISSIONS.READ_SMS,
                 PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
             ];
 
