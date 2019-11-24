@@ -194,10 +194,11 @@ test:android:
 
 release:
     stage: release
-    only:
-        - master
+    # only:
+    #     - master
     dependencies:
         - build:android
+    when: manual
     tags:
         - docker
     image: tarampampam/node:10.15-alpine # node + git
