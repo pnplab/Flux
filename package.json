@@ -178,6 +178,7 @@
     "test-runner": "jest"
   },
   "release": {
+    "branch": "nuKs/dev",
     "repositoryUrl": "https://github.com/pnplab/Flux.git",
     "plugins": [
       "@semantic-release/commit-analyzer",
