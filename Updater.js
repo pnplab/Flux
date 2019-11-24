@@ -1,3 +1,5 @@
+// @warning package deprecated according to https://github.com/parryworld/react-native-appupdate.
+// Update/discard or turn to https://github.com/odemolliens/react-native-app-update
 import AppUpdate from "react-native-appupdate";
 
 export async function triggerUpdateIfNeeded() {
