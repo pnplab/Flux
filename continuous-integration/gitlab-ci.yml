@@ -211,6 +211,10 @@ release:
         # @warning only work with branch master for some reason.
         # cf. https://github.com/semantic-release/semantic-release/issues/1235
         # cf. https://github.com/pvdlg/env-ci/blob/master/services/gitlab.js
+        # Specifying branch explicitely in `package.json > release > branch`
+        # fixes this.
+        # @warning failed to push commit to github with GITHUB_TOKEN env.
+        # GH_TOKEN env with exact same token works fine though.
         - npx -p @semantic-release/changelog@3 -p @semantic-release/commit-analyzer@6 -p @semantic-release/exec@3 -p @semantic-release/github@5 -p @semantic-release/npm@5 -p @semantic-release/release-notes-generator@7 -p semantic-release@15 semantic-release
     after_script:
         - mv Flux.apk ${APK_FILE}
