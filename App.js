@@ -480,6 +480,6 @@ if (DEV || !DEV) {
 }
 
 // Automatically update the app when released.
-if (typeof FLUX_AUTO_UPDATE !== 'undefined' && FLUX_AUTO_UPDATE === 'true') {
+if (true || typeof FLUX_AUTO_UPDATE !== 'undefined' && FLUX_AUTO_UPDATE === 'true') {
     triggerUpdateIfNeeded();
 }
