@@ -8,7 +8,7 @@
 
 import React, { PureComponent } from 'react';
 import type { Element } from 'react';
-import { View } from 'react-native';
+import { View, Text } from 'react-native';
 
 import DailyTasksPolicy from './DailyTasksPolicy';
 import WeeklyTasksPolicy from './WeeklyTasksPolicy';
@@ -93,6 +93,7 @@ export default class HomeController extends PureComponent<Props, State> {
         return (
             <View accessibilityLabel="home">
                 <Layout menuComponent={this.props.menuComponent}>
+                    <Text>Auto Update is working !</Text>
                     {innerView}
                 </Layout>
             </View>
