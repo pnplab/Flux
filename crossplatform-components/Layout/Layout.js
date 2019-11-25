@@ -24,9 +24,11 @@ const Layout = (props: Props) => {
             <EnableCenteredContent>
                 {props.children}
             </EnableCenteredContent>
+            {/*
             <Footer>
                 {props.menuComponent}
             </Footer>
+            */}
         </Container>
     );
 };
