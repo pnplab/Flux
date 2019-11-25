@@ -1,314 +1,308 @@
+/**
+ * @flow
+ */
 import { List } from 'immutable';
 
+/* eslint-disable quotes */
 export default List([
     {
-        // cat: 'Qualité de vie',
-        label: 'Qualité vie',
-        text: 'aujourd\'hui, comment décrivez-vous votre qualité de vie?',
+        // cat: `Qualité de vie`,
+        label: `Qualité vie`,
+        text: `aujourd'hui, comment décrivez-vous votre qualité de vie ?`,
         guideline: {
-            left: 'très négatif',
-            right: 'très positif'
+            left: `très négatif`,
+            right: `très positif`
         },
-        id: '6dae4acd-6786-43e9-9ba3-d7640f0ac492',
+        id: `62a269c0-069d-4f8a-9dc3-d052a752a20f`
     },
     {
-        // cat: 'Fonctionnement (cognition)',
-        label: 'Concentration',
-        text: 'aujourd’hui, avez-vous eu de la difficulté à vous concentrer sur une tâche pendant dix minutes?',
+        // cat: `Fonctionnement (cognition)`,
+        label: `Concentration`,
+        text: `aujourd'hui, avez-vous eu des problèmes de mémoire ou de concentration ?`,
         guideline: {
-            left: 'pas du tout',
-            right: 'énormément'
+            left: `pas du tout`,
+            right: `énormément`
         },
-        id: '0017168a-3cc1-410a-a09b-a34e91617600',
+        id: `daea492a-b984-4189-93c9-b1da5ee92c5f`
     },
     {
-        // cat: 'Fonctionnement (soins)',
-        label: 'Hygiène',
-        text: 'aujourd’hui, avez-vous eu de la difficulté à laver votre corps tout entier?',
+        // cat: `Fonctionnement (soins)`,
+        label: `Hygiène`,
+        text: `aujourd'hui, vous êtes-vous occupé de votre hygiène personnelle ?`,
         guideline: {
-            left: 'pas du tout',
-            right: 'énormément'
+            left: `pas du tout`,
+            right: `énormément`
         },
-        id: '998c8cb4-c7c7-4388-a0e5-a51a8f1d4e5d',
+        id: `2cd8a3a7-c515-433e-b84d-e8c826d060b5`
     },
     {
-        // cat: 'Fonctionnement (mobilité)',
-        label: 'Marche',
-        text: 'aujourd’hui, avez-vous eu de la difficulté à marcher une longue distance comme un kilomètre?',
+        // cat: `Fonctionnement (mobilité)`,
+        label: `Marche`,
+        text: `aujourd'hui, avez-vous marché hors de votre domicile ?`,
         guideline: {
-            left: 'pas du tout',
-            right: 'énormément'
+            left: `pas du tout`,
+            right: `énormément`
         },
-        id: '3ed91e52-be24-4194-ab3e-35518967bffa',
+        id: `19641200-a154-4aeb-9f07-f7df5333df9b`
     },
     {
-        // cat: 'Fonctionnement (activités occupationnelles)',
-        label: 'Ménage',
-        text: 'aujourd’hui, avez-vous eu de la difficulté à vous occuper de vos responsabilités ménagères?',
+        // cat: `Fonctionnement (activités occupationnelles)`,
+        label: `Ménage`,
+        text: `aujourd'hui, vous êtes-vous occupé de vos responsabilités ménagères ?`,
         guideline: {
-            left: 'pas du tout',
-            right: 'énormément'
+            left: `pas du tout`,
+            right: `énormément`
         },
-        id: '325a4eb8-e7e6-4bb1-8932-cf908f100833',
+        id: `13f4ec61-a26d-4978-8e2f-58d7bbe290a0`
     },
     {
-        // cat: 'Fonctionnement (social)',
-        label: 'Social',
-        text: 'aujourd’hui, avez-vous eu de la difficulté à avoir à faire à des personnes que vous ne connaissez pas?',
+        // cat: `Fonctionnement (social)`,
+        label: `Social`,
+        text: `aujourd'hui, avez-vous interagi avec des personnes que vous ne connaissez pas ?`,
         guideline: {
-            left: 'pas du tout',
-            right: 'énormément'
+            left: `pas du tout`,
+            right: `énormément`
         },
-        id: '538d8593-f7f5-465a-9fcb-b881c111b0e0',
+        id: `3b9c6e15-38a6-4431-83dd-e3ebf5192f63`
     },
     {
-        // cat: 'Fonctionnement (participation)',
-        label: 'Communauté',
-        text: 'aujourd’hui, avez-vous eu de la difficulté à vous engager dans des activités communautaires?',
+        // cat: `Psychose (hallucinations)`,
+        label: `Voix/visions`,
+        text: `aujourd'hui, avez-vous entendu des voix ou vu des personnes ou des choses que les autres ne peuvent pas entendre ou voir ?`,
         guideline: {
-            left: 'pas du tout',
-            right: 'énormément'
+            left: `pas du tout`,
+            right: `énormément`
         },
-        id: 'b7722ebc-340f-4086-9afd-3da0801737fc',
+        id: `0d830f87-a8aa-4486-8547-8a1c631fcee1`
     },
     {
-        // cat: 'Psychose (hallucinations)',
-        label: 'Voix/visions',
-        text: 'aujourd\'hui, avez-vous entendu des voix ou vu des personnes ou des choses que les autres ne peuvent pas entendre ou voir ?',
+        // cat: `Psychose (grandiosité)`,
+        label: `Pouvoirs`,
+        text: `aujourd'hui, avez-vous eu l'impression d'avoir des pouvoirs spéciaux que les autres n'ont pas ?`,
         guideline: {
-            left: 'pas du tout',
-            right: 'énormément'
+            left: `pas du tout`,
+            right: `énormément`
         },
-        id: '0ba83d52-1b9d-48e7-ac67-3c099fdc962d',
+        id: `a1f4be35-6705-43a1-b048-40bf58aae6dc`
     },
     {
-        // cat: 'Psychose (grandiosité)',
-        label: 'Pouvoirs',
-        text: 'aujourd\'hui, avez-vous eu l\'impression d\'avoir des pouvoirs spéciaux que les autres n\'ont pas ?',
+        // cat: `Psychose (paranoia)`,
+        label: `Autres nuisent`,
+        text: `aujourd'hui, avez-vous eu l'impression que des gens ont cherché volontairement à vous nuire ?`,
         guideline: {
-            left: 'pas du tout',
-            right: 'énormément'
+            left: `pas du tout`,
+            right: `énormément`
         },
-        id: '3de91e60-b8fb-4a65-a6e7-a80baa8065bb',
+        id: `ae3954f3-ab8c-4f2c-b521-de9bfc9756a8`
     },
     {
-        // cat: 'Psychose (paranoia)',
-        label: 'Autres nuisent',
-        text: 'aujourd\'hui, avez-vous eu l\'impression que des gens ont cherché volontairement à vous nuire ?',
+        // cat: `Psychose (référence)`,
+        label: `Autres parlent`,
+        text: `aujourd'hui, avez-vous eu l'impression que les gens parlaient de vous ou qu'ils vous regardaient ?`,
         guideline: {
-            left: 'pas du tout',
-            right: 'énormément'
+            left: `pas du tout`,
+            right: `énormément`
         },
-        id: '0fc916f5-9ce0-4af6-8bb2-9840ffa4139c',
+        id: `5ec062ea-82ee-4a46-9a8a-f314c0f1f26d`
     },
     {
-        // cat: 'Psychose (référence)',
-        label: 'Autres parlent',
-        text: 'aujourd\'hui, avez-vous eu l\'impression que les gens parlaient de vous ou qu\'ils vous regardaient ?',
+        // cat: `Psychose (diffusion pensée)`,
+        label: `Pensées autres`,
+        text: `aujourd'hui, avez-vous eu l'impression que les autres étaient capables de lire dans vos pensées ou que les pensées dans votre tête ne sont pas vraiment les vôtres ?`,
         guideline: {
-            left: 'pas du tout',
-            right: 'énormément'
+            left: `pas du tout`,
+            right: `énormément`
         },
-        id: '109e291d-c9a1-4f8c-889e-c4f523e942fe',
+        id: `265fd993-9f3b-48b6-868e-b8f3bb02e82e`
     },
     {
-        // cat: 'Psychose (diffusion pensée)',
-        label: 'Pensées autres',
-        text: 'aujourd\'hui, avez-vous eu l\'impression que les autres étaient capables de lire dans vos pensées ou que les pensées dans votre tête ne sont pas vraiment les vôtres ?',
+        // cat: `Dépression/manie (anhédonie)`,
+        label: `Plaisir`,
+        text: `aujourd'hui, avez-vous éprouvé du plaisir ?`,
         guideline: {
-            left: 'pas du tout',
-            right: 'énormément'
+            left: `pas du tout`,
+            right: `énormément`
         },
-        id: '1e1a2311-b3e0-4295-a557-12878dc55cf0',
+        id: `719bd10f-2e90-41ac-806a-9316f539279c`
     },
     {
-        // cat: 'Dépression/manie (anhédonie)',
-        label: 'Plaisir',
-        text: 'aujourd\'hui, avez-vous éprouvé du plaisir ?',
+        // cat: `Dépression/manie (humeur)`,
+        label: `Humeur`,
+        text: `aujourd'hui, quelle a été votre humeur générale ?`,
         guideline: {
-            left: 'pas du tout',
-            right: 'énormément'
+            left: `très négatif`,
+            right: `très positif`
         },
-        id: 'd2a6fc25-a4c3-48f3-9f21-098135e31a4c',
+        id: `4df1c655-cc55-4cad-9798-076a9f9a4b60`
     },
     {
-        // cat: 'Dépression/manie (humeur)',
-        label: 'Humeur',
-        text: 'aujourd\'hui, quelle a été votre humeur générale ?',
+        // cat: `Dépression/manie (estime de soi)`,
+        label: `Estime`,
+        text: `aujourd'hui, quelle était votre estime de vous-même ?`,
         guideline: {
-            left: 'très négatif',
-            right: 'très positif'
+            left: `très négatif`,
+            right: `très positif`
         },
-        id: '5691270b-fe47-4f41-9ee0-732aeb0c81f2',
+        id: `aed57d91-dfd4-433e-b9b7-50ecd713ab3a`
     },
     {
-        // cat: 'Dépression/manie (estime de soi)',
-        label: 'Estime',
-        text: 'aujourd\'hui, quelle était votre estime de vous-même?',
+        // cat: `Dépression/manie (pensée accélérée)`,
+        label: `Pensées rapides`,
+        text: `aujourd'hui, vos pensées ont elles été plus rapides que d’habitude ?`,
         guideline: {
-            left: 'très négatif',
-            right: 'très positif'
+            left: `pas du tout`,
+            right: `énormément`
         },
-        id: 'bad34d0f-5293-4815-99dd-ebcc17e47580',
+        id: `205e6e36-97e7-4b7a-8f4c-39dbd07346d6`
     },
     {
-        // cat: 'Dépression/manie (pensée accélérée)',
-        label: 'Pensées rapides',
-        text: 'aujourd\'hui, vos pensées ont elles été plus rapides que d’habitude?',
+        // cat: `Dépression/manie (pensée rallentie)`,
+        label: `Pensées lentes`,
+        text: `aujourd'hui, vos pensées ont elles été plus lentes que d’habitude ?`,
         guideline: {
-            left: 'pas du tout',
-            right: 'énormément'
+            left: `pas du tout`,
+            right: `énormément`
         },
-        id: '8963f6f8-ed66-4a35-b656-2744308bb2dd',
+        id: `df950fd2-1207-4016-8908-93acab254719`
     },
     {
-        // cat: 'Dépression/manie (pensée ralentie)',
-        label: 'Pensées lentes',
-        text: 'aujourd\'hui, vos pensées ont elles été plus lentes que d’habitude?',
+        // cat: `Dépression/manie (social)`,
+        label: `Motivation parler`,
+        text: `aujourd'hui, avez-vous été motivé(e) à parler à des gens ?`,
         guideline: {
-            left: 'pas du tout',
-            right: 'énormément'
+            left: `pas du tout`,
+            right: `énormément`
         },
-        id: '190fa4cc-0759-4554-9505-4f450a8f7fff',
+        id: `ed4d6b4d-188a-459d-aeb9-1a4c847784f6`
     },
     {
-        // cat: 'Dépression/manie (social)',
-        label: 'Motivation parler',
-        text: 'aujourd\'hui, avez-vous été motivé(e) à parler à des gens ?',
+        // cat: `Dépression/manie`,
+        label: `Motivation faire`,
+        text: `aujourd'hui, avez-vous été motivé(e) à faire des choses ?`,
         guideline: {
-            left: 'pas du tout',
-            right: 'énormément'
+            left: `pas du tout`,
+            right: `énormément`
         },
-        id: '134ed8ec-da5d-4b87-a286-73f23b2845ae',
+        id: `108ac978-1512-4e0a-ae6b-db3a9cc19083`
     },
     {
-        // cat: 'Dépression/manie',
-        label: 'Motivation faire',
-        text: 'aujourd\'hui, avez-vous été motivé(e) à faire des choses ?',
+        // cat: `Dépression/manie (irritabilité)`,
+        label: `Irritable`,
+        text: `aujourd'hui, avez-vous éprouvé de l'irritabilité ou de la colère ?`,
         guideline: {
-            left: 'pas du tout',
-            right: 'énormément'
+            left: `pas du tout`,
+            right: `énormément `
         },
-        id: '0d27558d-8c5b-4c48-8280-efa0109f642a',
+        id: `d1039f5e-d542-46a1-9078-2502f6fa4c3c`
     },
     {
-        // cat: 'Dépression/manie (irritabilité)',
-        label: 'Irritable',
-        text: 'aujourd\'hui, avez-vous éprouvé de l\'irritabilité ou de la colère ?',
+        // cat: `Anxiété`,
+        label: `Anxiété`,
+        text: `aujourd'hui, avez-vous éprouvé de l'anxiété ?`,
         guideline: {
-            left: 'pas du tout',
-            right: 'énormément'
+            left: `pas du tout`,
+            right: `énormément`
         },
-        id: '285c67e1-a157-4c95-8073-e1d894a790f4',
+        id: `b0d3ed0d-3c21-4d57-ac46-2dbf53571020`
     },
     {
-        // cat: 'Anxiété',
-        label: 'Anxiété',
-        text: 'aujourd\'hui, avez-vous éprouvé de l\'anxiété ?',
+        // cat: `Stress`,
+        label: `Pression`,
+        text: `aujourd’hui, vous êtes-vous senti sous pression ?`,
         guideline: {
-            left: 'pas du tout',
-            right: 'énormément'
+            left: `pas du tout`,
+            right: `énormément`
         },
-        id: 'aa27fb9c-0e61-49e2-b143-8355e1ccab10',
+        id: `26508aa4-cbbc-4feb-beb6-0138c1079eab`
     },
     {
-        // cat: 'Stress',
-        label: 'Pression',
-        text: 'aujourd’hui, vous êtes-vous senti sous pression?',
+        // cat: `Événements`,
+        label: `Événements négatifs`,
+        text: `aujourd’hui, avez-vous vécu des événements marquants négatifs ?`,
         guideline: {
-            left: 'pas du tout',
-            right: 'énormément'
+            left: `pas du tout`,
+            right: `énormément`
         },
-        id: 'd26e113b-159a-4019-a90d-0dccf5671d7f',
+        id: `2f795016-5493-4885-9834-9a41e59db78a`
     },
     {
-        // cat: 'Événements',
-        label: 'Événements négatifs',
-        text: 'aujourd’hui, avez-vous vécu des événements marquants négatifs?',
+        // cat: `Événements`,
+        label: `Événements positifs`,
+        text: `aujourd’hui, avez-vous vécu des événements marquants positifs ?`,
         guideline: {
-            left: 'pas du tout',
-            right: 'énormément'
+            left: `pas du tout`,
+            right: `énormément `
         },
-        id: 'f21b2c7d-eda1-421c-8c30-7ff6010e1629',
+        id: `d1029cb6-eca6-4ac0-ad7a-4f51222fb391`
     },
     {
-        // cat: 'Événements',
-        label: 'Événements positifs',
-        text: 'aujourd’hui, avez-vous vécu des événements marquants positifs?',
+        // cat: `Sommeil`,
+        label: `Qualité sommeil`,
+        text: `la nuit passée, quelle a été la qualité de votre sommeil ?`,
         guideline: {
-            left: 'pas du tout',
-            right: 'énormément'
+            left: `Très négatif`,
+            right: `très positif`
         },
-        id: '4d6df3a0-c9c9-449a-8235-8006ad30b1c6',
+        id: `22d29269-1329-415c-91ef-16b03711df78`
     },
     {
-        // cat: 'Sommeil',
-        label: 'Qualité sommeil',
-        text: 'la nuit passée, quelle a été la qualité de votre sommeil?',
+        // cat: `Sommeil`,
+        label: `Impact sommeil`,
+        text: `aujourd'hui, vos activités ont-elles été perturbées parce-que vous avez mal dormi la nuit dernière ?`,
         guideline: {
-            left: 'très négatif',
-            right: 'très positif'
+            left: `pas du tout`,
+            right: `énormément`
         },
-        id: '55644d35-9fde-4597-b08d-259bfbe42c9f',
+        id: `f3a39f4c-8e55-4ee2-bf84-9756f4f70bdf`
     },
     {
-        // cat: 'Sommeil',
-        label: 'Impact sommeil',
-        text: 'aujourd\'hui, vos activités ont-elles été perturbées parce-que vous avez mal dormi la nuit dernière?',
+        // cat: `Toxicomanie`,
+        label: `Alcool`,
+        text: `aujourd'hui, avez-vous consommé de l'alcool ?`,
         guideline: {
-            left: 'pas du tout',
-            right: 'énormément'
+            left: `pas du tout`,
+            right: `énormément `
         },
-        id: '4e092615-1b04-4467-99a9-3f3b4565cc83',
+        id: `bf99ccf0-fe3a-4a24-a88d-cf1fe2488004`
     },
     {
-        // cat: 'Toxicomanie',
-        label: 'Alcool',
-        text: 'aujourd\'hui, avez-vous consommé de l\'alcool ?',
+        // cat: `Toxicomanie`,
+        label: `Cigarette`,
+        text: `aujourd'hui, avez-vous fumé la cigarette ou vapoté ?`,
         guideline: {
-            left: 'pas du tout',
-            right: 'énormément'
+            left: `pas du tout`,
+            right: `énormément`
         },
-        id: '8cf53a9f-801b-4873-aa45-ffc869e5e6cd',
+        id: `96ea9ea0-39ad-4dab-9ab0-3917ff157de8`
     },
     {
-        // cat: 'Toxicomanie',
-        label: 'Cigarette',
-        text: 'aujourd\'hui, avez-vous fumé la cigarette ou vapoté?',
+        // cat: `Toxicomanie`,
+        label: `Cannabis`,
+        text: `aujourd'hui, avez-vous consommé du cannabis ?`,
         guideline: {
-            left: 'pas du tout',
-            right: 'énormément'
+            left: `pas du tout`,
+            right: `énormément`
         },
-        id: 'bc609ff1-bc19-4005-9f6b-7d77b70fbd0a',
+        id: `bed8dba0-0719-4fe2-b11d-4201f71dae4b`
     },
     {
-        // cat: 'Toxicomanie',
-        label: 'Cannabis',
-        text: 'aujourd\'hui, avez-vous consommé du cannabis?',
+        // cat: `Toxicomanie`,
+        label: `Drogues`,
+        text: `aujourd'hui, avez-vous consommé d'autres drogues ?`,
         guideline: {
-            left: 'pas du tout',
-            right: 'énormément'
+            left: `pas du tout`,
+            right: `énormément `
         },
-        id: '9bd1d196-1779-4ae0-9834-f06f995a575a',
+        id: `1cf62a31-7020-4133-998b-e629e404436b`
     },
     {
-        // cat: 'Toxicomanie',
-        label: 'Drogues',
-        text: 'aujourd\'hui, avez-vous consommé d\'autres drogues ?',
+        // cat: `Observance`,
+        label: `Médicaments`,
+        text: `aujourd'hui, avez-vous pris vos médicaments aux bonnes heures et doses ?`,
         guideline: {
-            left: 'pas du tout',
-            right: 'énormément'
+            left: `pas du tout`,
+            right: `énormément `
         },
-        id: '87021206-9c38-41f2-bc07-22d10fc2d968',
-    },
-    {
-        // cat: 'Observance',
-        label: 'Médicaments',
-        text: 'aujourd\'hui, avez-vous pris vos médicaments aux bonnes heures et doses ?',
-        guideline: {
-            left: 'pas du tout',
-            right: 'énormément'
-        },
-        id: 'a922ea21-3f15-49d4-b3b2-1ee91f1e1b98',
-    },
+        id: `120961da-5d81-4e59-9a78-da6896dfa227`
+    }
 ]);
