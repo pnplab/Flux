@@ -357,6 +357,12 @@ export default (): React$Node =>
                                 goToStep(CheckDataSync);
                             }
                         }
+                        onTaskPostponed={
+                            () => {
+                                // Go back.
+                                goToStep(RestingStateTaskOnboarding);
+                            }
+                        }
                     />
 
                     <CheckDataSync

@@ -15,7 +15,7 @@ const isMuseCompatible = typeof RestingStateTaskNativeModule !== 'undefined';
 
 // Configure types.
 type Props = {
-    onTaskPostponed?: () => void, // Props is optional, if not set, postpone button wont appear.
+    onTaskPostponed: () => void, // Props is optional, if not set, postpone button wont appear.
     onTaskFinished: (msTimestamp: number) => void
 };
 type State = {
@@ -97,19 +97,12 @@ export default class RestingStateTaskController extends PureComponent<Props, Sta
         this.setState({ step: 'VIDEO' });
     }
     onPostponeTaskButtonClicked = () => {
-        // Button shouldn't appear if callback is not set, thus this method
-        // should not be called.
-        if (typeof this.props.onTaskPostponed === 'undefined') {
-            throw new Error('Impossible call to onTaskPostponed when callback not defined');
-        }
-        else {
-            // Apply changes related to model.
-            // @todo change method name to onPostponeTaskButtonClicked in java
-            RestingStateTaskNativeModule.onStartTaskButtonLongPush();
+        // Apply changes related to model.
+        // @todo change method name to onPostponeTaskButtonClicked in java
+        RestingStateTaskNativeModule.onStartTaskButtonLongPush();
 
-            // Bypass video.
-            this.props.onTaskPostponed();
-        }
+        // Bypass video.
+        this.props.onTaskPostponed();
     }
 
     onVideoStreamStarted = () => {
