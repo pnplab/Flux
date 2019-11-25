@@ -18,12 +18,12 @@ type Props = {
     +onStepFinished: () => void
 };
 type State = {
-    +currentPermissionName: 'write-external-storage' 
-        | 'get-accounts' 
-        | 'access-fine-location' 
-        | 'access-coarse-location' 
-        | 'read-phone-state' 
-        | 'read-call-log' 
+    +currentPermissionName: 'write-external-storage'
+        | 'get-accounts'
+        | 'access-fine-location'
+        | 'access-coarse-location'
+        | 'read-phone-state'
+        | 'read-call-log'
         | 'read-sms',
     +grantedPermissionNames: Array<string>
 };
@@ -36,10 +36,10 @@ export default class CheckPermissionsController extends PureComponent<Props, Sta
         {
             name: 'write-external-storage',
             title: 'Accès au système de fichier du smartphone.',
-            description: 
+            description:
                 `Nous utilisons cette permission pour temporairement stocker
                 les données sur votre smartphone jusqu'à ce qu'elles soient
-                envoyées sur le serveur. Nous n'accédons pas aux autres 
+                envoyées sur le serveur. Nous n'accédons pas aux autres
                 données enregistrées sur votre smartphone (photo, notes,
                 ...).`.replace(/\s{4,}/g, ' '),
             permission: PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
@@ -47,42 +47,42 @@ export default class CheckPermissionsController extends PureComponent<Props, Sta
         {
             name: 'get-accounts',
             title: 'Accès au système de connexion',
-            description: 
+            description:
                 `get-accounts`.replace(/\s{4,}/g, ' '),
             permission: PermissionsAndroid.PERMISSIONS.GET_ACCOUNTS
         },
         {
             name: 'access-fine-location',
             title: 'Accès au GPS 1',
-            description: 
+            description:
                 `access-fine-location`.replace(/\s{4,}/g, ' '),
             permission: PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
         },
         {
             name: 'access-coarse-location',
             title: 'Accès au GPS 2',
-            description: 
+            description:
                 `access-coarse-location`.replace(/\s{4,}/g, ' '),
             permission: PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION
         },
         {
             name: 'read-phone-state',
             title: 'Accès à l\'état réseau du téléphone',
-            description: 
+            description:
                 `read-phone-state`.replace(/\s{4,}/g, ' '),
             permission: PermissionsAndroid.PERMISSIONS.READ_PHONE_STATE
         },
         {
             name: 'read-call-log',
             title: 'Accès à l\'historique des appels',
-            description: 
+            description:
                 `read-call-log`.replace(/\s{4,}/g, ' '),
             permission: PermissionsAndroid.PERMISSIONS.READ_CALL_LOG
         },
         {
             name: 'read-sms',
             title: 'Accès à l\'historique des sms',
-            description: 
+            description:
                 `read-sms`.replace(/\s{4,}/g, ' '),
             permission: PermissionsAndroid.PERMISSIONS.READ_SMS
         }
@@ -95,14 +95,14 @@ export default class CheckPermissionsController extends PureComponent<Props, Sta
         .map(p => p.name);
 
     // Only show permissions up to the currently processed one.
-    // displayPerm = (p, idx) => 
+    // displayPerm = (p, idx) =>
     //     idx <= this.permissionNames.indexOf(this.state.currentPermissionName);
     // displayPerm = (p, idx) =>
     //     this.state.grantedPermissionNames.indexOf(p.name) === -1;
     displayPerm = () => true;
 
     // Only show the description of the currently processed permission.
-    displayPermDescr = (p) => 
+    displayPermDescr = (p) =>
         p.name === this.state.currentPermissionName;
 
     // Highlight the perms that have been set & the current one.
@@ -123,7 +123,7 @@ export default class CheckPermissionsController extends PureComponent<Props, Sta
     async componentDidMount() {
         try {
             // Update allowed permission list.
-            const newGrantedPermissionNames = 
+            const newGrantedPermissionNames =
                 (await Promise.all(
                     this
                         .permissions
@@ -140,7 +140,7 @@ export default class CheckPermissionsController extends PureComponent<Props, Sta
                 .map(p => p.name)
                 [0];
 
-            this.setState({ 
+            this.setState({
                 grantedPermissionNames: newGrantedPermissionNames,
                 currentPermissionName: newCurrentPermissionName
             });
@@ -195,7 +195,7 @@ export default class CheckPermissionsController extends PureComponent<Props, Sta
             break;
         }
 
-        // Set next permission 
+        // Set next permission
     }
 
     // Go to next step when the user pushes the submit button!
