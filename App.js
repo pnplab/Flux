@@ -281,6 +281,12 @@ export default (): React$Node =>
                                 goToStep(SurveyTaskOnboarding);
                             }
                         }
+                        onStartAwareBypassed={
+                            () => {
+                                // Go to next onboarding step.
+                                goToStep(SurveyTaskOnboarding);
+                            }
+                        }
                     />
 
                     <SurveyTaskOnboarding
