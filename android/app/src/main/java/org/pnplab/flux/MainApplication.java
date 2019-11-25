@@ -176,23 +176,25 @@ public class MainApplication extends Application implements ReactApplication {
         };
 
     private boolean isMuseCompatibleWithAndroidVersion() {
-        // Not sure anymore this is req. for Muse or for `Build.SUPPORTED_ABIS`.
-        return android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.LOLLIPOP;
+        // Not sure this is true. Official doc is deprecated. We relied on this
+        // source: https://images-na.ssl-images-amazon.com/images/I/816-85ZeU-S.pdf
+        return Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT;
     }
 
     private boolean isMuseCompatibleWithHardware() {
+        // Check current ABI is arm.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            return Build.CPU_ABI.equals("armeabi-v7a");
+        }
         // Check version is Lollipop in order to be able to use
         // `Build.SUPPORTED_ABIS`.
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            return false;
-        }
-        // Check current ABI is arm.
         else {
             // @note List -> SUPPORTED_ABIS `https://developer.android.com/ndk/guides/abis`
             String[] archs = Build.SUPPORTED_ABIS;
-            boolean supportsArm7 = !Arrays
+            boolean supportsArm7 = Arrays
                 .asList(archs)
                 .contains("armeabi-v7a");
+
             return supportsArm7;
         }
     }

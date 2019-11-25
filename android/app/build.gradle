@@ -223,24 +223,28 @@ android {
                 entryFile: "index.js"
             ]
 
-            // Instrumentation testing generates an additional apk containing the tests along with
-            // the traditional, tested apk.
+            // Instrumentation testing generates an additional apk containing
+            // the tests along with the traditional, tested apk.
             //
             // For some reason,
-            // - Muse .so is copied to the test instrumentation apk (but only the muse, not other
-            //   dependencies).
-            // - The log (once test are launched) defines instrumentation apk abi as null, instead
-            //   of x86 when opened with emulator.
-            // - The instrumentation apk refuses to install on the x86 emulator, except if we
-            //   exclude the armeabi-v7a libmuse from it (muse doesn't have a x86 version .so).
-            //   That's weird because under any condition should the instrumentation relate to
-            //   armeabi-v7a under the current setup.
+            // - Muse .so is copied to the test instrumentation apk (but only
+            //   the muse, not other dependencies).
+            // - The log (once test are launched) defines instrumentation apk
+            //   abi as null, instead of x86 when opened with emulator.
+            // - The instrumentation apk refuses to install on the x86 emulator,
+            //   except if we exclude the armeabi-v7a libmuse from it (muse
+            //   doesn't have a x86 version .so). That's weird because under
+            //   any condition should the instrumentation relate to armeabi-v7a
+            //   under the current setup.
             //
-            // The following option weirdly allow instrumentation apk to be installed on the x86
-            // emulator.
-            packagingOptions {
-                exclude 'lib/armeabi-v7a/libmuse_android.so'
-            }
+            // The following option weirdly allow instrumentation apk to be
+            // installed on the x86 emulator.
+            //
+            // @warning also breaks other sourcesets!
+            // @todo find a way to fix back integration test libmuse conflict.
+            // packagingOptions {
+            //     exclude 'lib/armeabi-v7a/libmuse_android.so'
+            // }
         }
     }
 
