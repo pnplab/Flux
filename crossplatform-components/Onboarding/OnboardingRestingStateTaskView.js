@@ -21,9 +21,7 @@ const OnboardingRestingStateTaskView = ({ onStartTask, onBypassTask }: Props) =>
                 <Title>Présentation: Resting State</Title>
             </R3Header>
             <R3Content>
-                <Text>Présentation de la tâche resting state...</Text>
-                <Text>5s maintain on muse to rebind.</Text>
-                <Text>Présentation de la tâche resting state...</Text>
+                <Text>Présentation de la tâche EEG.</Text>
             </R3Content>
             <R3Footer>
                 <CircleButton type="next" color="green" onPress={onStartTask} onLongPress={onBypassTask} delayLongPress={7000} accessibilityLabel="onboarding_restingstatetask-start_task" />
