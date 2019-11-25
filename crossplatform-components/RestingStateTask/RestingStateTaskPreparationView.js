@@ -8,6 +8,7 @@ import { View } from 'react-native';
 import styled from 'styled-components';
 
 import { Title, Text, Button } from '../../crossplatform-theme/pnplab-components';
+import { Container, R3Container, R3Header, R3Content, R3Footer } from '../../crossplatform-theme';
 import LottieView from 'lottie-react-native';
 
 type Props = {
@@ -18,40 +19,48 @@ type Props = {
 };
 
 const RestingStateTaskPreparationView = (props: Props) =>
-    <Wrapper>
-        <Title>Veuillez allumer votre Muse. La connexion s'effectuera automatiquement.</Title>
-        <StatusWrapper>
-            <NoticeWrapper>
-                <Text>
-                    {
-                        {
-                            UNDEFINED: 'En attente du status bluetooth...',
-                            BLUETOOTH_DISABLED: 'Veuillez activer bluetooth.',
-                            MUSE_DISCONNECTED: 'Muse déconnecté !',
-                            MUSE_CONNECTING: 'Muse en connexion...',
-                            MUSE_CONNECTED: 'Muse connecté !',
-                        }[props.state]
+    <Container accessibilityLabel="restingstatetask_preparation">
+        <R3Container>
+            <R3Header>
+                <Title>Veuillez allumer votre Muse. La connexion s'effectuera automatiquement.</Title>
+            </R3Header>
+            <R3Content>
+                <StatusWrapper>
+                    <NoticeWrapper>
+                        <Text>
+                            {
+                                {
+                                    UNDEFINED: 'En attente du status bluetooth...',
+                                    BLUETOOTH_DISABLED: 'Veuillez activer bluetooth.',
+                                    MUSE_DISCONNECTED: 'Muse déconnecté !',
+                                    MUSE_CONNECTING: 'Muse en connexion...',
+                                    MUSE_CONNECTED: 'Muse connecté !',
+                                }[props.state]
+                            }
+                        </Text>
+                    </NoticeWrapper>
+                    <LottieView
+                        style={{ width: '100%', maxHeight: 250 }}
+                        source={require('./2856-dotted-loader.json')}
+                        autoPlay
+                        loop
+                    />
+                </StatusWrapper>
+            </R3Content>
+            <R3Footer>
+                <ButtonBox>
+                    {typeof props.onPostponeTaskButtonClicked !== 'undefined' &&
+                        <ButtonWrapper>
+                            <Button onPress={props.onPostponeTaskButtonClicked}>PLUS TARD</Button>
+                        </ButtonWrapper>
                     }
-                </Text>
-            </NoticeWrapper>
-            <LottieView
-                style={{ width: '100%', maxHeight: 250 }}
-                source={require('./2856-dotted-loader.json')}
-                autoPlay
-                loop
-            />
-        </StatusWrapper>
-        <ButtonBox>
-            {typeof props.onPostponeTaskButtonClicked !== 'undefined' &&
-                <ButtonWrapper>
-                    <Button onPress={props.onPostponeTaskButtonClicked}>PLUS TARD</Button>
-                </ButtonWrapper>
-            }
-            <ButtonWrapper>
-                <Button onPress={props.onStartTaskButtonClicked} disabled={props.state !== 'MUSE_CONNECTED'}>CONTINUER</Button>
-            </ButtonWrapper>
-        </ButtonBox>
-    </Wrapper>;
+                    <ButtonWrapper>
+                        <Button onPress={props.onStartTaskButtonClicked} disabled={props.state !== 'MUSE_CONNECTED'}>CONTINUER</Button>
+                    </ButtonWrapper>
+                </ButtonBox>
+            </R3Footer>
+        </R3Container>
+    </Container>;
 
 const Wrapper = styled(View)`
         flex: 1;
