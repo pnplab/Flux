@@ -46,42 +46,42 @@ export default class CheckPermissionsController extends PureComponent<Props, Sta
         },
         {
             name: 'get-accounts',
-            title: 'get-accounts',
+            title: 'Accès au système de connexion',
             description: 
                 `get-accounts`.replace(/\s{4,}/g, ' '),
             permission: PermissionsAndroid.PERMISSIONS.GET_ACCOUNTS
         },
         {
             name: 'access-fine-location',
-            title: 'access-fine-location',
+            title: 'Accès au GPS 1',
             description: 
                 `access-fine-location`.replace(/\s{4,}/g, ' '),
             permission: PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
         },
         {
             name: 'access-coarse-location',
-            title: 'access-coarse-location',
+            title: 'Accès au GPS 2',
             description: 
                 `access-coarse-location`.replace(/\s{4,}/g, ' '),
             permission: PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION
         },
         {
             name: 'read-phone-state',
-            title: 'read-phone-state',
+            title: 'Accès à l\'état réseau du téléphone',
             description: 
                 `read-phone-state`.replace(/\s{4,}/g, ' '),
             permission: PermissionsAndroid.PERMISSIONS.READ_PHONE_STATE
         },
         {
             name: 'read-call-log',
-            title: 'read-call-log',
+            title: 'Accès à l\'historique des appels',
             description: 
                 `read-call-log`.replace(/\s{4,}/g, ' '),
             permission: PermissionsAndroid.PERMISSIONS.READ_CALL_LOG
         },
         {
             name: 'read-sms',
-            title: 'read-sms',
+            title: 'Accès à l\'historique des sms',
             description: 
                 `read-sms`.replace(/\s{4,}/g, ' '),
             permission: PermissionsAndroid.PERMISSIONS.READ_SMS
