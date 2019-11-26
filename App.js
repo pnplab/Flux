@@ -364,6 +364,15 @@ export default (): React$Node =>
                                 goToStep(RestingStateTaskOnboarding);
                             }
                         }
+                        onMuseIncompatibility={
+                            () => {
+                                // Toggle muse incompatibility alert.
+                                Alert.alert('Device is incompatible with Muse. Bypassing task.');
+
+                                // Redirect to next step.
+                                goToStep(CheckDataSync);
+                            }
+                        }
                     />
 
                     <CheckDataSync
@@ -452,6 +461,15 @@ export default (): React$Node =>
                         await setAndStoreUserSettings({ lastSubmittedRestingStateTaskTimestamp: msTimestamp });
 
                         // Switch to home screen as task is finished.
+                        goTo(Home);
+                    }
+                }
+                onMuseIncompatibility={
+                    () => {
+                        // Toggle muse incompatibility alert.
+                        Alert.alert('Device is incompatible with Muse. Bypassing task.');
+
+                        // Redirect to home.
                         goTo(Home);
                     }
                 }

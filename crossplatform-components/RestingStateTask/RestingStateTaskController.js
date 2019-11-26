@@ -7,16 +7,21 @@ import type { Event } from 'react';
 import RestingStateTaskPreparationView from './RestingStateTaskPreparationView';
 import RestingStateTaskVideoView from './RestingStateTaskVideoView';
 
-import { NativeModules, DeviceEventEmitter } from 'react-native';
+import { View, NativeModules, DeviceEventEmitter } from 'react-native';
 
 const RestingStateTaskNativeModule = NativeModules.RestingStateTask;
 // When muse is not compatible, the java module is not injected.
-const isMuseCompatible = typeof RestingStateTaskNativeModule !== 'undefined';
+const isMuseCompatible = typeof RestingStateTaskNativeModule !== 'undefined' && RestingStateTaskNativeModule !== null; /// @warning null, not undefined.
+console.info(NativeModules, NativeModules.RestingStateTask, RestingStateTaskNativeModule, isMuseCompatible);
 
 // Configure types.
 type Props = {
     onTaskPostponed: () => void, // Props is optional, if not set, postpone button wont appear.
-    onTaskFinished: (msTimestamp: number) => void
+    onTaskFinished: (msTimestamp: number) => void,
+    onMuseIncompatibility: () => void // Happens mainly on emulator (x86
+                                      // without 32bit emulation) and
+                                      // 64bit-compatible release for google
+                                      // play.
 };
 type State = {
     step: 'PREPARATION' | 'VIDEO',
@@ -54,15 +59,34 @@ export default class RestingStateTaskController extends PureComponent<Props, Sta
         this.setState({ taskPreparationState });
     }
     componentDidMount() {
+        // If the cellphone is not compatible with muse, handle device
+        // incompatibility instead of letting the user process task.
+        if (!isMuseCompatible) {
+            this.props.onMuseIncompatibility();
+            return;
+        }
+
         DeviceEventEmitter.addListener('TASK_PREPARATION_STATE_CHANGED', this._onTaskPreparationStateChanged);
 
         this.onPreparationViewOpened();
     }
     componentWillUnmount() {
+        // Bypass listener cleanup if the cellphone is incompatible with muse
+        // (and thus the task has been canceled).
+        if (!isMuseCompatible) {
+            return;
+        }
+
         DeviceEventEmitter.removeListener('TASK_PREPARATION_STATE_CHANGED', this._onTaskPreparationStateChanged);
     }
 
     render() {
+        // Do not display the view if the cellphone is incompatible with muse
+        // (and thus the task has been canceled).
+        if (!isMuseCompatible) {
+            return <View></View>;
+        }
+
         switch (this.state.step) {
         case 'PREPARATION':
             return (
