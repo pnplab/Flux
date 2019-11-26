@@ -55,7 +55,7 @@ class BugReporter {
         //     category: type,
         //     data: data
         // });
-        // bugsnag.leaveBreadcrumb(str, { ...data, type: type });
+        bugsnag.leaveBreadcrumb(str, { ...data, type: type });
     };
 
     // Used to test the behavior of bug reporters.
