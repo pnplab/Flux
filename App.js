@@ -438,7 +438,7 @@ export default (): React$Node =>
                         await setAndStoreUserSettings({ lastSubmittedSurveyTaskTimestamp: msTimestamp });
 
                         // Switch to home screen as task is finished.
-                        goTo(Home);
+                        goTo(RestingStateTask);
                     }
                 }
             />
