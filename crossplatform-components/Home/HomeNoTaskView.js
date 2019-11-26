@@ -17,7 +17,7 @@ const HomeNoTaskView = (props: Props) =>
     <ViewWrapper accessibilityLabel="home-notask">
         <TextWrapper>
             <Text>Le test n'est pas disponible pour le moment.</Text>
-            <Text>Revenez plus tard.</Text>
+            <Text>Revenez entre 18 et 22h.</Text>
         </TextWrapper>
     </ViewWrapper>;
 
