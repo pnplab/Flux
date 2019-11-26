@@ -20,8 +20,8 @@ export const MAX_HOUR = 22;
 // Curried/simplified function with predefined arguments. As used by the
 // HomeController.
 export default function unnamed(
-    hasAtLeastOneSurveyBeenSubmitted: boolean,
-    lastSubmittedSurveyTimestamp: ?number,
+    hasAtLeastOneSurveyTaskBeenSubmitted: boolean,
+    lastSubmittedSurveyTaskTimestamp: ?number,
     hasAtLeastOneRestingStateTaskBeenSubmitted: boolean,
     lastSubmittedRestingStateTaskTimestamp: ?number
 ): Task {
@@ -33,8 +33,8 @@ export default function unnamed(
         now,
         minHour,
         maxHour,
-        hasAtLeastOneSurveyBeenSubmitted,
-        lastSubmittedSurveyTimestamp,
+        hasAtLeastOneSurveyTaskBeenSubmitted,
+        lastSubmittedSurveyTaskTimestamp,
         hasAtLeastOneRestingStateTaskBeenSubmitted,
         lastSubmittedRestingStateTaskTimestamp
     );
@@ -45,8 +45,8 @@ export function DailyTasksPolicy(
     nowTimestamp: number, // in millisecond timestamp (`moment.valueOf()` or `new Date()` - NOT `moment.unix()` which is in second!)
     minHour: number, // in hour, inclusive.
     maxHour: number, // in hour, exclusive.
-    hasAtLeastOneSurveyBeenSubmitted: boolean,
-    lastSubmittedSurveyTimestamp: ?number,
+    hasAtLeastOneSurveyTaskBeenSubmitted: boolean,
+    lastSubmittedSurveyTaskTimestamp: ?number,
     hasAtLeastOneRestingStateTaskBeenSubmitted: boolean,
     lastSubmittedRestingStateTaskTimestamp: ?number
 ): Task {
@@ -79,13 +79,13 @@ export function DailyTasksPolicy(
     }
     // ...otherwise,
     // if no survey has been submitted yet, suggest one.
-    else if (!hasAtLeastOneSurveyBeenSubmitted) {
+    else if (!hasAtLeastOneSurveyTaskBeenSubmitted) {
         return 'SURVEY_TASK';
     }
     // if a survey has already been already submitted...
-    else if (hasAtLeastOneSurveyBeenSubmitted) {
+    else if (hasAtLeastOneSurveyTaskBeenSubmitted) {
         // Check if that survey was submitted during current opening time.
-        let lastSubmittedSurveyMoment = moment(lastSubmittedSurveyTimestamp);
+        let lastSubmittedSurveyMoment = moment(lastSubmittedSurveyTaskTimestamp);
         let isLastSubmittedSurveyInsideOpeningSchedule = lastSubmittedSurveyMoment.isSameOrAfter(openingHour) && lastSubmittedSurveyMoment.isBefore(closingHour);
 
         // No survey submitted today yet. Allow to run the task now.
@@ -108,8 +108,8 @@ export function DailyTasksPolicy(
             if (!isLastSubmittedRestingStateTaskInsideOpeningSchedule) {
                 return 'RESTING_STATE_TASK';
             }
-            // While we're inside the task schedule time, both resting
-            // state task and survey task have already been done. Thus, we
+            // While we're inside the task schedule time, both resting state
+            // task and survey task have already been done. Thus, we
             // can just show no task available.
             else {
                 return 'NO_TASK';

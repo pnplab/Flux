@@ -21,8 +21,8 @@ export const WEEKDAY = 7; // Weekday, ISO format [1,7].
 // Curried/simplified function with predefined arguments. As used by the
 // HomeController.
 export default function (
-    hasAtLeastOneSurveyBeenSubmitted: boolean,
-    lastSubmittedSurveyTimestamp: ?number,
+    hasAtLeastOneSurveyTaskBeenSubmitted: boolean,
+    lastSubmittedSurveyTaskTimestamp: ?number,
     hasAtLeastOneRestingStateTaskBeenSubmitted: boolean,
     lastSubmittedRestingStateTaskTimestamp: ?number
 ): Task {
@@ -36,8 +36,8 @@ export default function (
         minHour,
         maxHour,
         weekday,
-        hasAtLeastOneSurveyBeenSubmitted,
-        lastSubmittedSurveyTimestamp,
+        hasAtLeastOneSurveyTaskBeenSubmitted,
+        lastSubmittedSurveyTaskTimestamp,
         hasAtLeastOneRestingStateTaskBeenSubmitted,
         lastSubmittedRestingStateTaskTimestamp
     );
@@ -49,8 +49,8 @@ export function WeeklyTasksPolicy(
     minHour: number, // in hour, inclusive.
     maxHour: number, // in hour, exclusive.
     weekday: number, // weekday in ISO format [1, 7] where 7 is sunday.
-    hasAtLeastOneSurveyBeenSubmitted: boolean,
-    lastSubmittedSurveyTimestamp: ?number,
+    hasAtLeastOneSurveyTaskBeenSubmitted: boolean,
+    lastSubmittedSurveyTaskTimestamp: ?number,
     hasAtLeastOneRestingStateTaskBeenSubmitted: boolean,
     lastSubmittedRestingStateTaskTimestamp: ?number
 ): Task {
@@ -85,13 +85,13 @@ export function WeeklyTasksPolicy(
     }
     // ...otherwise,
     // if no survey has been submitted yet, suggest one.
-    else if (!hasAtLeastOneSurveyBeenSubmitted) {
+    else if (!hasAtLeastOneSurveyTaskBeenSubmitted) {
         return 'SURVEY_TASK';
     }
     // if a survey has already been already submitted...
-    else if (hasAtLeastOneSurveyBeenSubmitted) {
+    else if (hasAtLeastOneSurveyTaskBeenSubmitted) {
         // Check if that survey was submitted during current opening time.
-        let lastSubmittedSurveyMoment = moment(lastSubmittedSurveyTimestamp);
+        let lastSubmittedSurveyMoment = moment(lastSubmittedSurveyTaskTimestamp);
         let isLastSubmittedSurveyInsideOpeningSchedule = lastSubmittedSurveyMoment.isSameOrAfter(openingHour) && lastSubmittedSurveyMoment.isBefore(closingHour);
 
         // No survey submitted today yet. Allow to run the task now.
@@ -104,18 +104,18 @@ export function WeeklyTasksPolicy(
             return 'RESTING_STATE_TASK';
         }
         else if (hasAtLeastOneRestingStateTaskBeenSubmitted) {
-            // Check if that resting state task was done during current
-            // opening time.
+            // Check if that resting state task was done during current opening
+            // time.
             let lastSubmittedRestingStateTaskMoment = moment(lastSubmittedRestingStateTaskTimestamp);
             let isLastSubmittedRestingStateTaskInsideOpeningSchedule = lastSubmittedRestingStateTaskMoment.isSameOrAfter(openingHour) && lastSubmittedRestingStateTaskMoment.isBefore(closingHour);
 
-            // The resting state task has still not been done by user, so 
-            // we propose it.
+            // The resting state task has still not been done by user, so we
+            // propose it.
             if (!isLastSubmittedRestingStateTaskInsideOpeningSchedule) {
                 return 'RESTING_STATE_TASK';
             }
-            // While we're inside the task schedule time, both resting
-            // state task and survey task have already been done. Thus, we
+            // While we're inside the task schedule time, both resting state
+            // task and survey task have already been done. Thus, we
             // can just show no task available.
             else {
                 return 'NO_TASK';
@@ -128,8 +128,8 @@ export function WeeklyTasksPolicy(
         }
     }
     else {
-        // Unexpected code flow. Prevent FlowType from showing an error
-        // because of undefined return.
+        // Unexpected code flow. Prevent FlowType from showing an error because
+        // of undefined return.
         throw new Error('Unexpected behavior, policy should have returned something.');
     }
 }

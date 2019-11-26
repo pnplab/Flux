@@ -51,17 +51,17 @@ export default class HomeController extends PureComponent<Props, State> {
             suggestedTask: this.getSuggestedTask()
         };
     }
-    
+
     _intervalId = null;
 
     componentDidMount() {
         // Refresh the screen every second (only if needed) in case the current
-        // time changes thus making the underlying policy output change (ie. 
-        // the home screen no longer suggest a survey task because the user is 
+        // time changes thus making the underlying policy output change (ie.
+        // the home screen no longer suggest a survey task because the user is
         // no longer inside the allowed schedule to participate to the task).
-        // @note Would be probably more optimal to use a setTimeout and only 
-        //       refresh when needed but the optimization seems unnecessary as 
-        //       this is only a foreground operation.
+        // @note Would be probably more optimal to use a setTimeout and only
+        //     refresh when needed but the optimization seems unnecessary as
+        //     this is only a foreground operation.
         this._intervalId = setInterval(() => {
             let suggestedTask = this.getSuggestedTask();
             this.setState({ suggestedTask });
@@ -115,17 +115,17 @@ export default class HomeController extends PureComponent<Props, State> {
         }
 
         // Retrieve policy arguments from component's attributes.
-        // @note we could retrieve them from db here or from model instead of 
-        //       passing them down, thus improving separation of concerns,
-        //       but that would cause a flicker at component loading thus
-        //       making the app less responsive. Also, passing attributes
-        //       through props make the component more testable.
+        // @note we could retrieve them from db here or from model instead of
+        //     passing them down, thus improving separation of concerns,
+        //     but that would cause a flicker at component loading thus
+        //     making the app less responsive. Also, passing attributes
+        //     through props make the component more testable.
         let lastSubmittedSurveyTimestamp = this.props.lastSubmittedSurveyTimestamp;
         let hasAtLeastOneSurveyBeenSubmitted = typeof lastSubmittedSurveyTimestamp === 'undefined' ? false : true;
-        let lastSubmittedRestingStateTaskTimestamp = this.props.lastSubmittedSurveyTimestamp;
+        let lastSubmittedRestingStateTaskTimestamp = this.props.lastSubmittedRestingStateTaskTimestamp;
         let hasAtLeastOneRestingStateTaskBeenSubmitted = typeof lastSubmittedRestingStateTaskTimestamp === 'undefined' ? false : true;
 
-        // Apply policy to retrieve what to display on home screen (ie. a 
+        // Apply policy to retrieve what to display on home screen (ie. a
         // survey task, a resting state task or simply nothing).
         let suggestedTask = policy(
             hasAtLeastOneSurveyBeenSubmitted,

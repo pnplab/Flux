@@ -409,7 +409,7 @@ export default (): React$Node =>
 
             <Home
                 studyModality={userSettings && userSettings.studyModality}
-                lastSubmittedSurveyTimestamp={userSettings && userSettings.lastSubmittedSurveyTimestamp}
+                lastSubmittedSurveyTimestamp={userSettings && userSettings.lastSubmittedSurveyTaskTimestamp}
                 lastSubmittedRestingStateTaskTimestamp={userSettings && userSettings.lastSubmittedRestingStateTaskTimestamp}
                 onStartSurveyTask={
                     () => {
