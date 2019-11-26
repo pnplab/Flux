@@ -19,7 +19,7 @@ type Props = {
 const HomeRestingStateTaskView = (props: Props) =>
     <ViewWrapper accessibilityLabel="home-restingstatetask">
         <TextWrapper>
-            <Text>Le questionnaire est disponible.</Text>
+            <Text>La vidéo est disponible.</Text>
         </TextWrapper>
         <LottieViewWrapper
             source={ANIMATION_SRC}
