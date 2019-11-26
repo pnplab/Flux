@@ -306,7 +306,8 @@ export default (): React$Node =>
                                 // Store fake survey values remotely so we can
                                 // check if the sync as occured correctly in
                                 // the CheckDataSync step.
-                                storeSurvey({ fake: 0.1, fake2: 0.6, fake3: 0.4 });
+                                const currentTimestamp = new Date().getTime();
+                                storeSurvey(currentTimestamp, { fake: 0.1, fake2: 0.6, fake3: 0.4 });
 
                                 // Go to next onboarding step.
                                 goToStep(RestingStateTaskOnboarding);
@@ -320,7 +321,7 @@ export default (): React$Node =>
                                 // Store survey values remotely so we can check
                                 // if the sync as occured correctly in the
                                 // CheckDataSync step.
-                                storeSurvey(values);
+                                storeSurvey(msTimestamp, values);
 
                                 // Go to next onboarding step.
                                 goToStep(RestingStateTaskOnboarding);
@@ -421,7 +422,7 @@ export default (): React$Node =>
                     async (msTimestamp, values) => {
                         // Store survey to Aware for server sync and locally in
                         // realm for graphs
-                        storeSurvey(values);
+                        storeSurvey(msTimestamp, values);
 
                         // Store task timestamp so we don't allow user to do it
                         // again through Home screen.
