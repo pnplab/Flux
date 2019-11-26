@@ -93,7 +93,6 @@ export default class HomeController extends PureComponent<Props, State> {
         return (
             <View accessibilityLabel="home">
                 <Layout menuComponent={this.props.menuComponent}>
-                    <Text>Auto Update is working !</Text>
                     {innerView}
                 </Layout>
             </View>
