@@ -264,13 +264,15 @@ android {
         applicationId "org.pnplab.flux"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
+        // Fastlane versioning way:
         // @note This must be the first v,e,r,s,i,o,n,C,o,d,e word instance in
         // the file in order for the fastlane increment_version_code plugin to
         // work.
-        versionCode 40
-        versionName "LOCAL_BUILD"
-        // versionCode System.getenv("ANDROID_VERSION_CODE")
-        // versionName System.getenv("ANDROID_VERSION_NAME")
+        // versionCode 40
+        // versionName "LOCAL_BUILD"
+        // SemanticVersioning + Bugsnag way:
+        versionCode Integer.valueOf(System.getenv("ANDROID_VERSION_CODE"))
+        versionName System.getenv("ANDROID_VERSION_NAME")
 
         // Add project-specific config values (eg. credentials and so on).
         // buildConfigField "String", "AWARE_ENCRYPTION_KEY", System.getenv("DB_ENCRYPTION_KEY") -- Set within aware-core.gradle

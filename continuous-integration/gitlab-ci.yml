@@ -141,7 +141,7 @@ build:android:
         GRADLE_OUTPUT_PATH: android/app/build/outputs/apk/release/app-release.apk
         FLUX_AUTO_UPDATE: "false"
         ANDROID_VERSION_CODE: ${CI_JOB_ID} # CI_JOB_ID is a number incr at every gitlab job.
-        ANDROID_VERSION_NAME: "v1.0"
+        ANDROID_VERSION_NAME: "${CI_COMMIT_REF_NAME}.${CI_COMMIT_SHORT_SHA}" # branch|tag.commit
     artifacts:
         name: ${APK_FILE}
         paths:
