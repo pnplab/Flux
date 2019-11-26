@@ -69,7 +69,7 @@ const CheckDataSyncView = ({ syncStatus, currentStep, onSyncData, onNextClicked,
                     <CircleButton type="validate" color="blue" onPress={onSyncData} onLongPress={onBypassTask} accessibilityLabel="check_data_sync-sync" />
                 }
                 {
-                    currentStep === 'SYNC_DONE' &&
+                    (currentStep === 'SYNC_ONGOING' || currentStep === 'SYNC_DONE') &&
                     <CircleButton type="next" color="green" onPress={onNextClicked} accessibilityLabel="check_data_sync-next" />
                 }
             </R3Footer>
