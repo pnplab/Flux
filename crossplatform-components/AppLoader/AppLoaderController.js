@@ -46,7 +46,7 @@ export default class AppLoaderController extends PureComponent<Props, State> {
 
         // User not yet setup, we should redirect the user to the onboarding.
         if (!isUserAlreadySetup) {
-            this.props.onUserNotYetRegistered();
+            await this.props.onUserNotYetRegistered();
         }
         // User already setup, we can send relevant configuration data and 
         // start the app.
@@ -55,7 +55,7 @@ export default class AppLoaderController extends PureComponent<Props, State> {
             let userSettings = await UserManager.getUserSettings();
             
             // Send them to the rest of the app.
-            this.props.onUserAlreadyRegistered(userSettings);
+            await this.props.onUserAlreadyRegistered(userSettings);
         }
     }
 

@@ -135,7 +135,7 @@ export default (): React$Node =>
         <>
             <AppLoader
                 onUserNotYetRegistered={
-                    () => {
+                    async () => {
                         // Log current state.
                         console.info('User not yet registered.');
 
