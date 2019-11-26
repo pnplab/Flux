@@ -70,4 +70,4 @@ export async function triggerUpdateIfNeeded() {
 
     // Check update & install.
     updater.checkUpdate();
-};
+}
