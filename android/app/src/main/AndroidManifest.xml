@@ -155,6 +155,11 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
+                <!--
+                Remove GoogleAppIndexingWarning. Make app indexable by
+                google search. cf. https://developer.android.com/studio/write/app-link-indexing
+                -->
+                <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
 
