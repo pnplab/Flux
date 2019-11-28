@@ -1,16 +1,25 @@
 /**
  * @flow
  *
- * @warning
- * Package deprecated according to https://github.com/parryworld/react-native-appupdate.
+ * Originally deprecated package according to https://github.com/parryworld/react-native-appupdate.
  * Official page recommand to switch to https://github.com/odemolliens/react-native-app-update.
- * However, the latter doesn't handle app apk downlaod etc. It seems to merely
+ * However, the latter doesn't handle app apk download etc. It seems to merely
  * be a wrapper that release diff versions in AppStore/Google Play.
+ *
+ * We randomly found mikehardy up-to-date fork here https://github.com/mikehardy/react-native-update-apk.
+ *
+ * @warning
+ * There is now an official way to go, compatible with app store:
+ * https://developer.android.com/guide/app-bundle/in-app-updates
+ * Although perhaps not compatible with internal play distribution pipeline or
+ * not suitable for development upgrade (to be tested).
  */
-import AppUpdate from 'react-native-appupdate';
+import * as UpdateAPK from 'rn-update-apk';
 import { Alert } from 'react-native';
 
 export async function triggerUpdateIfNeeded() {
+    // @todo @warning only enable on wifi!
+
     // Fetch the updater version package of the last github release.
     // @todo change to a notification system instead.
 
@@ -36,8 +45,10 @@ export async function triggerUpdateIfNeeded() {
         return;
     }
 
+    console.info(updaterVersionPackage);
+
     // Generate updater.
-    const updater = new AppUpdate({
+    const updater = new UpdateAPK.UpdateAPK({
         // iosAppId: '123456',
         apkVersionUrl: updaterVersionPackage,
         needUpdateApp: (needUpdate) => {
@@ -59,7 +70,6 @@ export async function triggerUpdateIfNeeded() {
         },
         downloadApkProgress: (progress) => {
             console.log(`Downloading ${progress}%...`);
-            Alert.alert(`Downloading ${progress}%...`);
         },
         downloadApkEnd: () => {
             console.log('End');
