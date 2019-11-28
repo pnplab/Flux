@@ -254,47 +254,56 @@ android {
     }
 
     defaultConfig {
+        // Check required env variable. Variable check is important to avoid
+        // undescriptive issues such as `Gradle: Execution failed for task
+        // ':processDebugManifest'`, especially since we're dealing with
+        // docker/CI stuffs that are tedious to debug.
         if (System.getenv('ANDROID_VERSION_CODE') == null) {
            throw new GradleException("Please export number 'ANDROID_VERSION_CODE'")
         }
         if (System.getenv('ANDROID_VERSION_NAME') == null) {
            throw new GradleException("Please export string 'ANDROID_VERSION_NAME'")
         }
+        if (System.getenv('BUGSNAG_API_KEY') == null) {
+           throw new GradleException("Please export 'BUGSNAG_API_KEY'")
+        }
+        if (System.getenv('STUDY_URL') == null) {
+           throw new GradleException("Please export 'STUDY_URL'")
+        }
 
+        // Setup app package name and android compatible versions.
         applicationId "org.pnplab.flux"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        // Fastlane versioning way:
-        // @note This must be the first v,e,r,s,i,o,n,C,o,d,e word instance in
-        // the file in order for the fastlane increment_version_code plugin to
-        // work.
-        // versionCode 40
-        // versionName "LOCAL_BUILD"
-        // SemanticVersioning + Bugsnag way:
+
+        // Setup app version.
+        //
+        // Fastlane versioning way (not used anymore):
+        //    @warning This must be the first v,e,r,s,i,o,n,C,o,d,e word instance
+        //    in the file in order for the fastlane increment_version_code plugin
+        //    to work.
+        //    versionCode 40
+        //    versionName "LOCAL_BUILD"
+        //
+        // Semantic versioning / handy for bugsnag bug tracking:
+        // @todo rename ANDROID_ with something like ANDROID_APP_ would be more
+        //     explicit.
         versionCode Integer.valueOf(System.getenv("ANDROID_VERSION_CODE"))
         versionName System.getenv("ANDROID_VERSION_NAME")
 
         // Add project-specific config values (eg. credentials and so on).
         // buildConfigField "String", "AWARE_ENCRYPTION_KEY", System.getenv("DB_ENCRYPTION_KEY") -- Set within aware-core.gradle
-        // Variable check is important to avoid undescriptive issues such as
-        // `Gradle: Execution failed for task ':processDebugManifest'`,
-        // especially since we're dealing with docker/CI stuffs that are
-        // tedious to debug.
-        if (System.getenv('BUGSNAG_API_KEY') == null) {
-           throw new GradleException("Please export 'BUGSNAG_API_KEY'")
-        }
-        if (System.getenv('BUGSNAG_DETECT_NDK_CRASHES') == null) {
-           throw new GradleException("Please export 'BUGSNAG_DETECT_NDK_CRASHES'")
-        }
-        if (System.getenv('STUDY_URL') == null) {
-           throw new GradleException("Please export 'STUDY_URL'")
-        }
         manifestPlaceholders = [
-            BUGSNAG_API_KEY: System.getenv("BUGSNAG_API_KEY"),
-            BUGSNAG_DETECT_NDK_CRASHES: System.getenv("BUGSNAG_DETECT_NDK_CRASHES")
+            BUGSNAG_API_KEY: System.getenv("BUGSNAG_API_KEY")
         ]
+
         // Add STUDY_URL but only for unit test as the STUDY_URL config is passed from JS through JAVA.
         buildConfigField "String", "STUDY_URL", "\"" + System.getenv("STUDY_URL") + "\""
+
+        // Setup BUGSNAG_API_KEY both through Manifest and android code due to
+        // https://github.com/bugsnag/bugsnag-react-native/issues/376#issuecomment-513222395 and
+        // https://github.com/bugsnag/bugsnag-react-native/issues/376#issuecomment-514568602P
+        buildConfigField "String", "BUGSNAG_API_KEY", "\"" + System.getenv("BUGSNAG_API_KEY") + "\""
 
         // Enabling multidex support.
         multiDexEnabled true

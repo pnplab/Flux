@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Build;
 import android.util.Log;
 
+import com.bugsnag.android.Configuration;
 import com.choosemuse.libmuse.MuseManagerAndroid;
 import com.facebook.react.ReactApplication;
 import com.bugsnag.BugsnagReactNative;
@@ -48,7 +49,21 @@ public class MainApplication extends Application implements ReactApplication {
         permissionManager = new PermissionManager(this);
         processPriorityPromoter = new ProcessPriorityPromoter(this);
 
-        BugsnagReactNative.start(this);
+        // Set bugsnag enhanced native bug reporting on top of react-native one
+        // and detext anr.
+        // cf. https://docs.bugsnag.com/platforms/react-native/react-native/enhanced-native-integration/
+        // To set up java config, do not set config in manifest file but in java
+        // bugsnag init code cf. https://github.com/bugsnag/bugsnag-react-native/issues/376#issuecomment-513222395
+        // To upload jave stacktraces, set the manifest api key value anyway and
+        // use bugsnag gradle plugin.
+        // cf. https://github.com/bugsnag/bugsnag-react-native/issues/376#issuecomment-514568602
+        Configuration config = new Configuration(BuildConfig.BUGSNAG_API_KEY);
+        config.setDetectAnrs(true);
+        config.setDetectNdkCrashes(true);
+        config.setSendThreads(true);
+        config.setEnableExceptionHandler(true);
+        config.setProjectPackages(new String[]{"org,pnplab.flux", "com.aware"});
+        BugsnagReactNative.startWithConfiguration(this, config);
 
         SoLoader.init(this, /* native exopackage */ false);
         initializeFlipper(this);

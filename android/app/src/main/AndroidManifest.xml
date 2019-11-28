@@ -96,8 +96,14 @@
         android:networkSecurityConfig="@xml/network_security_config"
         tools:replace="android:networkSecurityConfig"
     >
+        <!--
+        Bugsnag config is done manually through js and java code. The manifest
+        config is thus not used for bugsnag java config in our case but still
+        by gradle for automatic sourcemap upload.
+        cf. https://github.com/bugsnag/bugsnag-react-native/issues/376#issuecomment-513222395 and
+        cf. https://github.com/bugsnag/bugsnag-react-native/issues/376#issuecomment-514568602P
+        -->
         <meta-data android:name="com.bugsnag.android.API_KEY" android:value="${BUGSNAG_API_KEY}"/>
-        <meta-data android:name="com.bugsnag.android.DETECT_NDK_CRASHES" android:value="${BUGSNAG_DETECT_NDK_CRASHES}"/>
 
         <service android:name="io.invertase.firebase.messaging.RNFirebaseMessagingService">
             <intent-filter>
