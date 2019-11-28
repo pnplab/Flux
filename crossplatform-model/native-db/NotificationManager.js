@@ -2,8 +2,9 @@
  * @flow
  */
 
+// @todo Move out of react-native-firebase as it requires google play services
+//     (like much of android app though - had read a third at some point).
 import type { Notification, NotificationOpen } from 'react-native-firebase';
-
 
 // @note When using firebase notifications with `new`, we dereference
 // through modules using `.notifications.Notification()`. When using

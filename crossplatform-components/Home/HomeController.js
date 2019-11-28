@@ -8,7 +8,7 @@
 
 import React, { PureComponent } from 'react';
 import type { Element } from 'react';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 
 import DailyTasksPolicy from './DailyTasksPolicy';
 import WeeklyTasksPolicy from './WeeklyTasksPolicy';

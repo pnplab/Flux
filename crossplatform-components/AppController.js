@@ -126,15 +126,13 @@ export default class AppController extends PureComponent<Props, State> {
     }
 
     storeRestingState = async () => {
-        // Get current timestamp to date the resting state task evaluation.
-        const currentTimestamp = new Date().getTime();
-
-        // Store in user for Home screen.
-        /* await */ UserManager.setLastSubmittedRestingStateTaskTimestamp(currentTimestamp);
-
         // ...the data are automatically stored to Aware in the native side
         // through the RestingStateTaskController which contains a binder to
         // java's code.
+
+        // Thus this method is not to be used. It is used to document the
+        // contrasting behavior with the storeSurvey one.
+        throw new Error('storeRestingState implemented in java code. not in javascript code.');
     }
 
     startAware = async (awareDeviceId: string) => {
@@ -158,7 +156,6 @@ export default class AppController extends PureComponent<Props, State> {
         //                !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // @warning @todo !!! Will make the app stuck if study fails !!!
         //                !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // @todo change url based on study.
 
         // Join study.
         await AwareManager.joinStudy(awareStudyUrl);
