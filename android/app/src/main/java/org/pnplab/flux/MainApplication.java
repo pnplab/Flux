@@ -8,6 +8,7 @@ import android.util.Log;
 import com.bugsnag.android.Configuration;
 import com.choosemuse.libmuse.MuseManagerAndroid;
 import com.facebook.react.ReactApplication;
+import net.mikehardy.rnupdateapk.RNUpdateAPKPackage;
 import com.bugsnag.BugsnagReactNative;
 import com.rnfs.RNFSPackage;
 import com.airbnb.android.react.lottie.LottiePackage;

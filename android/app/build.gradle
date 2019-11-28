@@ -479,7 +479,7 @@ dependencies {
     implementation project(':bugsnag-react-native')
     // implementation project(':@sentry/react-native')
     implementation project(':react-native-fs')
-    implementation project(':react-native-appupdate')
+    implementation project(':rn-update-apk')
     implementation project(':react-native-dev-menu')
     implementation project(':lottie-react-native')
     implementation project(':react-native-svg')
