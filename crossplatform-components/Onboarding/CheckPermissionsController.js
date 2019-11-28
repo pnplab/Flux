@@ -31,6 +31,9 @@ type State = {
 // Configure component logic.
 export default class CheckPermissionsController extends PureComponent<Props, State> {
 
+    // Set displayName for debug and bugreport navigation tracing.
+    static displayName = 'CheckPermissions';
+
     /* eslint-disable quotes */
     permissions = [
         {

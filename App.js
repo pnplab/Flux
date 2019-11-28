@@ -10,6 +10,7 @@ import React from 'react';
 import type { ComponentType } from 'react';
 import { Alert } from 'react-native';
 
+import BugReporter from './crossplatform-model/native-db/BugReporter';
 import AwareManager from './crossplatform-model/native-db/AwareManager';
 import NotificationManager from './crossplatform-model/native-db/NotificationManager';
 import Menu from './crossplatform-components/Menu';
@@ -130,6 +131,9 @@ export default (): React$Node =>
             <AppLoader
                 onUserNotYetRegistered={
                     async () => {
+                        // Track user bugs by user id.
+                        BugReporter.setDeviceId('unregistered');
+
                         // Log current state.
                         console.info('User not yet registered.');
 
@@ -140,6 +144,9 @@ export default (): React$Node =>
                 }
                 onUserAlreadyRegistered={
                     async (userSettings) => {
+                        // Track user bugs by user id.
+                        BugReporter.setDeviceId(userSettings.awareDeviceId);
+
                         // Log current state.
                         console.info(`
                             User retrieved with
@@ -162,6 +169,7 @@ export default (): React$Node =>
                         // launched independently from the app, restarted on
                         // crash, and even restarted automatically at phone
                         // boot. But for safety..
+                        BugReporter.breadcrumb('starting aware...', 'log');
                         await startAware(userSettings.awareDeviceId || 'byp0auth');
                         await joinAwareStudy(userSettings.awareStudyUrl);
                     }
@@ -196,6 +204,9 @@ export default (): React$Node =>
                     <Auth
                         onAuthSucceeded={
                             (studyModality, awareDeviceId, awareStudyUrl) => {
+                                // Track user bugs by user id.
+                                BugReporter.setDeviceId(awareDeviceId);
+
                                 // Set study values temporarily so they can be
                                 // used to start aware in CheckPhenotyping
                                 // step and then stored locally in
@@ -210,6 +221,9 @@ export default (): React$Node =>
                         }
                         onStartTest={
                             async (deviceId: string) => {
+                                // Track user bugs by user id.
+                                BugReporter.setDeviceId(deviceId);
+
                                 // Bypass onboarding process, aware loading and
                                 // go straightly to the Home component instead.
                                 // Useful for integration testing scenari which
@@ -264,9 +278,22 @@ export default (): React$Node =>
                         hasAwareStudyBeenJoined={hasAwareStudyBeenJoined}
                         onStartAwareClicked={
                             async () => {
-                                // Start aware and join study.
+                                // Start aware.
+                                BugReporter.breadcrumb('starting aware...', 'log');
                                 await startAware(awareDeviceId || 'byp0auth');
+
+                                // Join study.
+                                BugReporter.breadcrumb('joining aware study...', 'log');
                                 await joinAwareStudy(awareStudyUrl);
+
+                                // Log aware study has been joined, as app may
+                                // be stuck at this point. Indeed, there is no
+                                // proper error callback mechanism implemented
+                                // in case of join study failure.
+                                BugReporter.breadcrumb('aware study joined!', 'state', {
+                                    studyUrl: awareStudyUrl
+                                });
+                                BugReporter.notify('aware study joined');
                             }
                         }
                         onStepFinished={
@@ -360,6 +387,9 @@ export default (): React$Node =>
                         }
                         onMuseIncompatibility={
                             () => {
+                                // Log muse incompatibility.
+                                BugReporter.notify('Device is incompatible with Muse. Bypassing resting state task.');
+
                                 // Toggle muse incompatibility alert.
                                 Alert.alert('Device is incompatible with Muse. Bypassing task.');
 
@@ -423,6 +453,13 @@ export default (): React$Node =>
             <SurveyTask
                 onSubmit={
                     async (msTimestamp, values) => {
+                        // Track app state for bug reporter.
+                        BugReporter.breadcrumb('storing survey...', 'log', {
+                            timestamp: msTimestamp,
+                            length: Object.keys(values).length
+                        });
+                        BugReporter.notify('storing survey');
+
                         // Store survey to Aware for server sync and locally in
                         // realm for graphs
                         storeSurvey(msTimestamp, values);
@@ -446,9 +483,17 @@ export default (): React$Node =>
                 }
                 onTaskFinished={
                     async (msTimestamp) => {
-                        // ...resting state eeg data are already stored inside aware through java code (bound from
-                        // RestingStateTask component's code). Can't be done any other way due to high frequency
-                        // real time constraints of eeg recording.
+                        // Track app state for bug reporter.
+                        BugReporter.breadcrumb('storing resting state...', 'log', {
+                            timestamp: msTimestamp
+                        });
+                        BugReporter.notify('storing resting state');
+
+                        // ...resting state eeg data are already stored inside
+                        // aware through java code (bound from RestingStateTask
+                        // component's code). Can't be done any other way due
+                        // to high frequency real time constraints of eeg
+                        // recording.
 
                         // Store task timestamp so we don't allow user to do it
                         // again through Home screen.
@@ -460,6 +505,9 @@ export default (): React$Node =>
                 }
                 onMuseIncompatibility={
                     () => {
+                        // Log muse incompatibility.
+                        BugReporter.notify('bypassing resting state task: device is incompatible with muse');
+
                         // Toggle muse incompatibility alert.
                         Alert.alert('Device is incompatible with Muse. Bypassing task.');
 

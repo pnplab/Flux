@@ -48,6 +48,9 @@ const TEST_SCENARIO_PASSWORD: string = '371olh';
 // Configure component logic.
 export default class AuthController extends PureComponent<Props, State> {
 
+    // Set displayName for debug and bugreport navigation tracing.
+    static displayName = 'Auth';
+
     constructor(props: Props) {
         super(props);
 

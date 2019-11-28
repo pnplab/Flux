@@ -23,6 +23,9 @@ type State = {
 // Configure component logic.
 export default class CheckWifiController extends PureComponent<Props, State> {
 
+    // Set displayName for debug and bugreport navigation tracing.
+    static displayName = 'CheckWifi';
+
     constructor(props: Props) {
         super(props);
 

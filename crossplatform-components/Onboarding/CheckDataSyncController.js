@@ -36,6 +36,10 @@ type State = {
 
 // Configure component logic.
 export default class CheckDataSyncController extends PureComponent<Props, State> {
+
+    // Set displayName for debug and bugreport navigation tracing.
+    static displayName = 'CheckDataSync';
+
     constructor(props) {
         super(props);
 

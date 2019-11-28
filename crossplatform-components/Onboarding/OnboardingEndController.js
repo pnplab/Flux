@@ -23,6 +23,10 @@ type State = {
 
 // Configure component logic.
 export default class OnboardingEndController extends PureComponent<Props, State> {
+
+    // Set displayName for debug and bugreport navigation tracing.
+    static displayName = 'OnboardingEnd';
+
     constructor(props) {
         super(props);
 

@@ -10,9 +10,9 @@ import { StyleProvider } from 'native-base';
 import { getTheme } from '../crossplatform-theme/';
 
 import { isFragment } from 'react-is';
+import BugReporter from '../crossplatform-model/native-db/BugReporter';
 import AwareManager from '../crossplatform-model/native-db/AwareManager';
 import GraphManager from '../crossplatform-model/persistent-db/GraphManager';
-import BugReporter from '../crossplatform-model/native-db/BugReporter';
 import UserManager from '../crossplatform-model/persistent-db/UserManager';
 
 // Configure types.
@@ -45,11 +45,31 @@ export default class AppController extends PureComponent<Props, State> {
         };
     }
 
+    goTo = (componentType: ComponentType<any>) => {
+        // Retrieve current component name. We can't compare from ECMA import
+        // or use `contructor.name` because of code minification process. Thus
+        // we use displayName react property. It should be set for all
+        // component!
+        let componentName = componentType.displayName;
+
+        // Trace component navigation for precise bug reporting.
+        if (typeof componentName === 'undefined' || componentName === null) {
+            console.warn('unknown component name for bug reporting on AppController#goTo');
+            BugReporter.breadcrumb('unknown', 'navigation');
+        }
+        else {
+            BugReporter.breadcrumb(componentName, 'navigation');
+        }
+
+        // Switch shown component.
+        this.setState({ activeComponentType: componentType });
+    }
+
     render() {
         // Retrieve returned components from render prop function.
         const childFunctionResult = this.props.children({
             activeComponent: this.state.activeComponentType,
-            goTo: (componentType: ComponentType<any>) => this.setState({ activeComponentType: componentType }),
+            goTo: this.goTo,
             startAware: this.startAware,
             joinAwareStudy: this.joinAwareStudy,
             hasAwareStudyBeenJoined: this.state.hasAwareStudyBeenJoined,
@@ -73,7 +93,7 @@ export default class AppController extends PureComponent<Props, State> {
         // Pick up the current component type to display.
         const activeComponentType = this.state.activeComponentType;
 
-        // Rertieve the component instance to display.
+        // Retrieve the component instance to display.
         const shownComponent = children.filter(child => child.type === activeComponentType)[0];
 
         // Wrap component.
@@ -90,12 +110,6 @@ export default class AppController extends PureComponent<Props, State> {
     }
 
     storeSurvey = async (msTimestamp: number, values: {| [questionId: string]: number |}) => {
-        BugReporter.breadcrumb('Storing survey...', 'log', {
-            timestamp: msTimestamp,
-            length: Object.keys(values).length
-        });
-        BugReporter.notify('Storing survey.');
-
         // @note we use a redundant database architecture instead of a single
         // source of thruth one because of the complexity of implementing
         // abstraction binding between the native part for both android and iOS
@@ -129,8 +143,6 @@ export default class AppController extends PureComponent<Props, State> {
             throw new Error('awareDeviceId should be defined!');
         }
 
-        BugReporter.setDeviceId(awareDeviceId);
-
         // Request aware's mandatory permission. Should do nothing as they
         // already have been requested in onboarding step!
         // @todo redirect to onboarding request permission step if permissions
@@ -139,9 +151,6 @@ export default class AppController extends PureComponent<Props, State> {
         await AwareManager.requestPermissions();
 
         // Initialize aware.
-        BugReporter.breadcrumb('Starting aware...', 'log', {
-            deviceId: awareDeviceId
-        });
         AwareManager.startAware(awareDeviceId);
     }
 
@@ -152,18 +161,10 @@ export default class AppController extends PureComponent<Props, State> {
         // @todo change url based on study.
 
         // Join study.
-        BugReporter.breadcrumb('Joining aware study...', 'log', {
-            studyUrl: awareStudyUrl
-        });
         await AwareManager.joinStudy(awareStudyUrl);
 
-        // Log study joined.
-        BugReporter.breadcrumb('Aware study joined!', 'state', {
-            studyUrl: awareStudyUrl
-        });
-        BugReporter.notify('Aware study joined');
-
-        // Change button from 'start aware' to 'go to next step' in CheckPhenotypingController.
+        // Change button from 'start aware' to 'go to next step' in
+        // CheckPhenotypingController.
         this.setState({ hasAwareStudyBeenJoined: true });
     }
 

@@ -26,6 +26,9 @@ type State = {
 //     be used & customized in the onboarding process.
 export default class SurveyTaskController extends PureComponent<Props, State> {
 
+    // Set displayName for debug and bugreport navigation tracing.
+    static displayName = 'SurveyTask';
+
     questions: Array<Question>;
     values: { [questionId: string]: number };
 

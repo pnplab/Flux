@@ -39,6 +39,9 @@ export type Task = 'NO_TASK'
 // Configure component logic.
 export default class HomeController extends PureComponent<Props, State> {
 
+    // Set displayName for debug and bugreport navigation tracing.
+    static displayName = 'Home';
+
     constructor(props: Props) {
         super(props);
 

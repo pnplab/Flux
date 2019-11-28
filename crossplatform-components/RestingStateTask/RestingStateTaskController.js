@@ -44,6 +44,9 @@ type State = {
 // the stateful muse bluetooth connection (among data acquisition as well).
 export default class RestingStateTaskController extends PureComponent<Props, State> {
 
+    // Set displayName for debug and bugreport navigation tracing.
+    static displayName = 'RestingStateTask';
+
     constructor(props: Props) {
         super(props);
 
