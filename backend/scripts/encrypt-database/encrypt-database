@@ -1,0 +1,260 @@
+#!/usr/bin/env node
+
+// CLI Mysql Client is useful to test this script.
+// Beware mysql try to run local socket instead of ip by default. Considering
+// our mysql run behind docker, we need to force the use of IP instead of
+// socket.
+//
+// ```
+// brew install mysql-client
+// mysql -p -h 127.0.0.1 -u superuser Piront_1
+// INSERT INTO survey (timestamp, device_id, form_id, question_id, double_value) VALUES (100, device_id, form_id, question_id, 0.5);
+// SELECT
+//     survey.timestamp AS timestamp,
+//     survey.device_id AS device_id,
+//     CAST(AES_DECRYPT(survey.form_id, 'abcd') AS VARCHAR(255)) AS form_id,
+//     CAST(AES_DECRYPT(survey.question_id, 'abcd') AS VARCHAR(255)) AS question_id,
+//     CAST(AES_DECRYPT(survey.double_value, 'abcd') AS DOUBLE) AS double_value
+// FROM survey;
+// ```
+
+const mysql = require('promise-mysql');
+
+// Throw exception if env variable is missing!
+if (typeof process.env.MYSQL_HOST === 'undefined' || 
+    typeof process.env.MYSQL_USER === 'undefined' || 
+    typeof process.env.MYSQL_PASSWORD === 'undefined' || 
+    typeof process.env.MYSQL_DATABASE === 'undefined')
+{
+    throw new Error('Missing at least one mandatory MYSQL environment variable!');
+}
+
+if (typeof process.env.MYSQL_ENCRYPTION_KEY === 'undefined') {
+    throw new Error('MYSQL_ENCRYPTION_KEY environment variable is missing!');
+}
+// Do not encrypt the following tables.
+const unencryptedTables = [
+    'aware_log',
+    'aware_studies',
+    'aware_device'
+];
+
+// Do not encrypt the following fields as they are used by aware
+// to retrieve the last synced row so we client only sync unsynced
+// rows.
+const unencryptedColumns = [
+    '_id',
+    'id',
+    'device_id',
+    'double_end_timestamp',
+    'double_esm_user_answer_timestamp',
+    'timestamp'
+];
+
+(async () => {
+    // Connect to host!
+    const db = await mysql.createConnection({
+        host: process.env.MYSQL_HOST,
+        user: process.env.MYSQL_USER,
+        password: process.env.MYSQL_PASSWORD,
+        database: process.env.MYSQL_DATABASE
+    });
+
+    // Retrieve all fields in db.
+    const results = await db.query(`
+        SELECT TABLE_NAME, COLUMN_NAME, COLUMN_TYPE FROM information_schema.columns
+        WHERE table_schema = '${process.env.MYSQL_DATABASE}'
+        ORDER BY table_name,ordinal_position
+    `);
+
+    // List tables
+    const encryptedTables = results
+        // Table name
+        .map(res => res.TABLE_NAME)
+        // Distinct values only
+        .filter((table, index, self) => self.indexOf(table) === index)
+        // Do not encrypt some of the tables
+        .filter(table => unencryptedTables.indexOf(table) === -1)
+        ;
+
+    // Create triggers by tables
+    for (let i = 0; i < encryptedTables.length; ++i) {
+        let table = encryptedTables[i];
+        let columns = results
+            .filter(res => res.TABLE_NAME === table)
+            .map(res => res.COLUMN_NAME);
+
+        let encryptedColumns = columns
+            .filter(c => unencryptedColumns.indexOf(c) === -1);
+
+        // Ignore table with no encrypted field.
+        if (encryptedColumns.length === 0) {
+            continue;
+        }
+
+        // Log encrypted fields.
+        console.info('/*', 'encrypting table ' + table);
+        console.info('  ', encryptedColumns);
+        console.info('*/');
+        console.info('');
+
+        // Drop trigger if exists.
+        await db.query(`DROP TRIGGER IF EXISTS encrypt_${table}_data`);
+
+        // Adapt column to binary content.
+        for (let j = 0; j < encryptedColumns.length; ++j) {
+            const encryptedColumnName = encryptedColumns[j];
+
+            // Retrieve column type.
+            let columnType = results
+                .filter(res => table === res.TABLE_NAME)
+                // Fetch column by name in sql results.
+                .filter(res => res.COLUMN_NAME === encryptedColumnName)
+                // Retrieve column type.
+                .map(res => res.COLUMN_TYPE);
+            // Convert 1-item array into column type string.
+            columnType = columnType[0];
+
+            // Retrieve column type size and name.
+            let [, columnTypeName, columnTypeSize] = columnType.match(/^(\w+)\(?([0-9]+)?\)?$/);
+
+            // Convert every encrypted field to VARBINARY as it's AES_ENCRYPT's
+            // output format. Our manual tests shown keeping format such as
+            // DOUBLE returned 0 results although VARCHAR did work after
+            // the conversion.
+            let encryptedColumnType;
+
+            // AES is a block-level algorithm. Encrypted data are thus first
+            // padded into one or multiple fixed-size 16bytes block. Thus,
+            // we must define larger field size than the original one.
+            // cf. https://thinkdiff.net/mysql/encrypt-mysql-data-using-aes-techniques/
+            let encryptedColumnTypeSize = undefined;
+            if (typeof columnTypeSize !== 'undefined') {
+                // cf. formula from https://dev.mysql.com/doc/refman/8.0/en/encryption-functions.html#function_aes-encrypt
+                encryptedColumnTypeSize = 16 * (Math.floor(columnTypeSize / 16) + 1);
+
+                // @warning Starting from MYSQL5, column type size are in
+                //     character and not in byte!
+                // @warning This works for ASCII characters, but UTF8 strings
+                //     with >8bit characters strings may get truncated here !
+                //     As end-users are french/english persons, we consider
+                //     mostly 8bit char will be used and the original size
+                //     decision will allow enough margin to compensate for the
+                //     exceptions.
+                // @warning Strictly french/english end-users may be false
+                //     assumption. But we do not capture text data from them
+                //     yet so this should not be an issue for our context.
+            }
+
+            // Set fixed-size VARBINARY for constant-size column type like
+            // DOUBLE etc. Would be great to only encrypt timstamp and keep
+            // DOUBLE values unencrypted because this will take space,
+            // unfortunately localized number data such as GPS values wouldn't
+            // be anonymized from this. This seems weak to Differential
+            // cryptanalysis techniques as well.
+            if (typeof encryptedColumnTypeSize === 'undefined') {
+                encryptedColumnType = 'VARBINARY(16)';
+            }
+            // Set variable size VARBINARY for specific-size column type like
+            // CHAR, VARCHAR, etc.
+            else {
+                encryptedColumnType = `VARBINARY(${encryptedColumnTypeSize})`;
+            }
+
+            // Log new SELECT request.
+
+            // Retrieve table name.
+            let originalTableName = table;
+
+            // Retrieve unencrypted fields.
+            let originalTableUnencryptedColumnNames = results
+                .filter(res => table === res.TABLE_NAME)
+                .filter(res => unencryptedColumns.includes(res.COLUMN_NAME))
+                .map(res => res.COLUMN_NAME);
+
+            // Retrieve encrypted fields.
+            let originalTableEncryptedColumnNames = encryptedColumns;
+
+            // Write new SELECT request.
+            console.info('-- new SELECT request for ' + originalTableName);
+            console.info('SELECT');
+            let selectFieldStrs = [];
+            // Unencrypted fields.
+            for (let k = 0; k < originalTableUnencryptedColumnNames.length; ++k) {
+                const originalTableUnencryptedColumnName = originalTableUnencryptedColumnNames[k];
+                selectFieldStrs.push(`    ${originalTableName}.${originalTableUnencryptedColumnName} AS ${originalTableUnencryptedColumnName}`);
+            }
+            // Encrypted fields
+            for (let k = 0; k < originalTableEncryptedColumnNames.length; ++k) {
+                const originalTableEncryptedColumnName = originalTableEncryptedColumnNames[k];
+
+                // Retrieve original column type.
+                let originalTableEncryptedColumnType = results
+                    .filter(res => table === res.TABLE_NAME)
+                    // Retrieve current field
+                    .filter(res => originalTableEncryptedColumnName === res.COLUMN_NAME)
+                    // Retrieve original column type incl. size.
+                    .map(res => res.COLUMN_TYPE);
+                // Reduce 1-item array to value.
+                originalTableEncryptedColumnType = originalTableEncryptedColumnType[0];
+
+                // Log result.
+                selectFieldStrs.push(`    CAST(AES_DECRYPT(${originalTableName}.${originalTableEncryptedColumnName}) AS ${originalTableEncryptedColumnType}) AS ${originalTableEncryptedColumnName}`);
+            }
+            // Log down unencrypted and encrypted fields without comma on last iteration.
+            for (let k = 0; k < selectFieldStrs.length; ++k) {
+                let selectFieldStr = selectFieldStrs[k];
+                let endComma = k < selectFieldStrs.length - 1 ? ',' : '';
+                console.info(selectFieldStr + endComma);
+            }
+            console.info(`FROM ${originalTableName};`);
+            console.info('');
+
+            // Log revert ALTER request.
+            console.info('-- revert ALTER request for ' + originalTableName);
+            for (let k = 0; k < originalTableEncryptedColumnNames.length; ++k) {
+                const originalTableEncryptedColumnName = originalTableEncryptedColumnNames[k];
+
+                // Retrieve original column type.
+                let originalTableEncryptedColumnType = results
+                    .filter(res => table === res.TABLE_NAME)
+                    // Retrieve current field
+                    .filter(res => originalTableEncryptedColumnName === res.COLUMN_NAME)
+                    // Retrieve original column type incl. size.
+                    .map(res => res.COLUMN_TYPE);
+                // Reduce 1-item array to value.
+                originalTableEncryptedColumnType = originalTableEncryptedColumnType[0];
+
+                // Log result.
+                console.info(`ALTER TABLE ${originalTableName} MODIFY ${originalTableEncryptedColumnName} ${originalTableEncryptedColumnType};`);
+            }
+            console.info('');
+
+            // Modify column type / trigger SQL ALTER request.
+            await db.query(`ALTER TABLE ${table} MODIFY ${encryptedColumnName} ${encryptedColumnType}`);
+        }
+
+        // Create new encryption trigger.
+        /* eslint-disable indent */
+        let results2 = await db.query(`            
+            CREATE TRIGGER encrypt_${table}_data
+            BEFORE INSERT ON ${table}
+            FOR EACH ROW
+            BEGIN
+                ${'SET ' + encryptedColumns
+                    .map(
+                        column => 
+                       `NEW.${column}=AES_ENCRYPT(NEW.${column}, '${process.env.MYSQL_ENCRYPTION_KEY}')`
+                    )
+                    .join(',\n                    ') + ';'
+                }
+            END
+        `);
+        /* eslint-enable indent */
+
+        console.info('');
+    }
+
+    // Close db.
+    db.end();
+})();

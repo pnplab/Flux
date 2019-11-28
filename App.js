@@ -39,32 +39,26 @@ import {
 // -- About routing
 //
 // @note *We do not use router*, instead we only use redux to avoid having
-//         multiple source of thruth, as we've faced the same challenges
-//         referenced in
-//         `https://stackoverflow.com/questions/48893490/react-router-vs-redux-first-routing`
-//         in a previous version of the source code. We use a framework similar
-//         to the one mentioned in this article
-//         `https://medium.freecodecamp.org/an-introduction-to-the-redux-first-routing-model-98926ebf53cb`,
-//         although no the same one, as the one we use has a higher community
-//         spread & is compatible with react-native such as it doesn't
-//         necessarily rely on browser history, but can rely on mobile native
-//         mechanism for backward/forward navigation instead. See
-//         `https://github.com/respond-framework/rudy/blob/master/packages/rudy/docs/react-native.md`.
-//
+//     multiple source of thruth, as we've faced the same challenges
+//     referenced in
+//     `https://stackoverflow.com/questions/48893490/react-router-vs-redux-first-routing`
+//     in a previous version of the source code. We use a framework similar
+//     to the one mentioned in this article
+//     `https://medium.freecodecamp.org/an-introduction-to-the-redux-first-routing-model-98926ebf53cb`,
+//     although no the same one, as the one we use has a higher community
+//     spread & is compatible with react-native such as it doesn't
+//     necessarily rely on browser history, but can rely on mobile native
+//     mechanism for backward/forward navigation instead. See
+//     `https://github.com/respond-framework/rudy/blob/master/packages/rudy/docs/react-native.md`.
 // @warning Rudy's documentation (the redux router) is partly out of date.
+// @note EDIT: we do not use redux anymore either. Navigation system is
+//     implemented manually.
 
 // -- About theme and components
 //
 // @note We use native-base-theme library modified to use iOS style theme on
 //         both android & ios. The native-base-theme's theme is located in the
 //         `./crossplatform/theme` folder.
-
-
-// Start aware study
-// { (async () => await startAware('test') & await joinAwareStudy())() && null }
-
-// Store survey integration test.
-// { (async () => await startAware('test') & await joinAwareStudy() & storeSurvey({ abcd: 0.31 /* empty :D */ }) & AwareManager.disableMandatoryWifiForSync() & AwareManager.disableMandatoryBatteryForSync() & AwareManager.syncData() )() && null }
 
 // Disable yellow box (conosle.warn popups inside the app). It breaks
 // integration testing as it sometimes prevent button sitting underneath the
