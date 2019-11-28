@@ -50,6 +50,15 @@ public class MainApplication extends Application implements ReactApplication {
         permissionManager = new PermissionManager(this);
         processPriorityPromoter = new ProcessPriorityPromoter(this);
 
+        // Log android API version.
+        int androidApiVersion = android.os.Build.VERSION.SDK_INT;
+        Log.i("Flux", "System android API version is " + androidApiVersion);
+
+        // Log android hardware architecture.
+        String arch = System.getProperty("os.arch");
+        Log.i("Flux", "System architecture is " + arch);
+
+
         // Set bugsnag enhanced native bug reporting on top of react-native one
         // and detext anr.
         // cf. https://docs.bugsnag.com/platforms/react-native/react-native/enhanced-native-integration/
@@ -68,9 +77,6 @@ public class MainApplication extends Application implements ReactApplication {
 
         SoLoader.init(this, /* native exopackage */ false);
         initializeFlipper(this);
-
-        String arch = System.getProperty("os.arch");
-        Log.i("Flux", "Current arch: " + arch);
     }
 
     /**
