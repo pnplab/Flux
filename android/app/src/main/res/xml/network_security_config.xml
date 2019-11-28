@@ -6,6 +6,10 @@
             <certificates src="user" />
         </trust-anchors>
     </base-config>
+    <!--
+    Allow cleartext (disabled ssl http) and unofficial CA for local domains.
+    Should not be required anymore as we use an ngrok development proxy instead.
+    -->
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">localhost</domain>
         <domain includeSubdomains="false">127.0.0.1</domain>

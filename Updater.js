@@ -27,9 +27,12 @@ export async function triggerUpdateIfNeeded() {
             .browser_download_url;
     }
     // If request failed, do not update. Probably due to internet not being
-    // connected.
+    // connected. Emulator happens to have DNS issue from time to time, cold
+    // rebooting it work. The issue may be tested by opening android's chrome
+    // and checking wikipedia for instance. This should work!
     catch (e) {
-        console.warn('Application auto update failed. Github version could\'nt be retrieved. The device is probably not currently connected to internet.');
+        console.warn('Application auto update failed. Github version could\'nt be retrieved. The device is probably not currently connected to internet. On emulator, cold boot work.');
+        console.warn(e);
         return;
     }
 
