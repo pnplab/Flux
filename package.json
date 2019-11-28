@@ -60,7 +60,7 @@
     "react-redux": "6.0.0",
     "realm": "3.2.0",
     "redux": "4.0.1",
-    "rn-update-apk": "4.2.0",
+    "rn-update-apk": "nuKs/react-native-update-apk#f2945fc",
     "rxjs": "6.4.0",
     "styled-components": "4.1.3",
     "victory-native": "31.0.0"
