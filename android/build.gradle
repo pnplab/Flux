@@ -68,7 +68,6 @@ allprojects {
         maven { url "https://www.jitpack.io" }
         mavenLocal()
         google()
-        jcenter()
         maven { url 'https://maven.google.com' }
         maven {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
@@ -82,6 +81,9 @@ allprojects {
             // All of Detox' artifacts are provided via the npm module
             url("$rootDir/../node_modules/detox/Detox-android")
         }
+
+        // keep in the bottom cf. https://github.com/react-native-community/react-native-camera/issues/1878#issuecomment-432514334
+        jcenter()
 
         // Fix lottie-react-native build issue.
         // Fix `Execution failed for task ':react-native-appupdate:verifyReleaseResources'`
@@ -102,6 +104,17 @@ allprojects {
                 force "androidx.core:core:1.1.0"
                 force "androidx.appcompat:appcompat:1.1.0"
                 force "androidx.vectordrawable:vectordrawable:1.0.0"
+
+                // Having to add these after rn-update-apk upgrade from my own
+                // fork weirdly enough.
+                force "androidx.fragment:fragment:1.1.0"
+                force "androidx.collection:collection:1.1.0"
+                force "androidx.vectordrawable:vectordrawable-animated:1.1.0"
+                force "androidx.lifecycle:lifecycle-runtime:2.1.0"
+                force "androidx.lifecycle:lifecycle-viewmodel:2.1.0"
+                force "androidx.lifecycle:lifecycle-common:2.1.0"
+                force "androidx.arch.core:core-common:2.1.0"
+                force "androidx.lifecycle:lifecycle-runtime:2.0.0"
             }
         }
     }
