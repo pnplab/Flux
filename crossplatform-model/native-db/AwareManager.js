@@ -16,6 +16,12 @@ class AwareManager {
 
     }
 
+    // @warning this method doesn't check services state.
+    async hasStudyBeenJoined() {
+        const hasStudyBeenJoined = await this._awareManager.hasStudyBeenJoined();
+        return hasStudyBeenJoined;
+    }
+
     async requestPermissions() {
         // We need to add runtime permission check for dangerous permissions
         // on android ^23.
@@ -83,7 +89,7 @@ class AwareManager {
         // @note can't get them through java checkup -> sensor architecture is completely decoupled
         // @note only way is to either modify server or sensor architecture or to do tricky design (ie. caching the POST req. result)
         // We thus retrieve it manually.
-        
+
         // Retrieve synced table array from environment.
         const syncedTablesString = SYNCED_TABLES;
         const syncedTables = JSON.parse(syncedTablesString);

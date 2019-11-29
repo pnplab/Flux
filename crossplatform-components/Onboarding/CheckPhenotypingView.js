@@ -32,7 +32,7 @@ import {
 const ANIMATION_SRC: string = require('./3165-loader.json');
 
 type Props = {
-    +showOnActivateAwareButton: boolean,
+    +showActivateAwareButton: boolean,
     +onActivateAware: () => void,
     +onActivateAwareLongPress: () => void,
     +showFinishStepButton: boolean,
@@ -40,7 +40,7 @@ type Props = {
 };
 
 const CheckPhenotypingView = ({
-    showOnActivateAwareButton,
+    showActivateAwareButton,
     onActivateAware,
     onActivateAwareLongPress,
     showFinishStepButton,
@@ -53,7 +53,7 @@ const CheckPhenotypingView = ({
             </R3Header>
             <R3Content>
                 {
-                    !showOnActivateAwareButton &&
+                    !showActivateAwareButton &&
                     !showFinishStepButton &&
                         <LottieView
                             source={ANIMATION_SRC}
@@ -64,7 +64,7 @@ const CheckPhenotypingView = ({
             </R3Content>
             <R3Footer>
                 {
-                    showOnActivateAwareButton &&
+                    showActivateAwareButton &&
                     <CircleButton type="validate" color="blue" onPress={onActivateAware} onLongPress={onActivateAwareLongPress} accessibilityLabel="checkphenotyping-startaware" />
                 }
                 {

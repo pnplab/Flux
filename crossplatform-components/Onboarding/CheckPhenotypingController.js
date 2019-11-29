@@ -11,6 +11,7 @@
 import React, { PureComponent } from 'react';
 
 import CheckPhenotypingView from './CheckPhenotypingView';
+import AwareManager from '../../crossplatform-model/native-db/AwareManager';
 
 // Configure types.
 type Props = {
@@ -20,7 +21,7 @@ type Props = {
     +hasAwareStudyBeenJoined: boolean
 };
 type State = {
-    +showOnActivateAwareButton: boolean
+    +showActivateAwareButton: boolean
 };
 
 // Configure component logic.
@@ -33,12 +34,16 @@ export default class CheckPhenotypingController extends PureComponent<Props, Sta
         super(props);
 
         this.state = {
-            showOnActivateAwareButton: true
+            showActivateAwareButton: true
         };
     }
 
-    componentDidMount() {
-
+    async componentDidMount() {
+        // If aware study has already been joined, skip activation step.
+        const hasStudyAlreadyBeenJoined = await AwareManager.hasStudyBeenJoined()
+        if (hasStudyAlreadyBeenJoined) {
+            this.setState({ showActivateAwareButton: false })
+        }
     }
 
     startAware = () => {
@@ -57,7 +62,7 @@ export default class CheckPhenotypingController extends PureComponent<Props, Sta
 
         // Hide activate aware button.
         this.setState({
-            showOnActivateAwareButton: false
+            showActivateAwareButton: false
         });
     }
 
@@ -74,7 +79,7 @@ export default class CheckPhenotypingController extends PureComponent<Props, Sta
 
         return (
             <CheckPhenotypingView
-                showOnActivateAwareButton={this.state.showOnActivateAwareButton}
+                showActivateAwareButton={this.state.showActivateAwareButton}
                 onActivateAware={this.startAware}
                 onActivateAwareLongPress={this.bypassAware}
                 showFinishStepButton={showFinishStepButton}

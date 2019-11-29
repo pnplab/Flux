@@ -169,9 +169,16 @@ export default (): React$Node =>
                         // launched independently from the app, restarted on
                         // crash, and even restarted automatically at phone
                         // boot. But for safety..
-                        BugReporter.breadcrumb('starting aware...', 'log');
-                        await startAware(userSettings.awareDeviceId || 'byp0auth');
-                        await joinAwareStudy(userSettings.awareStudyUrl);
+                        // Still, we first check aware study is not joined (
+                        // although this method doesn't check if services
+                        // are correctly started). Indeed, we've had issues
+                        // with ANR at app launch, these calls would had been
+                        // the cause.
+                        if (await AwareManager.hasStudyBeenJoined()) {
+                            BugReporter.breadcrumb('starting aware...', 'log');
+                            await startAware(userSettings.awareDeviceId || 'byp0auth');
+                            await joinAwareStudy(userSettings.awareStudyUrl);
+                        }
                     }
                 }
             />

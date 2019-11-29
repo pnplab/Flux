@@ -77,6 +77,19 @@ public class AwareManagerModule extends ReactContextBaseJavaModule {
         return "AwareManager";
     }
 
+    @ReactMethod
+    public void hasStudyBeenJoined(Promise promise) {
+        if (!Aware.IS_CORE_RUNNING) {
+            promise.resolve(false);
+        }
+        else {
+            // @warning doesn't tell if services are active.
+            Context context = getReactApplicationContext().getApplicationContext();
+            boolean hasStudyBeenJoined = Aware.isStudy(context);
+            promise.resolve(hasStudyBeenJoined);
+        }
+    }
+
     @SuppressLint("ApplySharedPref")
     @ReactMethod
     public void startAware(String deviceId) {
