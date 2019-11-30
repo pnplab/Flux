@@ -47,10 +47,10 @@ export default class OnboardingController extends Component<Props, State> {
         // Trace component navigation for precise bug reporting.
         if (typeof componentName === 'undefined' || componentName === null) {
             console.warn('unknown component name for bug reporting on OnboardingController#goToStep');
-            BugReporter.breadcrumb('onboarding/unknown', 'navigation');
+            BugReporter.breadcrumb('o>unknown', 'navigation');
         }
         else {
-            BugReporter.breadcrumb('onboarding/'+componentName, 'navigation');
+            BugReporter.breadcrumb('o>'+componentName, 'navigation');
         }
 
         // Switch shown component.
