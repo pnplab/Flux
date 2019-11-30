@@ -1,5 +1,6 @@
 package org.pnplab.flux.restingstatetask.model.muse_data_recorder;
 
+import com.bugsnag.android.Bugsnag;
 import com.choosemuse.libmuse.Eeg;
 import com.choosemuse.libmuse.Muse;
 
@@ -23,9 +24,28 @@ public class MuseDataRecorder {
 
         // Start recording muse data into circular buffer.
         _museDataCircularBuffer = new MuseDataCircularBuffer();
-        _museDataCircularBuffer.startDeviceDataRecording(museDevice, museDataPacket -> {
-                // @warning this method is executed from another thread. _museDataRepository and
-                // awareDeviceId access must be kept threadsafe!
+        _museDataCircularBuffer.startDeviceDataRecording(
+            museDevice,
+            museDataPacket -> {
+                // @warning this method is executed from another thread.
+                // _museDataRepository and awareDeviceId access must be kept
+                // threadsafe!
+
+                // Ignore packet recording if packet is null.
+                // Fixes app crash due to `Attempt to invoke virtual method
+                // 'long com.choosemuse.libmuse.MuseDataPacket.timestamp()' on
+                // a null object reference`. cf. https://github.com/pnplab/Flux/issues/3.
+                // Happen rarely. May be due to muse disconnection. We prevent
+                // the app crash but stop storing the eeg data though. We still
+                // log the issue in bugsnag. The video will keep going and user
+                // wont notice. Perhaps best to lose data than to restart since
+                // we don't want to bother the user too much in order to avoid
+                // churn.
+                // @todo Decide whether ask the user to restart the task or not.
+                if (museDataPacket == null) {
+                    Bugsnag.notify(new RuntimeException("Trying to store null muse data packet"));
+                    return;
+                }
 
                 // Retrieve values out of the packet.
                 long museTimestamp = museDataPacket.timestamp();
@@ -36,10 +56,10 @@ public class MuseDataRecorder {
                 double eegChannel4 = museDataPacket.getEegChannelValue(Eeg.EEG1);
 
                 // Record values in repository.
-                _museDataRepository.insertDataPoint(awareDeviceId, museTimestamp, phoneTimestamp,
-                        eegChannel1, eegChannel2, eegChannel3, eegChannel4);
-            }
-        );
+                _museDataRepository.insertDataPoint(awareDeviceId,
+                    museTimestamp, phoneTimestamp, eegChannel1, eegChannel2,
+                    eegChannel3, eegChannel4);
+        });
     }
 
     public void stopRecording() {
