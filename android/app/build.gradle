@@ -84,10 +84,6 @@ project.ext.react = [
 
 apply from: "../../node_modules/react-native/react.gradle"
 
-project.ext.sentryCli = [
-    logLevel: "debug"
-]
-
 /**
  * Set this to true to create two separate APKs instead of one:
  *   - An APK that only works on ARM devices
@@ -470,6 +466,7 @@ android {
 // }
 
 dependencies {
+    implementation project(':rn-update-apk')
     // @note because JUnit5 is built on Java 8 from the ground up, its
     // instrumentation tests will only run on devices running Android 8.0 (API
     // 26) or newer. Thus we keep `androidx.test.ext:junit` which points out
@@ -479,7 +476,6 @@ dependencies {
     implementation project(':bugsnag-react-native')
     // implementation project(':@sentry/react-native')
     implementation project(':react-native-fs')
-    implementation project(':rn-update-apk')
     implementation project(':react-native-dev-menu')
     implementation project(':lottie-react-native')
     implementation project(':react-native-svg')
@@ -490,8 +486,8 @@ dependencies {
     implementation project(':realm')
     implementation project(':react-native-linear-gradient')
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation 'androidx.appcompat:appcompat:^1.1.0'
-    implementation "com.facebook.react:react-native:+"  // From node_modules
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation "com.facebook.react:react-native:+" // From node_modules
 
     implementation project(':aware-core')
     implementation "net.zetetic:android-database-sqlcipher:4.1.3@aar" // SQLCipher (for plugins)

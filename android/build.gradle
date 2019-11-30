@@ -3,8 +3,29 @@
 apply from: 'aware-core/aware.gradle'
 
 project.ext {
-    aware_libs = (System.getenv("aware_libs") as String ?: "master-SNAPSHOT")
-    supportLibVersion = "28.0.0"
+    /* aware */
+    // @deprecated aware_libs is no longer necessary since aware package is now
+    // included in our code.
+    // @deprecated neither supportLibVersion as we switched to androidx.
+    // aware_libs = (System.getenv("aware_libs") as String ?: "master-SNAPSHOT")
+    // supportLibVersion = "28.0.0"
+
+    /* rn-update-apk */
+    // Most google play package we use are 17.1.0, `googlePlayServicesAuthVersion`
+    // version 17.1.0 doesn't exist.
+    // @note google auth play service dependency is used in this package to fix
+    // prevent an SSL bug on android 4.x. cf.
+    // https://github.com/mikehardy/react-native-update-apk
+    googlePlayServicesAuthVersion = '17.0.0'
+
+    // `supportLibVersion` set < 20 uses androidx. Default goes to the old
+    // android app-compat.
+    supportLibVersion = '1.1.0'
+
+    /* sentry */
+    sentryCli = [
+        logLevel: "debug"
+    ]
 }
 
 buildscript {
@@ -85,18 +106,6 @@ allprojects {
         // keep in the bottom cf. https://github.com/react-native-community/react-native-camera/issues/1878#issuecomment-432514334
         jcenter()
 
-        // Fix lottie-react-native build issue.
-        // Fix `Execution failed for task ':react-native-appupdate:verifyReleaseResources'`
-        // @note We now use androidx with jetifier.
-        /*
-        configurations.all {
-            resolutionStrategy {
-                force "com.android.support:appcompat-v7:$supportLibVersion"
-                force "com.android.support:support-v7:$supportLibVersion"
-            }
-        }
-        */
-
         configurations.all {
             resolutionStrategy {
                 // latest androidx lib versions are available here `https://developer.android.com/jetpack/androidx/versions`.
@@ -105,22 +114,12 @@ allprojects {
                 force "androidx.appcompat:appcompat:1.1.0"
                 force "androidx.vectordrawable:vectordrawable:1.0.0"
 
-                // Having to add these after rn-update-apk upgrade from my own
-                // fork weirdly enough.
-                force "androidx.fragment:fragment:1.1.0"
-                force "androidx.collection:collection:1.1.0"
-                force "androidx.vectordrawable:vectordrawable-animated:1.1.0"
-                force "androidx.lifecycle:lifecycle-runtime:2.1.0"
-                force "androidx.lifecycle:lifecycle-viewmodel:2.1.0"
-                force "androidx.lifecycle:lifecycle-common:2.1.0"
-                force "androidx.arch.core:core-common:2.1.0"
-                force "androidx.lifecycle:lifecycle-runtime:2.0.0"
+                // Fix lottie-react-native build issue.
+                // Fix `Execution failed for task ':react-native-appupdate:verifyReleaseResources'`
+                // @note We now use androidx with jetifier.
+                // force "com.android.support:appcompat-v7:$supportLibVersion"
+                // force "com.android.support:support-v7:$supportLibVersion"
             }
         }
     }
 }
-
-// task wrapper(type: Wrapper) {
-//     gradleVersion = '4.7'
-//     distributionUrl = distributionUrl.replace("bin", "all")
-// }
