@@ -42,8 +42,8 @@ buildscript {
         maven { url 'https://jitpack.io' }
     }
     dependencies {
-        // Tried to use Android Studio beta chanel with AGL 3.5.0-rc03 to address Robelectric issue
-        // https://github.com/robolectric/robolectric/issues/4942 - was 3.4.2
+        // Tried to use Android Studio beta chanel with AGL 3.5.0-rc03 to
+        // address Robelectric issue https://github.com/robolectric/robolectric/issues/4942 - was 3.4.2
         // -- However, 3.5.0-rc03 breaks realm plugin. Realm is fixed in unstable master branch but not yet released.
         // see https://github.com/realm/realm-js/commit/0648b9192fc67b7c94494617637c36cbe8372432 -
         // however yarn is unable to build it

@@ -428,7 +428,14 @@ android {
             testCoverageEnabled = false
         }
         debug {
-            signingConfig signingConfigs.debug
+            // @note we use the same signing config as the release apk one in
+            // debug apk so we can test application update process from the
+            // debug apk. make sure you use use the same encryption keys as
+            // well to test this so Realm and Aware can reuse the db after
+            // the downloaded [release] update as been installed.
+            // // signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
+
             debuggable true
             minifyEnabled false
             shrinkResources false

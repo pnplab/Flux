@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
+    Default for aware
+    -->
+    <external-path name="external_files" path="." />
+
+    <!--
+    Added for react-native-update-apk to fix issue `FileProvider -
+    IllegalArgumentException: Failed to find configured root.` here as we
+    can't
+
+    impl in js lib as:
+    const downloadDestPath = `${RNFS.CachesDirectoryPath}/NewApp.apk`;
+    thus contrary to doc, we must implement the file path as below.
+    -->
+    <cache-path name="external_files_cache" path="." />
+</paths>

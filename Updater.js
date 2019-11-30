@@ -8,11 +8,22 @@
  *
  * We randomly found mikehardy up-to-date fork here https://github.com/mikehardy/react-native-update-apk.
  *
- * @warning
+ * @note
  * There is now an official way to go, compatible with app store:
  * https://developer.android.com/guide/app-bundle/in-app-updates
  * Although perhaps not compatible with internal play distribution pipeline or
  * not suitable for development upgrade (to be tested).
+ *
+ * If the user has not enabled unknown app sources, they may need to do so, and
+ * you can advise them and send them directly to the system GUI pre-loaded with
+ * your package:
+ * https://developer.android.com/reference/android/provider/Settings.html#ACTION_MANAGE_UNKNOWN_APP_SOURCES
+ * cf. react-native-update-apk's TODO.md
+ * Android Q might require some changes.
+ *
+ * @note https://github.com/javiersantos/AppUpdater seems more powerful but
+ *     also lacks flexible tag management (req. v?X.X.X.X) for github for
+ *     instance.
  */
 import * as UpdateAPK from 'rn-update-apk';
 import { Alert } from 'react-native';
@@ -45,10 +56,15 @@ export async function triggerUpdateIfNeeded() {
         return;
     }
 
+    // @todo switch to versionCode!
+
     console.info(updaterVersionPackage);
 
     // Generate updater.
     const updater = new UpdateAPK.UpdateAPK({
+        // @note Must map android file provider defined in our AndroidManifest
+        //     xml file.
+        fileProviderAuthority: 'org.pnplab.flux.provider.storage',
         // iosAppId: '123456',
         apkVersionUrl: updaterVersionPackage,
         needUpdateApp: (needUpdate) => {

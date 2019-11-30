@@ -54,7 +54,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <!-- react-native-update-apk
-    For auto update with APK version > 25. This doesn't work with google play
+    For auto update with android API >= 25. This doesn't work with google play
     publishing, but is very helpful for testing.
     cf. https://github.com/mikehardy/react-native-update-apk
     -->
@@ -246,6 +246,36 @@
             android:enabled="true"
             android:exported="false"
             android:label="Process Priority Promotion Service" />
+
+        <!--
+        react-native-update-apk:
+        For auto update with android API >= 24. This doesn't work with google
+        play publishing, but is very helpful for testing.
+        cf. https://github.com/mikehardy/react-native-update-apk
+        @note authorities must map the one defined in JS.
+
+        Aware:
+        Already set in aware-core manifest. However, it is not possible to set
+        multiple different file providers on the base FileProvider class. The
+        workaround is instead to use implemented subclasses of the FileProvider.
+        This requires to modify the code using them.
+
+        @warning this may override other libs' FileProvider configurations and
+            this won't log because of `tools:replace`. There is no other
+            workaround.
+        -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="org.pnplab.flux.provider.storage"
+            android:exported="false"
+            android:grantUriPermissions="true"
+        >
+            <meta-data
+                tools:replace="android:resource"
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/fileprovider_paths"
+            />
+        </provider>
 
     </application>
 
