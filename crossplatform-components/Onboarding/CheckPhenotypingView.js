@@ -33,7 +33,7 @@ const ANIMATION_SRC: string = require('./3165-loader.json');
 
 type Props = {
     +showActivateAwareButton: boolean,
-    +onActivateAware: () => void,
+    +onActivateAware: () => any,
     +onActivateAwareLongPress: () => void,
     +showFinishStepButton: boolean,
     +finishStep: () => void

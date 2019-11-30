@@ -22,7 +22,7 @@ type Props = {
     |}) => void
 };
 type State = {
-    
+
 };
 
 // Configure component logic.
@@ -48,7 +48,7 @@ export default class AppLoaderController extends PureComponent<Props, State> {
         if (!isUserAlreadySetup) {
             await this.props.onUserNotYetRegistered();
         }
-        // User already setup, we can send relevant configuration data and 
+        // User already setup, we can send relevant configuration data and
         // start the app.
         else {
             // Retrieve the user configuration data first.

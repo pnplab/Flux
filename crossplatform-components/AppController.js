@@ -22,7 +22,6 @@ type Props = {|
 |};
 type State = {|
     activeComponentType: ComponentType<any>,
-    hasAwareStudyBeenJoined: boolean,
     userSettings?: {|
         +studyModality: 'daily' | 'weekly',
         +awareDeviceId: string,
@@ -40,7 +39,6 @@ export default class AppController extends PureComponent<Props, State> {
 
         this.state = {
             activeComponentType: this.props.index,
-            hasAwareStudyBeenJoined: false,
             userSettings: undefined
         };
     }
@@ -72,7 +70,6 @@ export default class AppController extends PureComponent<Props, State> {
             goTo: this.goTo,
             startAware: this.startAware,
             joinAwareStudy: this.joinAwareStudy,
-            hasAwareStudyBeenJoined: this.state.hasAwareStudyBeenJoined,
 
             // Register the app configuration into this single user settings.
             // These data are used to define the study modality (eg. daily or
@@ -159,10 +156,6 @@ export default class AppController extends PureComponent<Props, State> {
 
         // Join study.
         await AwareManager.joinStudy(awareStudyUrl);
-
-        // Change button from 'start aware' to 'go to next step' in
-        // CheckPhenotypingController.
-        this.setState({ hasAwareStudyBeenJoined: true });
     }
 
     setUserSettings = (userSettings: {|

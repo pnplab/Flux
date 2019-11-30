@@ -10,18 +10,18 @@
 
 import React, { PureComponent } from 'react';
 
-import CheckPhenotypingView from './CheckPhenotypingView';
 import AwareManager from '../../crossplatform-model/native-db/AwareManager';
+import CheckPhenotypingView from './CheckPhenotypingView';
 
 // Configure types.
 type Props = {
-    +onStartAwareClicked: () => void,
+    +onStartAwareClicked: () => Promise<void>,
     +onStepFinished: () => void,
-    +onStartAwareBypassed: () => void,
-    +hasAwareStudyBeenJoined: boolean
+    +onStartAwareBypassed: () => void
 };
 type State = {
-    +showActivateAwareButton: boolean
+    +showActivateAwareButton: boolean,
+    +showFinishStepButton: boolean
 };
 
 // Configure component logic.
@@ -34,36 +34,36 @@ export default class CheckPhenotypingController extends PureComponent<Props, Sta
         super(props);
 
         this.state = {
-            showActivateAwareButton: true
+            showActivateAwareButton: true,
+            showFinishStepButton: false
         };
     }
 
     async componentDidMount() {
         // If aware study has already been joined, skip activation step.
-        const hasStudyAlreadyBeenJoined = await AwareManager.hasStudyBeenJoined()
+        const hasStudyAlreadyBeenJoined = await AwareManager.hasStudyBeenJoined();
         if (hasStudyAlreadyBeenJoined) {
-            this.setState({ showActivateAwareButton: false })
+            this.setState({
+                showActivateAwareButton: false,
+                showFinishStepButton: true
+            });
         }
     }
 
-    startAware = () => {
-        // Assert aware has not already been started.
-        // @warning hasAwareStudyBeenJoined can't be false negative in case app
-        //     has been restarted because state isn't generated from aware's
-        //     owns but local to js only.
-        // @todo either store state in local db when aware start or update
-        //     aware to be able to retrieve this state.
-        if (this.props.hasAwareStudyBeenJoined) {
-            throw new Error('shouldn\'t be able to start already started aware');
-        }
-
+    startAware = async () => {
         // Forward aware start logic to main controller.
-        this.props.onStartAwareClicked();
+        try {
+            await this.props.onStartAwareClicked();
 
-        // Hide activate aware button.
-        this.setState({
-            showActivateAwareButton: false
-        });
+            // Hide activate aware button and show next step button instead.
+            this.setState({
+                showActivateAwareButton: false,
+                showFinishStepButton: true
+            });
+        }
+        catch (e) {
+            // Do nothing in case of error.
+        }
     }
 
     bypassAware = () => {
@@ -75,14 +75,12 @@ export default class CheckPhenotypingController extends PureComponent<Props, Sta
     }
 
     render() {
-        const showFinishStepButton = this.props.hasAwareStudyBeenJoined;
-
         return (
             <CheckPhenotypingView
                 showActivateAwareButton={this.state.showActivateAwareButton}
                 onActivateAware={this.startAware}
                 onActivateAwareLongPress={this.bypassAware}
-                showFinishStepButton={showFinishStepButton}
+                showFinishStepButton={this.state.showFinishStepButton}
                 finishStep={this.finishStep}
             />
         );

@@ -116,10 +116,6 @@ export default (): React$Node =>
             startAware,
             joinAwareStudy,
 
-            // `hasAwareStudyBeenJoined` is only used by onboarding to know
-            // when the user can go to the next onboarding step.
-            hasAwareStudyBeenJoined,
-
             // storeSurvey store the survey both remotely (through Aware) and
             // locally (for graphs).
             storeSurvey,
@@ -174,7 +170,7 @@ export default (): React$Node =>
                         // are correctly started). Indeed, we've had issues
                         // with ANR at app launch, these calls would had been
                         // the cause.
-                        if (await AwareManager.hasStudyBeenJoined()) {
+                        if (await AwareManager.hasStudyBeenJoined() === false) {
                             BugReporter.breadcrumb('starting aware...', 'log');
                             await startAware(userSettings.awareDeviceId || 'byp0auth');
                             await joinAwareStudy(userSettings.awareStudyUrl);
@@ -282,7 +278,6 @@ export default (): React$Node =>
                     />
 
                     <CheckPhenotyping
-                        hasAwareStudyBeenJoined={hasAwareStudyBeenJoined}
                         onStartAwareClicked={
                             async () => {
                                 // Start aware.
