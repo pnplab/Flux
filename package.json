@@ -176,49 +176,5 @@
       }
     },
     "test-runner": "jest"
-  },
-  "release": {
-    "branch": "nuKs/dev",
-    "repositoryUrl": "https://github.com/pnplab/Flux.git",
-    "plugins": [
-      "@semantic-release/commit-analyzer",
-      "@semantic-release/release-notes-generator",
-      [
-        "@semantic-release/changelog",
-        {
-          "changelogFile": "docs/CHANGELOG.md"
-        }
-      ],
-      [
-        "@semantic-release/npm",
-        {
-          "npmPublish": false
-        }
-      ],
-      [
-        "@semantic-release/exec",
-        {
-          "prepareCmd": "echo '{ \"versionName\": \"${nextRelease.version}\", \"forceUpdate\": true, \"apkUrl\": \"https://github.com/pnplab/Flux/releases/download/v${nextRelease.version}/Flux.apk\" }' > android/version.json"
-        }
-      ],
-      [
-        "@semantic-release/github",
-        {
-          "assets": [
-            {
-              "path": "Flux.apk",
-              "label": "Android Application"
-            },
-            {
-              "path": "docs/CHANGELOG.md"
-            },
-            {
-              "path": "android/version.json",
-              "label": "Continuous delivery package"
-            }
-          ]
-        }
-      ]
-    ]
   }
 }

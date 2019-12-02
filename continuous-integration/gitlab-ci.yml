@@ -195,6 +195,9 @@ build:android:
 
 
 release:
+    variables: # env variables w/ non sensible data
+        ANDROID_VERSION_CODE: ${CI_JOB_ID} # CI_JOB_ID is a number incr at every gitlab job.
+        ANDROID_VERSION_NAME: "${CI_COMMIT_REF_NAME}.${CI_COMMIT_SHORT_SHA}" # branch|tag.commit
     stage: release
     # only:
     #     - master
