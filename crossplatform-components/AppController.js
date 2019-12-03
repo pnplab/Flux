@@ -11,6 +11,7 @@ import { getTheme } from '../crossplatform-theme/';
 
 import { isFragment } from 'react-is';
 import BugReporter from '../crossplatform-model/native-db/BugReporter';
+import SurveyManager from '../crossplatform-model/native-db/SurveyManager';
 import AwareManager from '../crossplatform-model/native-db/AwareManager';
 import GraphManager from '../crossplatform-model/persistent-db/GraphManager';
 import UserManager from '../crossplatform-model/persistent-db/UserManager';
@@ -112,11 +113,11 @@ export default class AppController extends PureComponent<Props, State> {
         // abstraction binding between the native part for both android and iOS
         // and javascript. Indeed, we rely solely on Aware backend and its
         // inner mechanism for data synchronization with data that are out of
-        // is scope of concerns (which was a mistake, a dual backend would
+        // its scope of concerns (which was a mistake, a dual backend would
         // have made more sense and be easier to maintain).
 
         // Store in aware.
-        /* await */ AwareManager.storeSurvey(msTimestamp, values);
+        /* await */ SurveyManager.storeSurveyData(msTimestamp, values);
 
         // Store in realm for graphs.
         /* await */ GraphManager.storeSurvey(msTimestamp, values);

@@ -34,6 +34,7 @@ public class MuseDataRepository {
             _contentResolver.insert(MuseDataProvider.MuseEegData.CONTENT_URI, context_data);
         } catch (SQLException e) {
             Log.e(TAG, "Failed to record Muse timeseries data to SQL !");
+            Log.d(TAG, e.getMessage());
         }
     }
 

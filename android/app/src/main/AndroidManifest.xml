@@ -200,21 +200,6 @@
         -->
 
         <service
-            android:name="org.pnplab.flux.awareplugin.survey.Plugin"
-            android:enabled="true"
-            android:exported="false"
-            android:label="Survey Service" />
-
-        <provider
-            android:name="org.pnplab.flux.awareplugin.survey.Provider"
-            android:authorities="org.pnplab.flux.provider.survey"
-            android:exported="false"
-            android:label="Self-Reported Questionnaire"
-            android:syncable="true"
-            android:readPermission="com.aware.READ_CONTEXT_DATA"
-            android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
-
-        <service
             android:name="org.pnplab.flux.awareplugin.survey.SyncAdapter"
             android:enabled="true"
             android:exported="false">
@@ -228,7 +213,7 @@
             android:name="org.pnplab.flux.restingstatetask.model.muse_data_recorder.MuseDataProvider"
             android:authorities="org.pnplab.flux.provider.musedata"
             android:exported="false"
-            android:label="Muse timeseries EEG data"
+            android:label="Muse time-series EEG data"
             android:syncable="true" />
 
         <service
@@ -239,6 +224,23 @@
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
             <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/musedata_syncadapter_config" />
+        </service>
+
+        <provider
+            android:name="org.pnplab.flux.surveytask.model.SurveyDataProvider"
+            android:authorities="org.pnplab.flux.provider.survey"
+            android:exported="false"
+            android:label="Self-reported questionnaire data"
+            android:syncable="true" />
+
+        <service
+            android:name="org.pnplab.flux.surveytask.model.SurveyDataSyncAdapterService"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/survey_syncadapter_config" />
         </service>
 
         <service

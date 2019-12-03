@@ -15,12 +15,17 @@ import com.brentvatne.react.ReactVideoPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactNativeHost;
-import com.facebook.react.ReactPackage;
+
+import org.pnplab.flux.utils.PermissionManager;
+import org.pnplab.flux.utils.ProcessPriorityPromoter;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class TestApplication extends Application implements ReactApplication {
+
+    private PermissionManager permissionManager;
+    private ProcessPriorityPromoter processPriorityPromoter;
 
     private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
         @Override
@@ -31,14 +36,16 @@ public class TestApplication extends Application implements ReactApplication {
         }
 
         @Override
-        protected List<ReactPackage> getPackages() {
-            List<ReactPackage> packages = new PackageList(this).getPackages();
+        protected List<com.facebook.react.ReactPackage> getPackages() {
+            List<com.facebook.react.ReactPackage> packages = new PackageList(this).getPackages();
+            packages.add(new org.pnplab.flux.surveytask.ReactPackage());
+            packages.add(new org.pnplab.flux.aware.ReactPackage());
+
             packages.add(new RNFSPackage());
             packages.add(new LottiePackage());
             packages.add(new RNFirebasePackage());
             packages.add(new RNFirebaseMessagingPackage());
             packages.add(new ReactVideoPackage());
-            packages.add(new AwareManagerPackage());
             packages.add(new LinearGradientPackage());
 
             packages.removeIf(pkg -> pkg.getClass().isInstance(BugsnagReactNative.getPackage().getClass()));
@@ -64,8 +71,17 @@ public class TestApplication extends Application implements ReactApplication {
                     // react-native x86_64 apk).
                     try {
                         MuseManagerAndroid.getInstance();
-                        // list.add(new MuseManagerPackage());
-                        packages.add(new MuseManagerPackage());
+
+                        // Add pkg.
+                        org.pnplab.flux.restingstatetask.ReactPackage pkg =
+                                new org.pnplab.flux
+                                        .restingstatetask
+                                        .ReactPackage(
+                                            permissionManager,
+                                            processPriorityPromoter
+                                        );
+
+                        packages.add(pkg);
                     }
                     catch (UnsatisfiedLinkError e) {
                         Log.e("Flux", "Couldn't link muse even if linking appears to be supported!.");
@@ -92,6 +108,8 @@ public class TestApplication extends Application implements ReactApplication {
         super.onCreate();
 
         // BugsnagReactNative.start(this);
+        permissionManager = new PermissionManager(this);
+        processPriorityPromoter = new ProcessPriorityPromoter(this);
 
         // SoLoader.init(this, /* native exopackage */ false);
 

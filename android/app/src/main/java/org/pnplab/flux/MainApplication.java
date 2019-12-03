@@ -8,7 +8,6 @@ import android.util.Log;
 import com.bugsnag.android.Configuration;
 import com.choosemuse.libmuse.MuseManagerAndroid;
 import com.facebook.react.ReactApplication;
-import net.mikehardy.rnupdateapk.RNUpdateAPKPackage;
 import com.bugsnag.BugsnagReactNative;
 import com.rnfs.RNFSPackage;
 import com.airbnb.android.react.lottie.LottiePackage;
@@ -20,7 +19,6 @@ import com.brentvatne.react.ReactVideoPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactNativeHost;
-import com.facebook.react.ReactPackage;
 import com.facebook.soloader.SoLoader;
 
 import org.pnplab.flux.utils.ProcessPriorityPromoter;
@@ -116,12 +114,13 @@ public class MainApplication extends Application implements ReactApplication {
             }
 
             @Override
-            protected List<ReactPackage> getPackages() {
+            protected List<com.facebook.react.ReactPackage> getPackages() {
                 @SuppressWarnings("UnnecessaryLocalVariable")
-                List<ReactPackage> packages = new PackageList(this).getPackages();
+                List<com.facebook.react.ReactPackage> packages = new PackageList(this).getPackages();
 
                 // Auto linking is not implemented for our own packages.
-                packages.add(new AwareManagerPackage());
+                packages.add(new org.pnplab.flux.surveytask.ReactPackage());
+                packages.add(new org.pnplab.flux.aware.ReactPackage());
 
                 // Auto linking seems not to be implemented for these
                 // dependencies.
@@ -221,7 +220,7 @@ public class MainApplication extends Application implements ReactApplication {
         }
     }
 
-    private <T extends ReactPackage> void addPackageIfNotAutoLinked(List<ReactPackage> packages, Class<T> addedPackageClass) {
+    private <T extends com.facebook.react.ReactPackage> void addPackageIfNotAutoLinked(List<com.facebook.react.ReactPackage> packages, Class<T> addedPackageClass) {
         // Check if the package has been auto linked.
         boolean hasPackage = false;
         for (Object pkgItem: packages) {
