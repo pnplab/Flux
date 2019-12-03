@@ -118,10 +118,12 @@ export async function triggerUpdateIfNeeded() {
     const fileAlreadyExists = await RNFS.exists(RNFS.CachesDirectoryPath + '/FluxUpgrade.apk');
     if (fileAlreadyExists) {
         try {
+            console.info('removing existing apk file.')
             await RNFS.unlink(RNFS.CachesDirectoryPath + '/FluxUpgrade.apk');
             BugReporter.breadcrumb('apk downloaded file unlink', 'log');
         }
         catch (e) {
+            console.error(e);
             BugReporter.notify('upgrade: unlink failed');
             BugReporter.breadcrumb('apk upgrade failure', 'log');
             return;
