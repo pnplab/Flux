@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.app.Application.ActivityLifecycleCallbacks;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.SparseArray;
 
 import androidx.annotation.NonNull;
@@ -140,10 +141,11 @@ public class PermissionManager implements IPermissionManager, AutoCloseable {
                 currentActivity.get().startListenerForwarding(pm);
             }
             else {
-                // Hmmm, might throws with dialog and stuff like that, maybe we will just want to x
-                // implemetation activities that doesn't implement PermissionManager instead of
-                // throwing.
-                throw new RuntimeException("Current activity doesn't implement PermissionManagerForwarder");
+                // We just want to bypass implemetation activities that doesn't
+                // implement PermissionManager instead of throwing. eg. it
+                // throws with aware's PermissionsHandler.
+                currentActivity = null;
+                Log.e("Flux", "Current activity doesn't implement PermissionManagerForwarder");
             }
         }
 
