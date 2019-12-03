@@ -57,7 +57,7 @@ if (typeof process.env.ANDROID_VERSION_CODE === 'undefined') {
 }
 
 module.exports = {
-    'branch': 'nuks/dev',
+    'branch': 'nuKs/dev',
     'repositoryUrl': 'https://github.com/pnplab/Flux.git',
     'plugins': [
         '@semantic-release/commit-analyzer',
