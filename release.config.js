@@ -4,8 +4,8 @@
 // Problem for multi-channel implementation:
 // - There is a mismatch between APK's inner versionName and released git tag
 //   because semantic-release tool is executed after android apk build. We
-//   bypass this issue by relying on CI_JOB_ID as androidCode but this wouldn't
-//   work for multichannel as an integer is single-dimension.
+//   bypass this issue by relying on CI_PIPELINE_ID as androidCode but this
+//   wouldn't work for multichannel as an integer is single-dimension.
 // - Semantic-release tool's stable version doesn't handle multi channel
 //   version (although perhaps hackable).
 //
@@ -14,7 +14,7 @@
 // 2. Check wifi is on.
 // 3. Last version.json downloaded from github.
 // 4. Comparison over current android versionCode (embedded inside used apk)
-//    and version.json versionCode. Both are set by [gitlab] CI_JOB_ID.
+//    and version.json versionCode. Both are set by [gitlab] CI_PIPELINE_ID.
 //    @warning ANDROID_VERSION_NAME mismatches with release tag version as it's
 //        defined before semantic-release process! We thus rely only on
 //        ANDROID_VERSION_CODE only for upgrade comparison instead.
@@ -23,7 +23,7 @@
 //
 // Build system concerns (for android version code comparison x version name):
 // 1. Android build is triggered through continuous-integration/gitlab-ci.yml
-//    w/ ANDROID_VERSION_CODE set from [gitlab] CI_JOB_ID and
+//    w/ ANDROID_VERSION_CODE set from [gitlab] CI_PIPELINE_ID and
 //    ANDROID_VERSION_NAME [gitlab] CI_COMMIT_REF_NAME.CI_COMMIT_SHORT_SHA
 //    embedded into APK w/ CI_COMMIT_REF_NAME being branch or tag.
 // 2. Once the build is done, user has the possibility to trigger a release.
@@ -81,7 +81,7 @@ module.exports = {
                     `echo '{
                         "versionName": "\${nextRelease.version}",
                         "versionCode": "${process.env.ANDROID_VERSION_CODE}",
-                        "forceUpdate": false,
+                        "forceUpdate": true,
                         "apkUrl": "https://github.com/pnplab/Flux/releases/download/v\${nextRelease.version}/Flux.apk"
                     }' > android/version.json`
             }

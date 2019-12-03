@@ -99,6 +99,7 @@ export async function triggerUpdateIfNeeded() {
     // Check forceUpdate.
     if (!forceUpdate) {
         console.info('remote forceUpdate is false. bypassing update.');
+        BugReporter.breadcrumb('app upgrade stop. forceUpgrade: false', 'log');
         return;
     }
 
@@ -118,6 +119,7 @@ export async function triggerUpdateIfNeeded() {
     if (fileAlreadyExists) {
         try {
             await RNFS.unlink(RNFS.CachesDirectoryPath + '/FluxUpgrade.apk');
+            BugReporter.breadcrumb('apk downloaded file unlink', 'log');
         }
         catch (e) {
             BugReporter.notify('upgrade: unlink failed');
@@ -143,8 +145,9 @@ export async function triggerUpdateIfNeeded() {
     // Download new apk.
     try {
         Alert.alert('Une mise à jour de Flux disponible.', 'Veuillez patienter quelques minutes. Une alerte va s\'afficher en cas de succès ou d\'erreur.');
-        BugReporter.breadcrumb('app upgrade download', 'log');
+        BugReporter.breadcrumb('app upgrade download started', 'log');
         await UpdateManager.downloadApk(apkUrl, RNFS.CachesDirectoryPath + '/FluxUpgrade.apk');
+        BugReporter.breadcrumb('app upgrade download finished', 'log');
     }
     catch (e) {
         // apk download failure.

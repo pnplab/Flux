@@ -140,7 +140,7 @@ build:android:
     variables: # env variables w/ non sensible data
         GRADLE_OUTPUT_PATH: android/app/build/outputs/apk/release/app-release.apk
         FLUX_AUTO_UPDATE: "false"
-        ANDROID_VERSION_CODE: ${CI_JOB_ID} # CI_JOB_ID is a number incr at every gitlab job.
+        ANDROID_VERSION_CODE: ${CI_PIPELINE_ID} # CI_PIPELINE_ID is a number incr at every gitlab pipeline run start.
         ANDROID_VERSION_NAME: "${CI_COMMIT_REF_NAME}.${CI_COMMIT_SHORT_SHA}" # branch|tag.commit
     artifacts:
         name: ${APK_FILE}
@@ -196,7 +196,7 @@ build:android:
 
 release:
     variables: # env variables w/ non sensible data
-        ANDROID_VERSION_CODE: ${CI_JOB_ID} # CI_JOB_ID is a number incr at every gitlab job.
+        ANDROID_VERSION_CODE: ${CI_PIPELINE_ID} # CI_PIPELINE_ID is a number incr at every pipeline run start.
         ANDROID_VERSION_NAME: "${CI_COMMIT_REF_NAME}.${CI_COMMIT_SHORT_SHA}" # branch|tag.commit
     stage: release
     # only:

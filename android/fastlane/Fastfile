@@ -77,7 +77,7 @@ platform :android do
     # https://docs.fastlane.tools/best-practices/continuous-integration/gitlab/#auto-incremented-build-number
     # ios only
     # lane :increment_build_number do
-    #     increment_build_number(build_number: ENV['CI_JOB_ID']) # versionName # versionCode
+    #     increment_build_number(build_number: ENV['CI_PIPELINE_ID']) # versionName # versionCode
     #     git_commit(path: ['./android/gradle.properties'], message: 'Bump versionCode')
     #     push_to_git_remote
     # end
