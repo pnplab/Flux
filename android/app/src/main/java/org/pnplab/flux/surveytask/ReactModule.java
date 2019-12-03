@@ -40,7 +40,7 @@ public class ReactModule extends ReactContextBaseJavaModule {
         // Generate random id for form.
         String formId = UUID.randomUUID().toString();
 
-        // We use long for timestamp as it's defined in milisecond (> 2^32),
+        // We use long for timestamp as it's defined in millisecond (> 2^32),
         // both in default javascript `new date().getTime()` result & in aware.
         // Following aware's convention is mandatory as it's used to verify in
         // syncing as not been done already. @ReactMethod's bridge doesn't
