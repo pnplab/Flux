@@ -20,6 +20,7 @@ type Props = {
     +onStartAwareBypassed: () => void
 };
 type State = {
+    +showLoadingAnimation: boolean,
     +showActivateAwareButton: boolean,
     +showFinishStepButton: boolean
 };
@@ -34,6 +35,7 @@ export default class CheckPhenotypingController extends PureComponent<Props, Sta
         super(props);
 
         this.state = {
+            showLoadingAnimation: false,
             showActivateAwareButton: true,
             showFinishStepButton: false
         };
@@ -44,6 +46,7 @@ export default class CheckPhenotypingController extends PureComponent<Props, Sta
         const hasStudyAlreadyBeenJoined = await AwareManager.hasStudyBeenJoined();
         if (hasStudyAlreadyBeenJoined) {
             this.setState({
+                showLoadingAnimation: false,
                 showActivateAwareButton: false,
                 showFinishStepButton: true
             });
@@ -53,10 +56,19 @@ export default class CheckPhenotypingController extends PureComponent<Props, Sta
     startAware = async () => {
         // Forward aware start logic to main controller.
         try {
+            // Hide activate aware button and show loading animation.
+            this.setState({
+                showLoadingAnimation: true,
+                showActivateAwareButton: false,
+                showFinishStepButton: false
+            });
+
+            // Start aware and wait for result.
             await this.props.onStartAwareClicked();
 
-            // Hide activate aware button and show next step button instead.
+            // Hide loading animation and show next step button instead.
             this.setState({
+                showLoadingAnimation: false,
                 showActivateAwareButton: false,
                 showFinishStepButton: true
             });
@@ -77,6 +89,7 @@ export default class CheckPhenotypingController extends PureComponent<Props, Sta
     render() {
         return (
             <CheckPhenotypingView
+                showLoadingAnimation={this.state.showLoadingAnimation}
                 showActivateAwareButton={this.state.showActivateAwareButton}
                 onActivateAware={this.startAware}
                 onActivateAwareLongPress={this.bypassAware}

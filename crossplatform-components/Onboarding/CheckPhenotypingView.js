@@ -32,6 +32,7 @@ import {
 const ANIMATION_SRC: string = require('./3165-loader.json');
 
 type Props = {
+    +showLoadingAnimation: boolean,
     +showActivateAwareButton: boolean,
     +onActivateAware: () => any,
     +onActivateAwareLongPress: () => void,
@@ -40,6 +41,7 @@ type Props = {
 };
 
 const CheckPhenotypingView = ({
+    showLoadingAnimation,
     showActivateAwareButton,
     onActivateAware,
     onActivateAwareLongPress,
@@ -53,8 +55,7 @@ const CheckPhenotypingView = ({
             </R3Header>
             <R3Content>
                 {
-                    !showActivateAwareButton &&
-                    !showFinishStepButton &&
+                    showLoadingAnimation &&
                         <LottieView
                             source={ANIMATION_SRC}
                             autoPlay
