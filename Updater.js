@@ -76,6 +76,20 @@ export async function triggerUpdateIfNeeded() {
 
     const { versionCode, versionName, forceUpdate, apkUrl } = releaseJson;
 
+    // Check json file formatting.
+    if (typeof versionCode !== 'number') {
+        throw new Error('version.json\'s versionCode should be a number.');
+    }
+    if (typeof versionName !== 'string') {
+        throw new Error('version.json\'s versionName should be a string.');
+    }
+    if (typeof forceUpdate !== 'boolean') {
+        throw new Error('version.json\'s forceUpdate should be a boolean.');
+    }
+    if (typeof apkUrl !== 'string') {
+        throw new Error('version.json\'s apkUrl should be a boolean.');
+    }
+
     // Compare latest release version code with current one.
     const currentApkInfo = UpdateManager.getCurrentApkInfo();
     const currentVersionCode = currentApkInfo.versionCode;
@@ -118,7 +132,7 @@ export async function triggerUpdateIfNeeded() {
     const fileAlreadyExists = await RNFS.exists(RNFS.CachesDirectoryPath + '/FluxUpgrade.apk');
     if (fileAlreadyExists) {
         try {
-            console.info('removing existing apk file.')
+            console.info('removing existing apk file.');
             await RNFS.unlink(RNFS.CachesDirectoryPath + '/FluxUpgrade.apk');
             BugReporter.breadcrumb('apk downloaded file unlink', 'log');
         }
