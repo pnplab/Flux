@@ -99,6 +99,10 @@ class AwareManager {
     }
 
     async joinStudy(studyUrl: string) {
+        if (typeof studyUrl !== 'string' || !studyUrl.includes('http')) {
+            throw new Error('studyUrl not set ! ' + studyUrl);
+        }
+
         await this._awareManager.joinStudy(studyUrl);
     }
 

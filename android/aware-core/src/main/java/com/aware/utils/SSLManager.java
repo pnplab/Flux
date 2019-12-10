@@ -59,6 +59,11 @@ public class SSLManager {
             e.printStackTrace();
         }
 
+        if (!protocol.equals("https")) {
+            Log.e("Flux", "Aware#SSLManager#handleUrl not HTTPS " + url + " trigger async exception");
+            // @todo return ?
+        }
+
         if (study_uri.getQuery() != null) {
             // If it is in URL parameters, always unconditionally handle it
             String crt = study_uri.getQueryParameter("crt");
@@ -110,6 +115,8 @@ public class SSLManager {
             this.url = URL;
             this.context = context;
 
+            Log.d("Flux", "Aware#CheckCertificates url: "+URL+" (must be https)");
+
             Uri study_uri = Uri.parse(url);
             this.hostname = study_uri.getHost();
 
@@ -117,12 +124,19 @@ public class SSLManager {
             try {
                 protocol = new URL(url).getProtocol();
             } catch (MalformedURLException e) {
+                Log.e("Flux", "Aware#CheckCertificates MalformedURLException");
                 e.printStackTrace();
             }
         }
 
         @Override
         protected Void doInBackground(X509Certificate... x509Certificate) {
+            if (!this.protocol.equals("https")) {
+                Log.e("Flux", "Aware#CheckCertificates PROTOCOL NOT HTTPS! " + this.url);
+                // @todo return ?
+                return null;
+            }
+
             try {
                 X509Certificate remote_certificate = retrieveRemoteCertificate(new URL(protocol+"://"+hostname));
                 if (!x509Certificate[0].equals(remote_certificate)) { //local certificate is expired or different, download new certificate
@@ -130,6 +144,12 @@ public class SSLManager {
                     //this will force download of SSL certificate from the server. Checked every 15 minutes until successful update to up-to-date certificate.
                 }
             } catch (MalformedURLException e) {
+                Log.e("Flux", "Aware#CheckCertificates doInBackground MalformedURLException");
+                e.printStackTrace();
+            } catch (RuntimeException e) {
+                // cf. https://stackoverflow.com/questions/11127578/java-lang-classcastexception-libcore-net-http-httpurlconnectionimpl-cannot-be-c
+                Log.e("Flux", "Aware#CheckCertificates doInBackground RuntimeException");
+                Log.e("Flux", "Aware#CheckCertificates probably bad cast from ");
                 e.printStackTrace();
             }
             return null;
@@ -173,6 +193,10 @@ public class SSLManager {
             // other exceptions are subclasses of IOException
             Log.d(Aware.TAG, "Certificates: " + ioe.getMessage());
             return null;
+        } catch (RuntimeException e) {
+            // cf. https://stackoverflow.com/questions/11127578/java-lang-classcastexception-libcore-net-http-httpurlconnectionimpl-cannot-be-c
+            Log.e(Aware.TAG, "Certificates: RuntimeException. probably bad URL -> HttpsURL cast.");
+            throw e;
         }
     }
 

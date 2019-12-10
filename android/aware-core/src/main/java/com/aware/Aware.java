@@ -1702,6 +1702,9 @@ public class Aware extends Service {
 
                 String request;
                 if (protocol.equals("https")) {
+                    // @warning triggers `java.lang.RuntimeException: An error occurred while executing doInBackground()`
+                    // `Caused by: java.lang.ClassCastException: com.android.okhttp.internal.huc.HttpURLConnection
+                    // `Impl cannot be cast to javax.net.ssl.HttpsURLConnection`
                     SSLManager.handleUrl(getApplicationContext(), full_url, true);
 
                     // Wait until we have the certificate downloaded.

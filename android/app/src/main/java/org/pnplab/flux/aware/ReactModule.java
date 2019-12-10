@@ -59,6 +59,9 @@ public class ReactModule extends ReactContextBaseJavaModule {
         else {
             // @warning doesn't tell if services are active.
             Context context = getReactApplicationContext().getApplicationContext();
+            // @warning seems to have false positive -- maybe due to corrupt db
+            // (by looking at code, there is unchecked error use-cases) ?
+            // unlikely though.
             boolean hasStudyBeenJoined = Aware.isStudy(context);
             promise.resolve(hasStudyBeenJoined);
         }
@@ -104,6 +107,9 @@ public class ReactModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void joinStudy(String studyUrl, Promise promise) {
         Context context = getReactApplicationContext().getApplicationContext();
+
+        // @warning promise is never rejected in case of failure as aware
+        // doesn't have propper callback mechanism.
 
         // Resolve promise once study has been joined.
         BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
