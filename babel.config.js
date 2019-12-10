@@ -1,16 +1,4 @@
 module.exports = {
-    // plugins: [
-    //     [
-    //         // @note seems not to be working!
-    //         //     "@babel/core": "7.3.3",
-            
-    //         "@babel/plugin-proposal-class-properties",
-    //         {
-    //             loose: true
-    //         }
-            
-    //     ]
-    // ],
     presets: [
         // "@babel/preset-flow", // @note not sure it's doing anything. everything works without (except flow logs are not shown). / ! Not set in default react-native config !
         'module:metro-react-native-babel-preset'
@@ -53,6 +41,48 @@ module.exports = {
                     'SENTRY_DSN'
                 ]
             }
+        ],
+
+        // Uses babel-plugin-inline-import to be able to embedd svg files as
+        // text in react-native-svg.
+        // cf. https://github.com/react-native-community/react-native-svg/tree/29dd8a43dff0d6ebfb96d3266f679120062b7dbf#use-with-svg-files
+        //
+        // Tried react-native-svg-uri-reborn first with something like
+        // <SVG width="100" height="100" source={require('./undraw_Security_on_ff2u.svg')} />
+        //
+        // However, [ANDROID] There is a problem with static SVG file on
+        // Android, Works OK in debug mode but fails to load the file in
+        // release mode. At the moment the only workaround is to pass the svg
+        // content in the svgXmlData prop.
+        // cf. https://github.com/MrDatastorage/react-native-svg-uri-reborn#readme
+        //
+        // Although these issues are from the forked repo (not the new one),
+        // svg files with class perhaps don't work (undraw doesn't rely on classes).
+        // cf. https://github.com/vault-development/react-native-svg-uri/issues/98
+        // svg files with opacity don't seem to work (undraw rely on opacity).
+        // cf. https://github.com/vault-development/react-native-svg-uri/issues/107
+        //
+        // Also, didn't allow rescaling for instance with KeyboardAvoidingView
+        // use cases.
+        //
+        // Tried to embed svg in a font using https://glyphter.com/, however
+        // it only accept grayscale fonts.
+        //
+        // Only way left is https://github.com/react-native-community/react-native-svg/
+        // with modification to build system.
+        //
+        // Found underhood https://github.com/smooth-code/svgr in the meanwhile.
+        // cf. https://github.com/react-native-community/react-native-svg/issues/900#issuecomment-472079313
+        // Didn't work, needed preprocess https://jakearchibald.github.io/svgomg/
+        // cf. https://github.com/react-native-community/react-native-svg/issues/1084#issuecomment-527150671
+        // Didn't work either, indeed svgr converts to react (not react-native)
+        // code and thus uses HTML svg code instead of react-native-svg one.
+        [
+            'babel-plugin-inline-import',
+            {
+                'extensions': ['.svg']
+            }
         ]
+
     ]
 };
