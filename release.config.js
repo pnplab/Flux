@@ -81,7 +81,7 @@ module.exports = {
                     `echo '{
                         "versionName": "\${nextRelease.version}",
                         "versionCode": ${process.env.ANDROID_VERSION_CODE},
-                        "forceUpdate": true,
+                        "forceUpdate": false,
                         "apkUrl": "https://github.com/pnplab/Flux/releases/download/v\${nextRelease.version}/Flux.apk"
                     }' > android/version.json`
             }
