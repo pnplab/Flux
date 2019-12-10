@@ -58,7 +58,7 @@ export default class HomeController extends PureComponent<Props, State> {
     _intervalId = null;
 
     componentDidMount() {
-        // Refresh the screen every second (only if needed) in case the current
+        // Refresh the screen every second (only on change) in case the current
         // time changes thus making the underlying policy output change (ie.
         // the home screen no longer suggest a survey task because the user is
         // no longer inside the allowed schedule to participate to the task).

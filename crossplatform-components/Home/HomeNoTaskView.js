@@ -7,7 +7,7 @@ import { View } from 'react-native';
 
 import styled from 'styled-components';
 
-import { Text } from '../../crossplatform-theme/pnplab-components';
+import { Text } from '../../crossplatform-theme';
 
 type Props = {
 
@@ -16,8 +16,10 @@ type Props = {
 const HomeNoTaskView = (props: Props) =>
     <ViewWrapper accessibilityLabel="home-notask">
         <TextWrapper>
-            <Text>Le test n'est pas disponible pour le moment.</Text>
-            <Text>Revenez entre 18 et 22h.</Text>
+            <Text>
+                Le test n'est pas disponible pour le moment.
+                Revenez entre 18 et 22h.
+            </Text>
         </TextWrapper>
     </ViewWrapper>;
 
