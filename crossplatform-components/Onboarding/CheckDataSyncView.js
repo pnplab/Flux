@@ -7,7 +7,7 @@ import { View, Text, ScrollView } from 'react-native';
 
 import styled from 'styled-components';
 
-import { Container, Content, Title, Button, Form, Item, Label, Input, CircleButton, R3Container, R3Header, R3Content, R3Footer, CheckList, CLItem, CLIHeader, CLIHcurrentStep, CLIHTitle, CLIContent } from '../../crossplatform-theme';
+import { TextButton, Container, Content, Title, Button, Form, Item, Label, Input, CircleButton, R3Container, R3Header, R3Content, R3Footer, CheckList, CLItem, CLIHeader, CLIHcurrentStep, CLIHTitle, CLIContent } from '../../crossplatform-theme';
 
 type Props = {
     +syncStatus: {
@@ -28,14 +28,14 @@ const CheckDataSyncView = ({ syncStatus, currentStep, onSyncData, onNextClicked,
     <Container accessibilityLabel="check_data_sync">
         <R3Container>
             <R3Header>
-                <Title>Vérification de la synchronisation!</Title>
+                <Title>Synchronisation</Title>
             </R3Header>
             <R3Content>
                 <ScrollView>
                     {
                         Object
                             .keys(syncStatus)
-                            .map(table => 
+                            .map(table =>
                                 <View key={table} style={{marginBottom: 15}}>
                                     <Text accessibilityLabel={`${table}Status`}>
                                         {table}: {syncStatus[table].status}
@@ -66,11 +66,11 @@ const CheckDataSyncView = ({ syncStatus, currentStep, onSyncData, onNextClicked,
             <R3Footer>
                 {
                     currentStep === 'TEXT' &&
-                    <CircleButton type="validate" color="blue" onPress={onSyncData} onLongPress={onBypassTask} accessibilityLabel="check_data_sync-sync" />
+                    <TextButton icon="ok" color="blue" onPress={onSyncData} onLongPress={onBypassTask} accessibilityLabel="check_data_sync-sync" />
                 }
                 {
                     (currentStep === 'SYNC_ONGOING' || currentStep === 'SYNC_DONE') &&
-                    <CircleButton type="next" color="green" onPress={onNextClicked} accessibilityLabel="check_data_sync-next" />
+                    <TextButton icon="next" color="green" onPress={onNextClicked} accessibilityLabel="check_data_sync-next" />
                 }
             </R3Footer>
         </R3Container>

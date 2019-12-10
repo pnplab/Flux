@@ -60,6 +60,17 @@
     -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
+    <!-- digital phenotyping
+    This is required to bypass android service limitations in order for
+    - the tracking to be able to start back at phone reboot.
+    - the tracking to occur when the phone is sleeping.
+    @warning google play refuses programmatically setting this except for
+       specific use cases clinical uses aren't part of. thus this only works
+       outside of google play.
+       cf. https://developer.android.com/training/monitoring-device-state/doze-standby
+    -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
     <!--
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>

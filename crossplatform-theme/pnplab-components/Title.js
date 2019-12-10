@@ -4,8 +4,8 @@
  */
 
 import React from 'react';
-import { View } from "react-native";
-import { Text } from "native-base";
+import { View, Text } from 'react-native';
+import styled from 'styled-components';
 
 type Props = {
     +childlen?: React.Node,
@@ -13,11 +13,30 @@ type Props = {
     +props: Array<any>,
 };
 
+const StyledText = styled(Text)`
+        color: ${props => props.color || '#333'};
+        font-family: Oxygen-Medium;
+        font-size: 30;
+        text-align: center;
+        /* text-transform: lowercase; */
+        width: 100%;
+    `;
+
 const Title_ = ({children, style={}, ...props}: Props) => (
     <View>
-        <Text {...props} style={{ color: props.color || '#444', fontFamily: 'Roboto', fontWeight: '500', textAlign: 'center', ...style }}>
-            {children}
-        </Text>
+        <View style={{ flexDirection: 'row' }}>
+            {/*
+            <View style={{ paddingTop: 5, paddingRight: 20, justifyContent: 'center' }}>
+                <Text>•</Text>
+            </View>
+            */}
+            <StyledText>{children}</StyledText>
+            {/*
+            <View style={{ paddingTop: 5, paddingLeft: 20, justifyContent: 'center' }}>
+                <Text>•</Text>
+            </View>
+            */}
+        </View>
     </View>
 );
 

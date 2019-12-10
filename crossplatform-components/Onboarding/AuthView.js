@@ -3,11 +3,14 @@
  */
 
 import React from 'react';
-import { View } from 'react-native';
+import { View, Image } from 'react-native';
 
 import styled from 'styled-components';
 
-import { Container, Content, Title, Text, Form, Item, Label, Input, CircleButton } from '../../crossplatform-theme';
+import { Container, Content, Title, Text, Form, Item, Label, Input, TextButton, R2Container, R2Header, R2Footer, R2Spacer, R3Container, R3Separator, R3Header, R3Content, R3Footer } from '../../crossplatform-theme';
+
+import { SvgXml } from 'react-native-svg';
+import svgFile from './undraw_Security_on_ff2u.svg'; // @note require instead of import doesn't work because it bypasses babel raw string import extension.
 
 type Props = {
     +error?: string,
@@ -19,60 +22,63 @@ type Props = {
 };
 
 const AuthView = (props: Props) =>
-    <Container accessibilityLabel="auth">
-        {/* @note native-base `Content` replaces KeyboardAvoidingView! */}
-        <EnableCenteredContent>
-            <Title>Flux</Title>
-            {/*
-            <StretchedView>
-                <Text>Entrez le mot de passe.</Text>
-                <Text>qui vous a été fourni.</Text>
-            </StretchedView>
-            */}
+    <R2Container accessibilityLabel="auth">
+        <R2Header>
+            <SvgXml width="100%" height="100%" xml={svgFile} />
+        </R2Header>
+        <R2Footer padding>
+            <R2Spacer onKeyboardActive/>
             <InputView>
-                <Form>
-                    <Item floatingLabel>
-                        <Label>numéro d'identification</Label>
+                <Form style={{width: '100%'}}>
+                    <Item floatingLabel style={{ marginTop: 0, marginBottom: 0, marginLeft: 0, marginRight: 0 }}>
+                        <Label style={{color: '#777', fontFamily: 'Oxygen-Light', fontSize: 14}}>numéro d'identification</Label>
                         <Input value={props.deviceId} onChangeText={deviceId => props.onDeviceIdChanged(deviceId)} accessibilityLabel="auth-deviceid" />
                     </Item>
-                    <Item floatingLabel>
-                        <Label>code d'accès</Label>
+                    <Item floatingLabel style={{ marginTop: 5, marginBottom: 0, marginLeft: 0, marginRight: 0 }}>
+                        <Label style={{color: '#777', fontFamily: 'Oxygen-Light', fontSize: 14}}>code d'accès</Label>
                         <Input value={props.password} onChangeText={password => props.onPasswordChanged(password)} onSubmitEditing={e => props.onSubmit()} accessibilityLabel="auth-password" />
                     </Item>
                 </Form>
+                {
+                    props.error &&
+                    <ErrorView>
+                        <Text color="red">{props.error}</Text>
+                    </ErrorView>
+                }
             </InputView>
-            {props.error &&
-                <ErrorView>
-                    <Text color="red" style={{ position: 'absolute', textAlign: 'center', width: '100%' }}>{props.error}</Text>
-                </ErrorView>
-            }
+            <R2Spacer />
             <ButtonView>
-                <CircleButton type="next" onPress={e => props.onSubmit()} accessibilityLabel="auth-submit" />
+                <TextButton icon="next" onPress={e => props.onSubmit()} accessibilityLabel="auth-submit">authentification</TextButton>
             </ButtonView>
-        </EnableCenteredContent>
-    </Container>;
+            <R2Spacer/>
+        </R2Footer>
+    </R2Container>;
 
 // Main view, padded & centered.
 const InputView = styled(View)`
-        flex: 2;
+        /*
+        flex-direction: column;
         justify-content: center;
+        */
         width: 100%;
-        padding-left: 64px;
-        padding-right: 64px;
-        min-height: 100px;
-    `;
-
-// Button's view, 70% button width.
-const ButtonView = styled(View)`
-        align-items: center;
-        width: 100%;
+        /* ensure a minimum space for error messages. */
     `;
 
 // Error's view, with negative margin bottom so it doesn't adds up spaces.
 const ErrorView = styled(View)`
-        flex: 0;
-        position: relative;
-        bottom: 45px;
+        flex-direction: row;
+        justify-content: center;
+        width: 100%;
+
+        margin-top: 5%;
+        margin-left: -19%;
+        width: 138%;
+    `;
+
+// Button's view, 70% button width.
+const ButtonView = styled(View)`
+        flex-direction: row;
+        justify-content: center;
     `;
 
 // Grayscale gradient.
@@ -97,19 +103,5 @@ const ErrorView = styled(View)`
 //         justify-content: space-between;
 //         align-items: center;
 //     `;
-
-// Style container to allow content to be centered.
-// @note See contentContainerStyle here `https://github.com/GeekyAnts/NativeBase/issues/1336`
-const EnableCenteredContent = styled(Content)
-    .attrs({
-        contentContainerStyle: {
-            flexGrow: 1,
-            justifyContent: 'space-around'
-        }
-    })`
-        flex: 1;
-        padding-top: 45px;
-        padding-bottom: 60px;
-    `;
 
 export default AuthView;

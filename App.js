@@ -26,8 +26,11 @@ import {
     Onboarding,
     Auth,
     CheckWifi,
-    CheckPermissions,
-    CheckPhenotyping,
+    RequestPermissionsNotice,
+    RequestPermissions,
+    RequestBypassDozePrivilege,
+    RequestsConfirmation,
+    DataCollection,
     SurveyTaskOnboarding,
     RestingStateTaskOnboarding,
     CheckDataSync,
@@ -211,9 +214,9 @@ export default (): React$Node =>
                                 BugReporter.setDeviceId(awareDeviceId);
 
                                 // Set study values temporarily so they can be
-                                // used to start aware in CheckPhenotyping
-                                // step and then stored locally in
-                                // OnboardingEnd step.
+                                // used to start aware in DataCollection step
+                                // and then stored locally in OnboardingEnd
+                                // step.
                                 setStudyModality(studyModality);
                                 setAwareDeviceId(awareDeviceId);
                                 setAwareStudyUrl(awareStudyUrl);
@@ -263,21 +266,57 @@ export default (): React$Node =>
                         onStepFinished={
                             () => {
                                 // Go to next onboarding step.
-                                goToStep(CheckPermissions);
+                                goToStep(RequestPermissionsNotice);
                             }
                         }
                     />
 
-                    <CheckPermissions
+                    <RequestPermissionsNotice
                         onStepFinished={
                             () => {
                                 // Go to next onboarding step.
-                                goToStep(CheckPhenotyping);
+                                goToStep(RequestPermissions);
                             }
                         }
                     />
 
-                    <CheckPhenotyping
+                    <RequestPermissions
+                        onStepFinished={
+                            () => {
+                                // Go to next onboarding step.
+                                goToStep(RequestBypassDozePrivilege);
+                            }
+                        }
+                    />
+
+                    <RequestBypassDozePrivilege
+                        onStepFinished={
+                            () => {
+                                // Go to next onboarding step.
+                                goToStep(RequestsConfirmation);
+                            }
+                        }
+                        onBypassRequest={
+                            () => {
+                                // Go to next onboarding step in case of bypass
+                                // (could be useful if cellphone happens to be
+                                // incompatible with the android feature due to
+                                // non-standard android fork).
+                                goToStep(RequestsConfirmation);
+                            }
+                        }
+                    />
+
+                    <RequestsConfirmation
+                        onStepFinished={
+                            () => {
+                                // Go to next onboarding step.
+                                goToStep(DataCollection);
+                            }
+                        }
+                    />
+
+                    <DataCollection
                         onStartAwareClicked={
                             async () => {
                                 // Start aware.

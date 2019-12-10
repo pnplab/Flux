@@ -89,7 +89,7 @@ export default class OnboardingController extends Component<Props, State> {
         // Wrap shown component inside `onboarding` accessibilityLabel just for
         // the sake of being able to test onboarding presence.
         const wrappedShownComponent =
-            <View accessibilityLabel="onboarding">
+            <View accessibilityLabel="onboarding" style={{flex: 1}}>
                 {shownComponent}
             </View>;
 

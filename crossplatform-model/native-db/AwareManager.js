@@ -257,6 +257,26 @@ class AwareManager {
     disableMandatoryBatteryForSync() {
         this._awareManager.disableMandatoryBatteryForSync();
     }
+
+    // Checks if current package is not affected by Volte, Doze.This only
+    // works for Android OS native battery savings, not custom ones(e.g., Sony
+    // Stamina, etc). (cf. Aware source code).
+    //
+    // @warning due to android limitation, promise is resolved once the intent
+    //     request has been triggered, thus the promise will *always* resolve
+    //     too soon, before the privilege has been granted!
+    isBatteryOptimisationIgnored = async (): Promise<boolean> => {
+        return await this._awareManager.isBatteryOptimisationIgnored();
+    }
+
+    // This is required to bypass android service limitations in order for
+    // - the tracking to be able to start back at phone reboot.
+    // - the tracking to occur when the phone is sleeping.
+    // @warning use permission not allowed for published Google Play app.
+    //     Would require to launch settings instead if published to G. Play.
+    ignoreBatteryOptimisation = async (): Promise<void> => {
+        return await this._awareManager.ignoreBatteryOptimisation();
+    }
 }
 
 const awareManager = new AwareManager();

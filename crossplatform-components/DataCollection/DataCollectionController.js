@@ -11,7 +11,7 @@
 import React, { PureComponent } from 'react';
 
 import AwareManager from '../../crossplatform-model/native-db/AwareManager';
-import CheckPhenotypingView from './CheckPhenotypingView';
+import DataCollectionView from './DataCollectionView';
 
 // Configure types.
 type Props = {
@@ -26,10 +26,10 @@ type State = {
 };
 
 // Configure component logic.
-export default class CheckPhenotypingController extends PureComponent<Props, State> {
+export default class DataCollectionController extends PureComponent<Props, State> {
 
     // Set displayName for debug and bugreport navigation tracing.
-    static displayName = 'CheckPhenotyping';
+    static displayName = 'DataCollection';
 
     constructor(props: Props) {
         super(props);
@@ -43,6 +43,9 @@ export default class CheckPhenotypingController extends PureComponent<Props, Sta
 
     async componentDidMount() {
         // If aware study has already been joined, skip activation step.
+        // @warning @todo seems not to be working (at least in debug). was
+        // perhaps due to connexion issue - could trigger false negative in
+        // this case. -- confirmed.
         const hasStudyAlreadyBeenJoined = await AwareManager.hasStudyBeenJoined();
         if (hasStudyAlreadyBeenJoined) {
             this.setState({
@@ -88,7 +91,7 @@ export default class CheckPhenotypingController extends PureComponent<Props, Sta
 
     render() {
         return (
-            <CheckPhenotypingView
+            <DataCollectionView
                 showLoadingAnimation={this.state.showLoadingAnimation}
                 showActivateAwareButton={this.state.showActivateAwareButton}
                 onActivateAware={this.startAware}

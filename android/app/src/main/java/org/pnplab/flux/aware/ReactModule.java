@@ -1,10 +1,17 @@
 package org.pnplab.flux.aware;
 
 import android.annotation.SuppressLint;
+import android.app.Application;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
+import android.os.Build;
+import android.os.PowerManager;
+import android.provider.Settings;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.aware.Applications;
@@ -184,6 +191,172 @@ public class ReactModule extends ReactContextBaseJavaModule {
         Context context = getReactApplicationContext().getApplicationContext();
 
         Aware.setSetting(context, Aware_Preferences.WEBSERVICE_CHARGING, "false");
+    }
+
+    /**
+     * Checks if current package is not affected by Volte, Doze. This only
+     * works for Android OS native battery savings, not custom ones (e.g., Sony
+     * Stamina, etc). (cf. Aware source code).
+     */
+    @ReactMethod
+    public void isBatteryOptimisationIgnored(Promise promise) {
+        Context context = getReactApplicationContext().getApplicationContext();
+
+        // Ignored by default on old android versions (didn't exist at the
+        // time).
+        boolean isBatteryOptimisationIgnored = true;
+        // Check on new android version.
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
+            PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+            // @todo set app package name dynamically in case of change.
+            isBatteryOptimisationIgnored = pm.isIgnoringBatteryOptimizations("org.pnplab.flux");
+        }
+
+        promise.resolve(isBatteryOptimisationIgnored);
+    }
+
+    /**
+     * This is required to bypass android service limitations in order for
+     * - the tracking to be able to start back at phone reboot.
+     * - the tracking to occur when the phone is sleeping.
+     *
+     * @pre Check if needed with isBatteryOptimisationIgnored.
+     *
+     * @warning due to android limitation, promise is resolved once the intent
+     *     request has been triggered, thus the promise will *always* resolve
+     *     too soon, before the privilege has been granted!
+     */
+    @ReactMethod
+    public void ignoreBatteryOptimisation(Promise promise) {
+        Context context = getReactApplicationContext().getApplicationContext();
+
+        // Since we do not know how to retrieve feedback result from
+        // intent-triggered setting change. We can't reliably know whether the
+        // request is in-treatment or has been rejected except through polling
+        // with timeout. It's thus required to allow user to do multiple
+        // request before result even though it's unclean.
+        //
+        // // Check if battery optimisation is already ignored (for safety only,
+        // // should have already been checked before this method call).
+        //
+        // // For old android versions, true by default.
+        // boolean isBatteryOptimisationIgnored = true;
+        //
+        // // Check for more recent android version.
+        // if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
+        //     PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        //     // @todo set app package name dynamically in case of change.
+        //     isBatteryOptimisationIgnored = pm.isIgnoringBatteryOptimizations("org.pnplab.flux");
+        // }
+        //
+        // // Log error if doze is actually already ignored.
+        // if (isBatteryOptimisationIgnored) {
+        //     Log.e("Flux", "attempt to ignore already ignored android battery optimisations.");
+        //     promise.reject("attempt to ignore already ignored android battery optimisations.");
+        //     return;
+        // }
+
+        // @warning google play refuses programmatically setting this except
+        //    for specific use cases clinical uses aren't part of. thus this
+        //    only works outside of google play. It is possible to launch the
+        //    settings dynamically though but requires complex multi-step
+        //    interaction (activate "disabling" sub setting in a list, select
+        //    the app through all phone apps list, open specific app setting,
+        //    disable optimisation, accept the popup authorization request and
+        //    go back to app using phone's navigation button a few times). Code
+        //    is available in aware source.
+        //    cf. https://stackoverflow.com/questions/31154128/set-specific-app-to-ignore-optimization-by-code-in-android-m
+        //    cf. https://developer.android.com/training/monitoring-device-state/doze-standby
+        Log.w("Flux", "Doze optimization disabling is not allowed if app is pushed through google play.");
+
+        try {
+            // Trigger battery optimisation ignore request.
+            Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+            // @todo set app package name dynamically in case of change.
+            intent.setData(Uri.parse("package:org.pnplab.flux"));
+            context.startActivity(intent);
+
+            // Resolve promise once done.
+            // @warning This should not work as intent is triggered and
+            //     executed by android OS asynchronously. We should poll for
+            //     change instead.
+            promise.resolve(null);
+        } catch (ActivityNotFoundException e) {
+            // Reject promise in case of failure.
+            promise.reject("failed to request battery optimizations.");
+
+            // Log issue.
+            Log.e("Flux", "failed to request battery optimizations.");
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     *  @warning this checks for Applications class (the aware accessibility
+     *      service) only.
+     */
+    @ReactMethod
+    public void isAccessibilityServiceEnabled(Promise promise) {
+        Context context = getReactApplicationContext().getApplicationContext();
+
+        // Check global accessibility system is enabled.
+        int globalAccessibilitySystemEnabled = 0;
+        try {
+            // Check global accessibility system is enabled.
+            globalAccessibilitySystemEnabled = Settings.Secure.getInt(context.getContentResolver(), android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
+        } catch (Settings.SettingNotFoundException e) {
+            // Accessibility system not found.
+            Log.e("Flux", "Error finding accessibility setting, default accessibility to not found: " + e.getMessage());
+        }
+
+        // Check our own accessibility service is enabled if global system is
+        // enabled.
+        boolean isAccessibilityServiceEnabled = false;
+        if (globalAccessibilitySystemEnabled == 0) {
+            // ...global accessibility system is disabled.
+            // keep isAccessibilityServiceEnabled to false.
+        }
+        else if (globalAccessibilitySystemEnabled == 1) {
+            // @warning this checks for Applications class (the aware
+            //     accessibility service) only.
+            final String accessibilityService = context.getPackageName() + "/" + Applications.class.getCanonicalName();
+            TextUtils.SimpleStringSplitter mStringColonSplitter = new TextUtils.SimpleStringSplitter(':');
+
+            String settingValue = Settings.Secure.getString(context.getApplicationContext().getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+            if (settingValue != null) {
+                mStringColonSplitter.setString(settingValue);
+                // Compare all accessibility service names with our.
+                while (mStringColonSplitter.hasNext()) {
+                    String currentAccessibilityService = mStringColonSplitter.next();
+
+                    if (currentAccessibilityService.equalsIgnoreCase(accessibilityService)) {
+                        // Our accessibility service is enabled!
+                        isAccessibilityServiceEnabled = true;
+
+                        // ...no need to check further through.
+                        // Break the loop.
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Return the result.
+        promise.resolve(isAccessibilityServiceEnabled);
+
+    }
+    @ReactMethod
+    public void openSystemAccessibilitySettings() {
+        Context context = getReactApplicationContext().getApplicationContext();
+
+        // ...there is no way to dynamically set accessibility setting (except
+        // for system app, which must be preinstalled android rom apps).
+        // cf. https://stackoverflow.com/questions/10061154/how-to-programmatically-enable-disable-accessibility-service-in-android
+
+        // Open accessibility settings.
+        Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP); // keep new activity in same navigation history so user can go back easily.
+        context.startActivity(intent);
     }
 
     // Forward aware sync event updates to javascript.
