@@ -11,7 +11,7 @@ import { Text, Icon } from 'native-base';
 type Props = {
     +children: string,
     +onPress: () => void,
-    +icon: 'next' | 'ok',
+    +icon: 'prev' | 'next' | 'ok',
     +disabled ?: boolean,
     +color ?: 'blue' | 'green',
     +onLongPress ?: () => void,
@@ -36,10 +36,10 @@ const StyledTouchableOpacity = styled(TouchableOpacity)`
 `;
 
 const StyledText = styled(Text)`
-    /* compensate alignment for icon size */
-    marginLeft: 32;
+    /* compensate alignment for icon size + set standard 10 px margin */
+    marginLeft: ${props => props.compensateRightIcon ? 32 : 10};
+    marginRight: ${props => props.compensateLeftIcon ? 32 : 10};
 
-    marginRight: 10;
     /*
     without uppercase
 
@@ -70,11 +70,28 @@ const StyledIcon = styled(Icon)`
 /* eslint-enable indent */
 
 // Components
-const TextButton = ({ children, onPress, icon, color = undefined, disabled = false, onLongPress = undefined, delayLongPress = undefined, accessibilityLabel = undefined }: Props) => (
+const TextButton = ({
+    children,
+    onPress,
+    icon,
+    color = undefined,
+    disabled = false,
+    onLongPress = undefined,
+    delayLongPress = undefined,
+    accessibilityLabel = undefined
+}: Props) => (
     <StyledTouchableOpacity disabled={disabled} color={color} onPress={onPress} onLongPress={onLongPress} delayLongPress={delayLongPress} accessibilityLabel={accessibilityLabel}>
         {
+            icon === 'prev' &&
+            <StyledIcon
+                disabled={disabled}
+                type="Entypo"
+                name="chevron-small-left"
+            />
+        }
+        {
             typeof children !== 'undefined' &&
-                <StyledText>
+                <StyledText disabled={disabled} compensateLeftIcon={icon === 'prev'} compensateRightIcon={icon !== 'prev'}>
                     {children}
                 </StyledText>
         }
