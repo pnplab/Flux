@@ -65,9 +65,10 @@ public class MuseDataRecorder {
     public void stopRecording() {
         assert _museDataCircularBuffer != null;
         
-        // Stop recording data and unpromote the app from background state once the circular buffer
-        // processing is done.
-        // @warning this method is executed from another thread. Content must be threadsafe.
+        // Stop recording data and unpromote the app from background state once
+        // the circular buffer processing is done.
+        // @warning this method is executed from another thread. Content must
+        //     be threadsafe.
         _museDataCircularBuffer.stopDeviceDataRecording(_backgroundStatePromoter::unpromoteProcessFromBackgroundState);
         _museDataCircularBuffer = null;
     }

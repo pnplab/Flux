@@ -49,12 +49,19 @@ public class VideoScreen {
     }
 
     public void onVideoStreamFinished() {
+        // Stop (and store) recording.
         _museDataRecorder.stopRecording();
+
+        // Disconnect device.
+        _museDeviceManager.disconnectDevice();
 
         // ... Video view control flow is handled through JS.
     }
 
     public void onVideoLoadingError() {
+        // Disconnect device.
+        _museDeviceManager.disconnectDevice();
+
         // ... Video error control flow is handled through JS.
     }
 

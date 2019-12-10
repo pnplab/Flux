@@ -86,7 +86,7 @@ public class MuseDataCircularBuffer {
 
         // Stop the consumer thread. This method calls Thread#Interrupt. Note that Thread#interrupt actually does not interrupt the
         // thread but rather set an interrupted flag to on that some methods might use to throw
-        // an InterruptionException if they wish to. In our implemetation, consumer thread will
+        // an InterruptionException if they wish to. In our implementation, consumer thread will
         // continue running until circular buffer is empty. That should happen soon enough (max
         // 30sec with the current CIRCULAR_BUFFER_SIZE settings).
         _cbDataConsumer.stopSafely(onDataProcessingFinishedCallback);
@@ -96,7 +96,7 @@ public class MuseDataCircularBuffer {
         // Clean up circular buffer to free up some memory.
         _circularBuffer = null;
 
-        // ... recording as stopped, but consumer thread is probably still running for a short
+        // ... recording has stopped, but consumer thread is probably still running for a short
         // while. It will stop soon enough, and GC will only then be able to free _circularBuffer
         // memory.
     }
