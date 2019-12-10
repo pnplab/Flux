@@ -133,14 +133,9 @@ const CardTitle = styled(Text)
         adjustsFontSizeToFit: true,
         numberOfLines: 4
     })`
-        font-size: 15;
-        text-align: center;
-        
-        /* for some reason padding alone doesn't work inside styled-components.. */
-        padding-left: 10;
-        padding-right: 10;
-        
-        color: #222;
+        color: #333;
+        line-height: 16;
+        marginTop: 4;
     `;
 
 const NoticeCard = () => 
@@ -161,9 +156,9 @@ const NoticeCardIconWrapper = styled(View)`
 
 const NoticeCardIcon = styled(Icon).attrs(
     {
-        fontSize: 35
     })`
-        margin-top: 15px;
+        color: #333;
+        fontSize: 35;
     `;
 
 const QuestionCard = ({ value, onSlidingCompleted, onValueChanged, item, isOdd, showError }) =>
@@ -174,11 +169,11 @@ const QuestionCard = ({ value, onSlidingCompleted, onValueChanged, item, isOdd, 
         backgroundColor: isOdd ? 'transparent' : '#EFEFEF',
         padding: 15,
         paddingTop: 10,
-        paddingBottom: 10,
+        paddingBottom: 5,
         borderLeftWidth: showError ? 5 : 0,
         borderColor: 'red'
     }}>
-        <Text style={{textAlign: 'left', fontSize: 13, color: '#333'}}>{item.text}</Text>
+        <Text style={{textAlign: 'left', fontSize: 13, lineHeight: 16, color: '#333'}}>{item.text}</Text>
         <Slider
             value={value}
             onSlidingComplete={v => onSlidingCompleted(item.id, v)}
