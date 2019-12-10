@@ -35,7 +35,7 @@
 // Semantic-release (for flexible/multi-channel git tag/release publishment):
 // Multi-channel release development have been developed in semantic-release
 // since v16 alpha. *There is no final release yet and the documentation is
-// conflicting.*
+// conflicting.
 // cf. 2 years old draft: https://github.com/semantic-release/evolution/blob/release-workflows/_drafts/release-workflows.md#single-release-branch
 // cf. To-date issue: https://github.com/semantic-release/semantic-release/issues/563
 //
