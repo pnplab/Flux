@@ -22,30 +22,35 @@ const RestingStateTaskPreparationView = (props: Props) =>
     <Container accessibilityLabel="restingstatetask_preparation">
         <R3Container>
             <R3Header>
-                <Title>Veuillez allumer votre Muse. La connexion s'effectuera automatiquement.</Title>
+                <Title>Connection</Title>
             </R3Header>
             <R3Content>
-                <StatusWrapper>
-                    <NoticeWrapper>
-                        <Text>
-                            {
-                                {
-                                    UNDEFINED: 'En attente du status bluetooth...',
-                                    BLUETOOTH_DISABLED: 'Veuillez activer bluetooth.',
-                                    MUSE_DISCONNECTED: 'Muse déconnecté !',
-                                    MUSE_CONNECTING: 'Muse en connexion...',
-                                    MUSE_CONNECTED: 'Muse connecté !',
-                                }[props.state]
-                            }
-                        </Text>
-                    </NoticeWrapper>
+                <View style={{ alignItems: 'center', flexGrow: 1, flexShrink: 0 }}>
+                    <Text>
+                        Veuillez allumer votre Muse. La connexion s'effectuera automatiquement.
+                    </Text>
+                </View>
+                <View style={{ alignItems: 'center', flexGrow: 5, flexShrink: 1 }}>
                     <LottieView
-                        style={{ width: '100%', maxHeight: 250 }}
+                        style={{marginTop: -15}}
                         source={require('./2856-dotted-loader.json')}
                         autoPlay
                         loop
                     />
-                </StatusWrapper>
+                </View>
+                <View style={{ alignItems: 'center', flexGrow: 1, flexShrink: 0 }}>
+                    <Text>
+                        {
+                            {
+                                UNDEFINED: 'En attente du status bluetooth...',
+                                BLUETOOTH_DISABLED: 'Veuillez activer bluetooth.',
+                                MUSE_DISCONNECTED: 'Muse déconnecté !',
+                                MUSE_CONNECTING: 'Muse en connexion...',
+                                MUSE_CONNECTED: 'Muse connecté !',
+                            }[props.state]
+                        }
+                    </Text>
+                </View>
             </R3Content>
             <R3Footer>
                 <ButtonBox>

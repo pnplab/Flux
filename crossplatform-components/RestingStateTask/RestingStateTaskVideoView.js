@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { View, StatusBar } from 'react-native';
-import { Container, Content } from '../../crossplatform-theme';
+import { Container } from '../../crossplatform-theme';
 
 import styled from 'styled-components';
 import Video from 'react-native-video';
