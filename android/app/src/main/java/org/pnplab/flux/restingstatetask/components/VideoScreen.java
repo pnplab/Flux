@@ -45,7 +45,7 @@ public class VideoScreen {
         String awareDeviceId = Aware.getSetting(_context, Aware_Preferences.DEVICE_ID);
         _museDataRecorder.startRecording(awareDeviceId, museDevice);
 
-        // ... Video view control flow is handled through JS.
+        // ...video view control flow is handled through JS.
     }
 
     public void onVideoStreamFinished() {
@@ -53,16 +53,20 @@ public class VideoScreen {
         _museDataRecorder.stopRecording();
 
         // Disconnect device.
+        // @note it doesn't shut it down though. muse doesn't provide any API
+        //     to do so.
         _museDeviceManager.disconnectDevice();
 
-        // ... Video view control flow is handled through JS.
+        // ...video view control flow is handled through JS.
     }
 
     public void onVideoLoadingError() {
         // Disconnect device.
+        // @note it doesn't shut it down though. muse doesn't provide any API
+        //     to do so.
         _museDeviceManager.disconnectDevice();
 
-        // ... Video error control flow is handled through JS.
+        // ...video error control flow is handled through JS.
     }
 
 }
