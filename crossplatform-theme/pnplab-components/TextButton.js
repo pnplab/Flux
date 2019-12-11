@@ -66,6 +66,12 @@ const StyledIcon = styled(Icon)`
         props.color === 'blue' ? colors.blue :
         colors.default
     };
+
+    /* Add padding, user had issues clicking on icon-only buttons. */
+    paddingTop: 15;
+    paddingRight: 15;
+    paddingBottom: 15;
+    paddingLeft: 15;
 `;
 /* eslint-enable indent */
 
@@ -80,7 +86,16 @@ const TextButton = ({
     delayLongPress = undefined,
     accessibilityLabel = undefined
 }: Props) => (
-    <StyledTouchableOpacity disabled={disabled} color={color} onPress={onPress} onLongPress={onLongPress} delayLongPress={delayLongPress} accessibilityLabel={accessibilityLabel}>
+    <StyledTouchableOpacity
+        accessibilityLabel={accessibilityLabel}
+
+        color={color}
+        disabled={disabled}
+
+        onPress={onPress}
+        onLongPress={onLongPress}
+        delayLongPress={delayLongPress}
+    >
         {
             icon === 'prev' &&
             <StyledIcon

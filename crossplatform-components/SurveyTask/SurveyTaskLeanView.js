@@ -12,7 +12,7 @@ import memoize from 'memoize-one';
 import type { Question } from '../../crossplatform-model/immutable-db/QuestionType';
 
 import styled from 'styled-components';
-import { Text, Button, Icon } from '../../crossplatform-theme/pnplab-components';
+import { Text, TextButton, Icon } from '../../crossplatform-theme';
 import Slider from 'react-native-slider';
 
 // import Card from './SurveyTaskLeanCardView';
@@ -166,7 +166,7 @@ const QuestionCard = ({ value, onSlidingCompleted, onValueChanged, item, isOdd, 
         flex: 1,
         alignItems: 'flex-start',
         justifyContent: 'flex-start',
-        backgroundColor: isOdd ? 'transparent' : '#EFEFEF',
+        backgroundColor: isOdd ? 'transparent' : '#F4F4F4',
         padding: 15,
         paddingTop: 10,
         paddingBottom: 5,
@@ -181,14 +181,14 @@ const QuestionCard = ({ value, onSlidingCompleted, onValueChanged, item, isOdd, 
 
             style={{width: '100%', height: 60, marginTop: -10, marginBottom: -10}}
             trackStyle={sliderIosStyle.track}
-            thumbStyle={sliderIosStyle.thumb}
+            thumbStyle={{...sliderIosStyle.thumb, height: 16, width: 16}}
             minimumTrackTintColor="#1073ff"
             maximumTrackTintColor="#b7b7b7"
 
             thumbTouchSize={{width: 60, height: 60}}
         />
         {/* <Slider value={typeof this.state.questionValues[item.id] === 'undefined' ? 0.5 : this.state.questionValues[item.id]} style={{flex: 1, transform: [{ scaleX: 3 }, { scaleY: 3 }], marginLeft: '30%', marginRight: '30%'}} onSlidingComplete={this.onSlidingCompleted} /> --> */}
-        <View style={{width: '100%', flexDirection: 'row', backgroundColor: 'transparent', justifyContent: 'space-between', marginTop: -15, zIndex: -1}}>
+        <View style={{width: '100%', flexDirection: 'row', backgroundColor: 'transparent', justifyContent: 'space-between', marginTop: -20, zIndex: -1}}>
             <Text style={{fontVariant: ['small-caps'], fontSize: 11, color: '#333'}}>{item.guideline.left}</Text>
             <Text style={{fontVariant: ['small-caps'], fontSize: 11, color: '#333'}}>{item.guideline.right}</Text>
         </View>
@@ -196,10 +196,8 @@ const QuestionCard = ({ value, onSlidingCompleted, onValueChanged, item, isOdd, 
 
 const SubmitCard = ({ onSubmit, hasError }) =>
     // @todo icon="checkmark-circle"
-    <Card style={{paddingLeft: '20%', paddingRight: '20%', paddingTop: 20, paddingBottom: 30}}>
-        <Button onPress={onSubmit} disabled={hasError}>
-            VALIDER
-        </Button>
+    <Card style={{ paddingTop: 20, paddingBottom: 30, alignItems: 'center' }}>
+        <TextButton icon="ok" onPress={onSubmit} disabled={hasError}>valider</TextButton>
     </Card>;
 
 
