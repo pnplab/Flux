@@ -272,8 +272,16 @@ public class ReactModule extends ReactContextBaseJavaModule {
         try {
             // Trigger battery optimisation ignore request.
             Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+
+            // Set package to which ignore doze.
             // @todo set app package name dynamically in case of change.
             intent.setData(Uri.parse("package:org.pnplab.flux"));
+
+            // Fixes `Calling startActivity() from outside of an Activity
+            // context requires the FLAG_ACTIVITY_NEW_TASK flag.` on Android 9+.
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+            // Toggle permission request popup.
             context.startActivity(intent);
 
             // Resolve promise once done.
@@ -355,7 +363,14 @@ public class ReactModule extends ReactContextBaseJavaModule {
 
         // Open accessibility settings.
         Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP); // keep new activity in same navigation history so user can go back easily.
+
+        // Fixes `Calling startActivity() from outside of an Activity context
+        // requires the FLAG_ACTIVITY_NEW_TASK flag.` on Android 9+.
+        // FLAG_ACTIVITY_CLEAR_TOP keeps new activity in same navigation
+        // history so user can go back easily.
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        // Toggle accessibility system settings.
         context.startActivity(intent);
     }
 
