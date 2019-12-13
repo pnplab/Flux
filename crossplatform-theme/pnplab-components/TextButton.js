@@ -33,12 +33,22 @@ const StyledTouchableOpacity = styled(TouchableOpacity)`
     flex-direction: row;
     padding: 5px;
     align-items: center;
+    justify-content: center;
+
+    /*
+    Add min dimensions, user had issues clicking on icon-only buttons because
+    too small. using 15-px padding led to positionment issues for side-by-side
+    buttons. thus we use min-height/width while making sure we don't outcenter
+    content.
+    */
+    min-height: 40;
+    min-width: 60;
 `;
 
 const StyledText = styled(Text)`
     /* compensate alignment for icon size + set standard 10 px margin */
-    marginLeft: ${props => props.compensateRightIcon ? 32 : 10};
-    marginRight: ${props => props.compensateLeftIcon ? 32 : 10};
+    marginLeft: ${props => props.compensateRightIcon ? 32 : 16};
+    marginRight: ${props => props.compensateLeftIcon ? 32 : 16};
 
     /*
     without uppercase
@@ -66,12 +76,6 @@ const StyledIcon = styled(Icon)`
         props.color === 'blue' ? colors.blue :
         colors.default
     };
-
-    /* Add padding, user had issues clicking on icon-only buttons. */
-    paddingTop: 15;
-    paddingRight: 15;
-    paddingBottom: 15;
-    paddingLeft: 15;
 `;
 /* eslint-enable indent */
 
