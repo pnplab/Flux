@@ -1865,7 +1865,6 @@ public class Aware extends Service {
                                 String package_name = "com.aware.phone";
                                 if (getApplicationContext().getResources().getBoolean(R.bool.standalone)) package_name = getApplicationContext().getPackageName();
 
-
                                 // @pnplab injected code part !
                                 // @warning !!! dirty code !!!
                                 // @todo allow server to change these values!
