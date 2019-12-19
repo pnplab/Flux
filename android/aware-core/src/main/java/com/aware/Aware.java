@@ -1876,8 +1876,17 @@ public class Aware extends Service {
                                 ) {
                                     sensor_config.put("value", false);
                                 }
-                                // /@pnplab
 
+                                // Replace server-value webservice_server by
+                                // device-value study url. Indeed, server value
+                                // has returned non-https url during
+                                // development, leading to CheckCertificates
+                                // crash due to HTTPS object instance bad
+                                // cast - instead of HTTP object instance cast.
+                                if (sensor_config.getString("setting").equals("webservice_server")) {
+                                    sensor_config.put("value", full_url);
+                                }
+                                // /@pnplab
 
                                 Aware.setSetting(getApplicationContext(), sensor_config.getString("setting"), sensor_config.get("value"), package_name);
                             } catch (JSONException e) {
