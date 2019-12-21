@@ -112,6 +112,9 @@ public class ReactModule extends ReactContextBaseJavaModule {
     public void joinStudy(String studyUrl, Promise promise) {
         Context context = getReactApplicationContext().getApplicationContext();
 
+        // @warning @todo check out for this potential race condition
+        //     https://github.com/denzilferreira/aware-client/commit/9debeaa4475fd80ccafc09ffc58634d686fa6aa0
+
         // @warning promise is never rejected in case of failure as aware
         // doesn't have propper callback mechanism.
 

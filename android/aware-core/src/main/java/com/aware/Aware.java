@@ -1868,7 +1868,13 @@ public class Aware extends Service {
                                 // @pnplab injected code part !
                                 // @warning !!! dirty code !!!
                                 // @todo allow server to change these values!
-                                // Overrides server-side result to force webservice, esm & mqtt disabling.
+                                // Overrides server-side result to force
+                                // webservice, esm & mqtt disabling on study
+                                // join. Note that webserver will be brought
+                                // back later during onboarding's late check
+                                // data synchronization step so we don't upload
+                                // data before we test sync, as we need
+                                // unuploaded data for this step.
                                 if (
                                         sensor_config.getString("setting").equals("status_webservice") ||
                                                 sensor_config.getString("setting").equals("status_esm") ||
@@ -1884,6 +1890,7 @@ public class Aware extends Service {
                                 // crash due to HTTPS object instance bad
                                 // cast - instead of HTTP object instance cast.
                                 if (sensor_config.getString("setting").equals("webservice_server")) {
+                                    Log.i("Flux", "Converting " + sensor_config.getString("value") + " to " + full_url);
                                     sensor_config.put("value", full_url);
                                 }
                                 // /@pnplab
