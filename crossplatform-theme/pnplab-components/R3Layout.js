@@ -38,8 +38,8 @@ const R3Content = styled(View)`
         flex-shrink: 0;
 
         /* wrap text content if it sticks to the border */
-        margin-left: 7.225%;
-        margin-right: 7.225%;
+        margin-left: ${props => props.nomargin ? '0' : '7.225%'};
+        margin-right: ${props => props.nomargin ? '0' : '7.225%'};
     `;
 
 const R3SeparatorWrapper = styled(View)`

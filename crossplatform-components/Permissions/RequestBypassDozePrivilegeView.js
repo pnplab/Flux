@@ -50,21 +50,20 @@ const CheckPermissionsView = ({
         </R3Content>
         <R3Footer>
             {
-                onRequestPermission &&
                 /* @warning accessibilityLabel of both Submit & Request button have to get the same name or
                     integration testing doesn't work for some reason (didn't investigate).
                     @warning the above comment/rule is broken - should check if appium tests still works. */
-                <TextButton
-                    accessibilityLabel="checkpermissions-doze-request"
-                    
-                    icon="ok"
-                    color="blue"
-
-                    onPress={onRequestPermission}
-                    onLongPress={onBypassRequest}
-                    delayLongPress={7000}
-                />
             }
+            <TextButton
+                accessibilityLabel="checkpermissions-doze-request"
+
+                icon="ok"
+                color="blue"
+
+                onPress={onRequestPermission}
+                onLongPress={onBypassRequest}
+                delayLongPress={7000}
+            />
         </R3Footer>
     </R3Container>;
 

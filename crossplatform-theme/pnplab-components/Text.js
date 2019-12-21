@@ -9,14 +9,14 @@ import { Text } from "native-base";
 import styled from 'styled-components';
 
 type Props = {
-    +childlen?: React.Node,
+    +children?: React.Node,
     +italic?: boolean,
     +justify?: boolean, // @warning justify only works on iOS.
     +left?: boolean
 };
 
 const Text_ = ({children, italic = false, justify = false, left = undefined, ...props}: Props) => (
-    <View>
+    <View {...props}>
         <Text__ italic={italic} justify={justify} left={left} {...props}>
             {children}
         </Text__>

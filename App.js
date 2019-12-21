@@ -29,6 +29,7 @@ import {
     RequestPermissionsNotice,
     RequestPermissions,
     RequestBypassDozePrivilege,
+    RequestAccessibilityPrivilege,
     RequestsConfirmation,
     DataCollection,
     SurveyTaskOnboarding,
@@ -293,7 +294,7 @@ export default (): React$Node =>
                         onStepFinished={
                             () => {
                                 // Go to next onboarding step.
-                                goToStep(RequestsConfirmation);
+                                goToStep(RequestAccessibilityPrivilege);
                             }
                         }
                         onBypassRequest={
@@ -302,6 +303,15 @@ export default (): React$Node =>
                                 // (could be useful if cellphone happens to be
                                 // incompatible with the android feature due to
                                 // non-standard android fork).
+                                goToStep(RequestAccessibilityPrivilege);
+                            }
+                        }
+                    />
+
+                    <RequestAccessibilityPrivilege
+                        onStepFinished={
+                            () => {
+                                // Go to next onboarding step.
                                 goToStep(RequestsConfirmation);
                             }
                         }

@@ -11,7 +11,7 @@ class AwareManager {
     _awareManager = NativeModules.AwareManager;
 
     // @note AwareManager is used from adapter (for now) @todo refactor
-    
+
     constructor() {
 
     }
@@ -276,6 +276,18 @@ class AwareManager {
     //     Would require to launch settings instead if published to G. Play.
     ignoreBatteryOptimisation = async (): Promise<void> => {
         return await this._awareManager.ignoreBatteryOptimisation();
+    }
+
+    isAccessibilityServiceEnabled = async (): Promise<boolean> => {
+        return await this._awareManager.isAccessibilityServiceEnabled();
+    }
+
+    openSystemAccessibilitySettings = (): void => {
+        return this._awareManager.openSystemAccessibilitySettings();
+    }
+
+    displayFluxAppBack = (): void => {
+        return this._awareManager.displayFluxAppBack();
     }
 }
 

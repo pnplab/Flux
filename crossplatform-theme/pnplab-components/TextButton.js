@@ -11,7 +11,7 @@ import { Text, Icon } from 'native-base';
 type Props = {
     +children: string,
     +onPress: () => void,
-    +icon: 'prev' | 'next' | 'ok',
+    +icon: 'prev' | 'next' | 'next-out' | 'ok',
     +disabled ?: boolean,
     +color ?: 'blue' | 'green',
     +onLongPress ?: () => void,
@@ -120,6 +120,12 @@ const TextButton = ({
                 disabled={disabled}
                 type="Entypo"
                 name="chevron-small-right"
+            /> ||
+            icon === 'next-out' &&
+            <StyledIcon
+                disabled={disabled}
+                type="Ionicons"
+                name="md-log-in"
             /> ||
             icon === 'ok' &&
             <StyledIcon

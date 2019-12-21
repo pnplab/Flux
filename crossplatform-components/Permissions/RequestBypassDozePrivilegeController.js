@@ -1,4 +1,4 @@
-/*
+/**
  * @flow
  *
  * Checks if current package is not affected by Volte, Doze. This only
@@ -102,7 +102,6 @@ export default class RequestBypassDozePrivilege extends PureComponent<Props, Sta
         catch (e) {
             // Log error.
             console.error(e);
-            BugReporter.notify(e);
             BugReporter.notify(e);
 
             // Display error to the user. Ignore error if we find out

@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.PowerManager;
@@ -88,10 +89,6 @@ public class ReactModule extends ReactContextBaseJavaModule {
             Intent aware = new Intent(context, Aware.class);
             context.startService(aware);
         }
-
-        // Ask user to enable accessibility service and ignore battery optimisation.
-        Applications.isAccessibilityServiceActive(context);
-        Aware.isBatteryOptimizationIgnored(context, context.getPackageName());
 
         // @warning AWARE device_id is random UUID which makes it untraceable. We need to specify a
         //     static device_id. We use manually mapped participant id.
@@ -371,6 +368,27 @@ public class ReactModule extends ReactContextBaseJavaModule {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         // Toggle accessibility system settings.
+        context.startActivity(intent);
+    }
+
+    @ReactMethod
+    public void displayFluxAppBack() {
+        Context context = getReactApplicationContext().getApplicationContext();
+        PackageManager packageManager = context.getPackageManager();
+
+        // Open flux back.
+        Intent intent = packageManager.getLaunchIntentForPackage("org.pnplab.flux");
+
+        // Fixes `Calling startActivity() from outside of an Activity context
+        // requires the FLAG_ACTIVITY_NEW_TASK flag.` on Android 9+.
+        // FLAG_ACTIVITY_CLEAR_TOP keeps new activity in same navigation
+        // history so user can go back easily.
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        // Add launcher category.
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+
+        // Toggle back flux.
         context.startActivity(intent);
     }
 
