@@ -13,6 +13,9 @@
 -dontnote okio.**
 -dontnote com.facebook.react.**
 
+# Keep hermes javascript engine
+-keep class com.facebook.hermes.unicode.** { *; }
+
 -keep,includedescriptorclasses class com.BV.LinearGradient.LinearGradientManager { *; }
 -keep,includedescriptorclasses class com.ramotion.fluidslider.FluidSlider { *; }
 -keep,includedescriptorclasses class com.react.rnspinkit.RNSpinkit { *; }

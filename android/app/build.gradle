@@ -77,9 +77,20 @@ import com.android.build.OutputFile
 
 project.ext.react = [
     entryFile: "index.js",
+    // Enabling Hermes javascript engine drastically reduces app launch time,
+    // which has appeared to be a problem on some old phones patient we have
+    // use.
+    // cf. http://blog.nparashuram.com/2019/07/facebook-announced-hermes-new.html
+    //
+    // @warning crashes app due to realmjs cf.
+    //     https://github.com/realm/realm-js/issues/2455
+    //     and https://github.com/realm/realm-js/issues/2516
+    //     fix is not expected to be written before 2020 as realmjs is
+    //     highly coupled to js engine.
     // @warning rn-firebase is said to be incompatible. cf. https://rnfirebase.io/docs/v5.x.x/getting-started#Supported-versions---React-Native-/-Firebase
     // @warning google play aab release (instead of apk) crashes. cf. https://github.com/facebook/react-native/issues/25927
-    enableHermes: false,  // clean and rebuild if changing
+    // @warning clean and rebuild if changing
+    enableHermes: false
 ]
 
 apply from: "../../node_modules/react-native/react.gradle"
