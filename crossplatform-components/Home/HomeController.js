@@ -13,7 +13,6 @@ import { View } from 'react-native';
 import DailyTasksPolicy from './DailyTasksPolicy';
 import WeeklyTasksPolicy from './WeeklyTasksPolicy';
 
-import Layout from '../Layout';
 import HomeNoTaskView from './HomeNoTaskView';
 import HomeSurveyTaskView from './HomeSurveyTaskView';
 import HomeRestingStateTaskView from './HomeRestingStateTaskView';
@@ -94,10 +93,8 @@ export default class HomeController extends PureComponent<Props, State> {
         }
 
         return (
-            <View accessibilityLabel="home">
-                <Layout menuComponent={this.props.menuComponent}>
-                    {innerView}
-                </Layout>
+            <View accessibilityLabel="home" style={{ flex: 1 }}>
+                {innerView}
             </View>
         );
     }

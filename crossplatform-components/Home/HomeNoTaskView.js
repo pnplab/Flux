@@ -7,35 +7,32 @@ import { View } from 'react-native';
 
 import styled from 'styled-components';
 
-import { Text } from '../../crossplatform-theme';
+import { R2Container, R2Header, R2Footer, R2Spacer, Title, Text } from '../../crossplatform-theme';
+
+import { SvgXml } from 'react-native-svg';
+import svgFile from './undraw_secure_data_0rwp.svg'; // @note require instead of import doesn't work because it bypasses babel raw string import extension.
 
 type Props = {
 
 };
 
 const HomeNoTaskView = (props: Props) =>
-    <ViewWrapper accessibilityLabel="home-notask">
-        <TextWrapper>
+    <R2Container accessibilityLabel="home-notask">
+        <R2Header>
+            <SvgXml width="100%" height="100%" xml={svgFile} />
+        </R2Header>
+        <R2Footer>
+            <Title>
+                Flux
+            </Title>
+            <R2Spacer />
             <Text>
-                Le test n'est pas disponible pour le moment.
-                Revenez entre 18 et 22h.
+                Les tâches ne sont actuellement pas disponibles. Elles seront accessible à partir de 18h, jusqu'à 22h.
             </Text>
-        </TextWrapper>
-    </ViewWrapper>;
+            <R2Spacer />
+            <R2Spacer />
+        </R2Footer>
+    </R2Container>;
 
-// Center position wrapper.
-const ViewWrapper = styled(View)`
-    position: relative;
-    flex: 1;
-    justifyContent: center;
-    alignItems: center;
-`;
-
-// Wrapper to position the text relatively to the main linear gradient view.
-const TextWrapper = styled(View)`
-    position: absolute;
-    width: 100%;
-    top: 100px;
-`;
 
 export default HomeNoTaskView;
