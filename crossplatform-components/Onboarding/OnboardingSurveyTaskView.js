@@ -34,7 +34,7 @@ const OnboardingSurveyTaskView = ({ onStartTaskClicked, onStepBypassed }: Props)
             </Text>
         </R3Content>
         <R3Footer>
-            <TextButton icon="next" color="green" onPress={onStartTaskClicked} onLongPress={onStepBypassed} delayLongPress={7000} accessibilityLabel="onboarding_surveytask-start_task" />
+            <TextButton icon="next" color="green" onPress={onStartTaskClicked} onLongPress={onStepBypassed} delayLongPress={5000} accessibilityLabel="onboarding_surveytask-start_task" />
         </R3Footer>
     </R3Container>;
 

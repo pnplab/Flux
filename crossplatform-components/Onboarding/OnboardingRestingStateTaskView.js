@@ -33,7 +33,7 @@ const OnboardingRestingStateTaskView = ({ onStartTask, onBypassTask }: Props) =>
             </Text>
         </R3Content>
         <R3Footer>
-            <TextButton icon="next" color="green" onPress={onStartTask} onLongPress={onBypassTask} delayLongPress={7000} accessibilityLabel="onboarding_restingstatetask-start_task" />
+            <TextButton icon="next" color="green" onPress={onStartTask} onLongPress={onBypassTask} delayLongPress={5000} accessibilityLabel="onboarding_restingstatetask-start_task" />
         </R3Footer>
     </R3Container>;
 
