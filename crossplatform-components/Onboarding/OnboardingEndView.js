@@ -3,25 +3,39 @@
  */
 
 import React from 'react';
-import { View, Text } from 'react-native';
 
-import styled from 'styled-components';
-
-import { TextButton, Container, Content, Title, Button, Form, Item, Label, Input, CircleButton, R3Container, R3Header, R3Content, R3Footer, CheckList, CLItem, CLIHeader, CLIHStatus, CLIHTitle, CLIContent } from '../../crossplatform-theme';
+import {
+    R3Container,
+    R3Header,
+    R3Content,
+    R3Footer,
+    Title,
+    Text,
+    TextButton
+} from '../../crossplatform-theme';
 
 type Props = {
 
 };
 
-const OnboardingEndView = ({ onSubmit }: Props) => 
+const OnboardingEndView = ({ onSubmit }: Props) =>
     <R3Container accessibilityLabel="onboarding_end">
         <R3Header>
-            <Title>Fin</Title>
+            <Title>Fin du processus</Title>
         </R3Header>
         <R3Content>
+            <Text>
+                Le processus d'initialisation de l'application est terminé.
+                Afficher l'écran d'accueil de l'application en continuant.
+                Cet écran s'affichera dès à présent au démarrage
+                de l'application. Il vous permettra de réaliser les tâches
+                durant des périodes imparties.
+            </Text>
         </R3Content>
         <R3Footer>
-            <TextButton icon="ok" color="blue" onPress={onSubmit} accessibilityLabel="onboarding_end-next" />
+            <TextButton icon="next" color="blue" onPress={onSubmit} accessibilityLabel="onboarding_end-next">
+                Écran d'accueil
+            </TextButton>
         </R3Footer>
     </R3Container>;
 
