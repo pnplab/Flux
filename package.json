@@ -30,6 +30,7 @@
     "device:quit": "adb -d shell am force-stop org.pnplab.flux",
     "device:debugport": "adb -d forward tcp:8562 tcp:8562 && nc -v 127.0.0.1 8562",
     "device:hidekeyboard": "adb -d shell input keyevent 111",
+    "device:pullaccelerometerdb": "adb -d pull /sdcard/Android/data/org.pnplab.flux/files/AWARE/accelerometer.db",
     "backend": "source dev.env && cd backend && (docker-compose down; docker-compose up --build) && cd ..",
     "backend:ngrok": "ngrok http 8888",
     "emulator": "$(which emulator) -avd \"$($(which emulator) -list-avds | tail -1)\"",
