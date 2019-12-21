@@ -5,8 +5,6 @@
 import React from 'react';
 import { Image, View } from 'react-native';
 
-import styled from 'styled-components';
-
 import {
     R3Container,
     R3Header,
