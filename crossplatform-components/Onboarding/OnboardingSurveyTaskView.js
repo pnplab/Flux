@@ -3,11 +3,18 @@
  */
 
 import React from 'react';
-import { View, Text } from 'react-native';
 
 import styled from 'styled-components';
 
-import { TextButton, Container, Content, Title, Button, Form, Item, Label, Input, CircleButton, R3Container, R3Header, R3Content, R3Footer, CheckList, CLItem, CLIHeader, CLIHStatus, CLIHTitle, CLIContent } from '../../crossplatform-theme';
+import {
+    R3Container,
+    R3Header,
+    R3Content,
+    R3Footer,
+    Text,
+    TextButton,
+    Title
+} from '../../crossplatform-theme';
 
 type Props = {
     +onStartTaskClicked: () => void,
@@ -15,18 +22,20 @@ type Props = {
 };
 
 const OnboardingSurveyTaskView = ({ onStartTaskClicked, onStepBypassed }: Props) => 
-    <Container accessibilityLabel="onboarding_surveytask">
-        <R3Container>
-            <R3Header>
-                <Title>Questionnaire</Title>
-            </R3Header>
-            <R3Content>
-                <Text></Text>
-            </R3Content>
-            <R3Footer>
-                <TextButton icon="next" color="green" onPress={onStartTaskClicked} onLongPress={onStepBypassed} delayLongPress={7000} accessibilityLabel="onboarding_surveytask-start_task" />
-            </R3Footer>
-        </R3Container>
-    </Container>;
+    <R3Container accessibilityLabel="onboarding_surveytask">
+        <R3Header>
+            <Title>Questionnaire</Title>
+        </R3Header>
+        <R3Content>
+            <Text>
+                La prochaine étape vous permet d'expérimenter avec le
+                questionnaire que vous compléterez lorsque vous utiliserez
+                l'application durant les heures des tâches est visualisable.
+            </Text>
+        </R3Content>
+        <R3Footer>
+            <TextButton icon="next" color="green" onPress={onStartTaskClicked} onLongPress={onStepBypassed} delayLongPress={7000} accessibilityLabel="onboarding_surveytask-start_task" />
+        </R3Footer>
+    </R3Container>;
 
 export default OnboardingSurveyTaskView;
