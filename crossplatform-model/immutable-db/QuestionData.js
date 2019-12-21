@@ -8,7 +8,7 @@ export default List([
     {
         // cat: `Qualité de vie`,
         label: `Qualité vie`,
-        text: `aujourd'hui, comment décrivez-vous votre qualité de vie ?`,
+        text: `Aujourd'hui, comment décrivez-vous votre qualité de vie ?`,
         guideline: {
             left: `très négatif`,
             right: `très positif`
@@ -18,7 +18,7 @@ export default List([
     {
         // cat: `Fonctionnement (cognition)`,
         label: `Concentration`,
-        text: `aujourd'hui, avez-vous eu des problèmes de mémoire ou de concentration ?`,
+        text: `Aujourd'hui, avez-vous eu des problèmes de mémoire ou de concentration ?`,
         guideline: {
             left: `pas du tout`,
             right: `énormément`
@@ -28,7 +28,7 @@ export default List([
     {
         // cat: `Fonctionnement (soins)`,
         label: `Hygiène`,
-        text: `aujourd'hui, vous êtes-vous occupé de votre hygiène personnelle ?`,
+        text: `Aujourd'hui, vous êtes-vous occupé de votre hygiène personnelle ?`,
         guideline: {
             left: `pas du tout`,
             right: `énormément`
@@ -38,7 +38,7 @@ export default List([
     {
         // cat: `Fonctionnement (mobilité)`,
         label: `Marche`,
-        text: `aujourd'hui, avez-vous marché hors de votre domicile ?`,
+        text: `Aujourd'hui, avez-vous marché hors de votre domicile ?`,
         guideline: {
             left: `pas du tout`,
             right: `énormément`
@@ -48,7 +48,7 @@ export default List([
     {
         // cat: `Fonctionnement (activités occupationnelles)`,
         label: `Ménage`,
-        text: `aujourd'hui, vous êtes-vous occupé de vos responsabilités ménagères ?`,
+        text: `Aujourd'hui, vous êtes-vous occupé de vos responsabilités ménagères ?`,
         guideline: {
             left: `pas du tout`,
             right: `énormément`
@@ -58,7 +58,7 @@ export default List([
     {
         // cat: `Fonctionnement (social)`,
         label: `Social`,
-        text: `aujourd'hui, avez-vous interagi avec des personnes que vous ne connaissez pas ?`,
+        text: `Aujourd'hui, avez-vous interagi avec des personnes que vous ne connaissez pas ?`,
         guideline: {
             left: `pas du tout`,
             right: `énormément`
@@ -68,7 +68,7 @@ export default List([
     {
         // cat: `Psychose (hallucinations)`,
         label: `Voix/visions`,
-        text: `aujourd'hui, avez-vous entendu des voix ou vu des personnes ou des choses que les autres ne peuvent pas entendre ou voir ?`,
+        text: `Aujourd'hui, avez-vous entendu des voix ou vu des personnes ou des choses que les autres ne peuvent pas entendre ou voir ?`,
         guideline: {
             left: `pas du tout`,
             right: `énormément`
@@ -78,7 +78,7 @@ export default List([
     {
         // cat: `Psychose (grandiosité)`,
         label: `Pouvoirs`,
-        text: `aujourd'hui, avez-vous eu l'impression d'avoir des pouvoirs spéciaux que les autres n'ont pas ?`,
+        text: `Aujourd'hui, avez-vous eu l'impression d'avoir des pouvoirs spéciaux que les autres n'ont pas ?`,
         guideline: {
             left: `pas du tout`,
             right: `énormément`
@@ -88,7 +88,7 @@ export default List([
     {
         // cat: `Psychose (paranoia)`,
         label: `Autres nuisent`,
-        text: `aujourd'hui, avez-vous eu l'impression que des gens ont cherché volontairement à vous nuire ?`,
+        text: `Aujourd'hui, avez-vous eu l'impression que des gens ont cherché volontairement à vous nuire ?`,
         guideline: {
             left: `pas du tout`,
             right: `énormément`
@@ -98,7 +98,7 @@ export default List([
     {
         // cat: `Psychose (référence)`,
         label: `Autres parlent`,
-        text: `aujourd'hui, avez-vous eu l'impression que les gens parlaient de vous ou qu'ils vous regardaient ?`,
+        text: `Aujourd'hui, avez-vous eu l'impression que les gens parlaient de vous ou qu'ils vous regardaient ?`,
         guideline: {
             left: `pas du tout`,
             right: `énormément`
@@ -108,7 +108,7 @@ export default List([
     {
         // cat: `Psychose (diffusion pensée)`,
         label: `Pensées autres`,
-        text: `aujourd'hui, avez-vous eu l'impression que les autres étaient capables de lire dans vos pensées ou que les pensées dans votre tête ne sont pas vraiment les vôtres ?`,
+        text: `Aujourd'hui, avez-vous eu l'impression que les autres étaient capables de lire dans vos pensées ou que les pensées dans votre tête ne sont pas vraiment les vôtres ?`,
         guideline: {
             left: `pas du tout`,
             right: `énormément`
@@ -118,7 +118,7 @@ export default List([
     {
         // cat: `Dépression/manie (anhédonie)`,
         label: `Plaisir`,
-        text: `aujourd'hui, avez-vous éprouvé du plaisir ?`,
+        text: `Aujourd'hui, avez-vous éprouvé du plaisir ?`,
         guideline: {
             left: `pas du tout`,
             right: `énormément`
@@ -128,7 +128,7 @@ export default List([
     {
         // cat: `Dépression/manie (humeur)`,
         label: `Humeur`,
-        text: `aujourd'hui, quelle a été votre humeur générale ?`,
+        text: `Aujourd'hui, quelle a été votre humeur générale ?`,
         guideline: {
             left: `très négatif`,
             right: `très positif`
@@ -138,7 +138,7 @@ export default List([
     {
         // cat: `Dépression/manie (estime de soi)`,
         label: `Estime`,
-        text: `aujourd'hui, quelle était votre estime de vous-même ?`,
+        text: `Aujourd'hui, quelle était votre estime de vous-même ?`,
         guideline: {
             left: `très négatif`,
             right: `très positif`
@@ -148,7 +148,7 @@ export default List([
     {
         // cat: `Dépression/manie (pensée accélérée)`,
         label: `Pensées rapides`,
-        text: `aujourd'hui, vos pensées ont elles été plus rapides que d’habitude ?`,
+        text: `Aujourd'hui, vos pensées ont elles été plus rapides que d’habitude ?`,
         guideline: {
             left: `pas du tout`,
             right: `énormément`
@@ -158,7 +158,7 @@ export default List([
     {
         // cat: `Dépression/manie (pensée rallentie)`,
         label: `Pensées lentes`,
-        text: `aujourd'hui, vos pensées ont elles été plus lentes que d’habitude ?`,
+        text: `Aujourd'hui, vos pensées ont elles été plus lentes que d’habitude ?`,
         guideline: {
             left: `pas du tout`,
             right: `énormément`
@@ -168,7 +168,7 @@ export default List([
     {
         // cat: `Dépression/manie (social)`,
         label: `Motivation parler`,
-        text: `aujourd'hui, avez-vous été motivé(e) à parler à des gens ?`,
+        text: `Aujourd'hui, avez-vous été motivé(e) à parler à des gens ?`,
         guideline: {
             left: `pas du tout`,
             right: `énormément`
@@ -178,7 +178,7 @@ export default List([
     {
         // cat: `Dépression/manie`,
         label: `Motivation faire`,
-        text: `aujourd'hui, avez-vous été motivé(e) à faire des choses ?`,
+        text: `Aujourd'hui, avez-vous été motivé(e) à faire des choses ?`,
         guideline: {
             left: `pas du tout`,
             right: `énormément`
@@ -188,7 +188,7 @@ export default List([
     {
         // cat: `Dépression/manie (irritabilité)`,
         label: `Irritable`,
-        text: `aujourd'hui, avez-vous éprouvé de l'irritabilité ou de la colère ?`,
+        text: `Aujourd'hui, avez-vous éprouvé de l'irritabilité ou de la colère ?`,
         guideline: {
             left: `pas du tout`,
             right: `énormément `
@@ -198,7 +198,7 @@ export default List([
     {
         // cat: `Anxiété`,
         label: `Anxiété`,
-        text: `aujourd'hui, avez-vous éprouvé de l'anxiété ?`,
+        text: `Aujourd'hui, avez-vous éprouvé de l'anxiété ?`,
         guideline: {
             left: `pas du tout`,
             right: `énormément`
@@ -208,7 +208,7 @@ export default List([
     {
         // cat: `Stress`,
         label: `Pression`,
-        text: `aujourd’hui, vous êtes-vous senti sous pression ?`,
+        text: `Aujourd’hui, vous êtes-vous senti sous pression ?`,
         guideline: {
             left: `pas du tout`,
             right: `énormément`
@@ -218,7 +218,7 @@ export default List([
     {
         // cat: `Événements`,
         label: `Événements négatifs`,
-        text: `aujourd’hui, avez-vous vécu des événements marquants négatifs ?`,
+        text: `Aujourd’hui, avez-vous vécu des événements marquants négatifs ?`,
         guideline: {
             left: `pas du tout`,
             right: `énormément`
@@ -228,7 +228,7 @@ export default List([
     {
         // cat: `Événements`,
         label: `Événements positifs`,
-        text: `aujourd’hui, avez-vous vécu des événements marquants positifs ?`,
+        text: `Aujourd’hui, avez-vous vécu des événements marquants positifs ?`,
         guideline: {
             left: `pas du tout`,
             right: `énormément `
@@ -248,7 +248,7 @@ export default List([
     {
         // cat: `Sommeil`,
         label: `Impact sommeil`,
-        text: `aujourd'hui, vos activités ont-elles été perturbées parce-que vous avez mal dormi la nuit dernière ?`,
+        text: `Aujourd'hui, vos activités ont-elles été perturbées parce-que vous avez mal dormi la nuit dernière ?`,
         guideline: {
             left: `pas du tout`,
             right: `énormément`
@@ -258,7 +258,7 @@ export default List([
     {
         // cat: `Toxicomanie`,
         label: `Alcool`,
-        text: `aujourd'hui, avez-vous consommé de l'alcool ?`,
+        text: `Aujourd'hui, avez-vous consommé de l'alcool ?`,
         guideline: {
             left: `pas du tout`,
             right: `énormément `
@@ -268,7 +268,7 @@ export default List([
     {
         // cat: `Toxicomanie`,
         label: `Cigarette`,
-        text: `aujourd'hui, avez-vous fumé la cigarette ou vapoté ?`,
+        text: `Aujourd'hui, avez-vous fumé la cigarette ou vapoté ?`,
         guideline: {
             left: `pas du tout`,
             right: `énormément`
@@ -278,7 +278,7 @@ export default List([
     {
         // cat: `Toxicomanie`,
         label: `Cannabis`,
-        text: `aujourd'hui, avez-vous consommé du cannabis ?`,
+        text: `Aujourd'hui, avez-vous consommé du cannabis ?`,
         guideline: {
             left: `pas du tout`,
             right: `énormément`
@@ -288,7 +288,7 @@ export default List([
     {
         // cat: `Toxicomanie`,
         label: `Drogues`,
-        text: `aujourd'hui, avez-vous consommé d'autres drogues ?`,
+        text: `Aujourd'hui, avez-vous consommé d'autres drogues ?`,
         guideline: {
             left: `pas du tout`,
             right: `énormément `
@@ -298,7 +298,7 @@ export default List([
     {
         // cat: `Observance`,
         label: `Médicaments`,
-        text: `aujourd'hui, avez-vous pris vos médicaments aux bonnes heures et doses ?`,
+        text: `Aujourd'hui, avez-vous pris vos médicaments aux bonnes heures et doses ?`,
         guideline: {
             left: `pas du tout`,
             right: `énormément `

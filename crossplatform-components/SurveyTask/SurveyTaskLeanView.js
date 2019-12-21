@@ -34,10 +34,12 @@ const sliderIosStyle = StyleSheet.create({
         borderRadius: 1,
     },
     thumb: {
-        width: 30,
-        height: 30,
-        borderRadius: 30 / 2,
+        width: 25,
+        height: 25,
+        borderRadius: 25 / 2,
         backgroundColor: 'white',
+        borderColor: '#2266FF',
+        borderWidth: 1,
         shadowColor: 'black',
         shadowOffset: {width: 0, height: 2},
         shadowRadius: 2,
@@ -168,7 +170,7 @@ const QuestionCard = ({ value, onSlidingCompleted, onValueChanged, item, isOdd, 
         justifyContent: 'flex-start',
         backgroundColor: isOdd ? 'transparent' : '#F4F4F4',
         padding: 15,
-        paddingTop: 10,
+        paddingTop: 15,
         paddingBottom: 5,
         borderLeftWidth: showError ? 5 : 0,
         borderColor: 'red'
@@ -179,18 +181,18 @@ const QuestionCard = ({ value, onSlidingCompleted, onValueChanged, item, isOdd, 
             onSlidingComplete={v => onSlidingCompleted(item.id, v)}
             onValueChange={onValueChanged}
 
-            style={{width: '100%', height: 60, marginTop: -10, marginBottom: -10}}
+            style={{width: '100%', height: 60, marginTop: -10, marginBottom: 0}}
             trackStyle={sliderIosStyle.track}
-            thumbStyle={{...sliderIosStyle.thumb, height: 16, width: 16}}
+            thumbStyle={{...sliderIosStyle.thumb}}
             minimumTrackTintColor="#1073ff"
             maximumTrackTintColor="#b7b7b7"
 
             thumbTouchSize={{width: 60, height: 60}}
         />
         {/* <Slider value={typeof this.state.questionValues[item.id] === 'undefined' ? 0.5 : this.state.questionValues[item.id]} style={{flex: 1, transform: [{ scaleX: 3 }, { scaleY: 3 }], marginLeft: '30%', marginRight: '30%'}} onSlidingComplete={this.onSlidingCompleted} /> --> */}
-        <View style={{width: '100%', flexDirection: 'row', backgroundColor: 'transparent', justifyContent: 'space-between', marginTop: -20, zIndex: -1}}>
-            <Text style={{fontVariant: ['small-caps'], fontSize: 11, color: '#333'}}>{item.guideline.left}</Text>
-            <Text style={{fontVariant: ['small-caps'], fontSize: 11, color: '#333'}}>{item.guideline.right}</Text>
+        <View style={{width: '100%', flexDirection: 'row', backgroundColor: 'transparent', justifyContent: 'space-between', marginTop: -25, zIndex: -1}}>
+            <Text style={{textTransform: 'uppercase', fontSize: 9, color: '#555', fontWeight: 'bold' }}>{item.guideline.left}</Text>
+            <Text style={{textTransform: 'uppercase', fontSize: 9, color: '#555', fontWeight: 'bold' }}>{item.guideline.right}</Text>
         </View>
     </View>;
 
