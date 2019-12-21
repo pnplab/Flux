@@ -8,6 +8,7 @@ import android.util.Log;
 import com.bugsnag.android.Configuration;
 import com.choosemuse.libmuse.MuseManagerAndroid;
 import com.facebook.react.ReactApplication;
+import com.ocetnik.timer.BackgroundTimerPackage;
 import com.bugsnag.BugsnagReactNative;
 import com.rnfs.RNFSPackage;
 import com.airbnb.android.react.lottie.LottiePackage;

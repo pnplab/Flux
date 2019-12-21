@@ -49,6 +49,7 @@
     "react": "16.9.0",
     "react-is": "16.11.0",
     "react-native": "0.61.2",
+    "react-native-background-timer": "2.1.1",
     "react-native-dev-menu": "2.0.2",
     "react-native-device-info": "2.1.2",
     "react-native-firebase": "5.5.6",
