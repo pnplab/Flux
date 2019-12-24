@@ -3,9 +3,6 @@
  */
 
 import React from 'react';
-import { View } from 'react-native';
-
-import styled from 'styled-components';
 
 import { R2Container, R2Header, R2Footer, R2Spacer, Title, Text } from '../../crossplatform-theme';
 
