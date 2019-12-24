@@ -1,5 +1,6 @@
 export { default as App } from './AppController';
 export { default as AppLoader } from './AppLoader';
+export { default as SoftwareUpdate } from './SoftwareUpdate';
 export * from './Onboarding';
 export * from './Permissions';
 export * from './DataCollection';

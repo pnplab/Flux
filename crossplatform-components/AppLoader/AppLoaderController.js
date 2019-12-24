@@ -9,6 +9,7 @@
 import React, { PureComponent } from 'react';
 import AppLoaderView from './AppLoaderView';
 import UserManager from '../../crossplatform-model/persistent-db/UserManager';
+import SoftwareUpdateManager from '../../crossplatform-model/native-db/SoftwareUpdateManager';
 
 // Configure types.
 type Props = {
@@ -46,16 +47,26 @@ export default class AppLoaderController extends PureComponent<Props, State> {
 
         // User not yet setup, we should redirect the user to the onboarding.
         if (!isUserAlreadySetup) {
-            await this.props.onUserNotYetRegistered();
+            // Find out if a new update is available for unregistered users.
+            let isSoftwareUpdateAvailable = await SoftwareUpdateManager.isSoftwareUpdateAvailable(undefined);
+
+            // Trigger the callback.
+            await this.props.onUserNotYetRegistered(isSoftwareUpdateAvailable);
         }
         // User already setup, we can send relevant configuration data and
         // start the app.
         else {
             // Retrieve the user configuration data first.
             let userSettings = await UserManager.getUserSettings();
-            
+
+            // Find out if a new update is available for the current user. The
+            // ability to have user specific update is useful to apply bug
+            // fixes targeted to specfic user devices for instance (or even
+            // features, ie. for patients that require schedule-change).
+            let isSoftwareUpdateAvailable = await SoftwareUpdateManager.isSoftwareUpdateAvailable(userSettings.awareDeviceId);
+
             // Send them to the rest of the app.
-            await this.props.onUserAlreadyRegistered(userSettings);
+            await this.props.onUserAlreadyRegistered(isSoftwareUpdateAvailable, userSettings);
         }
     }
 
@@ -65,4 +76,3 @@ export default class AppLoaderController extends PureComponent<Props, State> {
         );
     }
 }
- 

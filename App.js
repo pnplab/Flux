@@ -17,12 +17,12 @@ import Menu from './crossplatform-components/Menu';
 import type { MenuButtonName } from './crossplatform-components/Menu';
 
 // import Router from './crossplatform-components/Router';
-import { triggerUpdateIfNeeded } from './Updater.js';
-import { DEV, FLUX_AUTO_UPDATE } from './config';
+import { DEV } from './config';
 
 import {
     App,
     AppLoader,
+    SoftwareUpdate,
     Onboarding,
     Auth,
     CheckWifi,
@@ -130,26 +130,38 @@ export default (): React$Node =>
         <>
             <AppLoader
                 onUserNotYetRegistered={
-                    async () => {
+                    async (isSoftwareUpdateAvailable) => {
                         // Track user bugs by user id.
                         BugReporter.setDeviceId('unregistered');
 
                         // Log current state.
-                        console.info('User not yet registered.');
+                        console.info('user not yet registered.');
 
-                        // Launch onboarding so the user can configurs the app
-                        // settings.
-                        goTo(Onboarding);
+                        // Update the app if relevant.
+                        if (isSoftwareUpdateAvailable) {
+                            // Log new version is available.
+                            console.info('a new software version is available.');
+
+                            // Launch the software update view so user update the
+                            // app.
+                            goTo(SoftwareUpdate);
+                        }
+                        // If the app doesn't have any update...
+                        else {
+                            // Launch onboarding so the user can configure the
+                            // app settings otherwise.
+                            goTo(Onboarding);
+                        }
                     }
                 }
                 onUserAlreadyRegistered={
-                    async (userSettings) => {
+                    async (isSoftwareUpdateAvailable, userSettings) => {
                         // Track user bugs by user id.
                         BugReporter.setDeviceId(userSettings.awareDeviceId);
 
                         // Log current state.
                         console.info(`
-                            User retrieved with
+                            user retrieved with
                             studyModality=${userSettings.studyModality}
                             awareDeviceId=${userSettings.awareDeviceId}
                             awareStudyUrl=${userSettings.awareStudyUrl}
@@ -161,23 +173,55 @@ export default (): React$Node =>
                         // app.
                         setUserSettings(userSettings);
 
-                        // Go to the home screen as app is loaded.
-                        goTo(Home);
+                        // Update the app if relevant.
+                        if (isSoftwareUpdateAvailable) {
+                            // Log new version is available.
+                            console.info('a new software version is available.');
 
-                        // Start and setup aware background service.
-                        // Probably unnecesseray, since aware should be kept
-                        // launched independently from the app, restarted on
-                        // crash, and even restarted automatically at phone
-                        // boot. But for safety..
-                        // Still, we first check aware study is not joined (
-                        // although this method doesn't check if services
-                        // are correctly started). Indeed, we've had issues
-                        // with ANR at app launch, these calls would had been
-                        // the cause.
-                        if (await AwareManager.hasStudyBeenJoined() === false) {
-                            BugReporter.breadcrumb('starting aware...', 'log');
-                            await startAware(userSettings.awareDeviceId || 'byp0auth');
-                            await joinAwareStudy(userSettings.awareStudyUrl);
+                            // Launch the software update view so user update the
+                            // app.
+                            goTo(SoftwareUpdate);
+                        }
+                        // If the app doesn't have any update...
+                        else {
+                            // Go to the home screen as app has been loaded.
+                            goTo(Home);
+
+                            // Start and setup aware background service.
+                            // Probably unnecesseray, since aware should be kept
+                            // launched independently from the app, restarted on
+                            // crash, and even restarted automatically at phone
+                            // boot. But for safety..
+                            // Still, we first check aware study is not joined (
+                            // although this method doesn't check if services
+                            // are correctly started). Indeed, we've had issues
+                            // with ANR at app launch, these calls would had been
+                            // the cause.
+                            if (await AwareManager.hasStudyBeenJoined() === false) {
+                                BugReporter.breadcrumb('starting aware...', 'log');
+                                await startAware(userSettings.awareDeviceId || 'byp0auth');
+                                await joinAwareStudy(userSettings.awareStudyUrl);
+                            }
+                        }
+                    }
+                }
+            />
+
+            <SoftwareUpdate
+                onUpdateBypass={
+                    () => {
+                        // ...allow user to bypass update through long presses.
+
+                        // Log update has been bypassed.
+                        BugReporter.notify('update: install bypassed');
+
+                        // Go to home if user is already set up.
+                        if (typeof userSettings !== 'undefined') {
+                            goTo(Home)
+                        }
+                        // Go to onboarding otherwise.
+                        else {
+                            goTo(Onboarding);
                         }
                     }
                 }
@@ -589,9 +633,4 @@ if (DEV || !DEV) {
     });
 
     DevMenu.addItem('aware: sync', () => AwareManager.syncData());
-}
-
-// Automatically update the app when released.
-if (true || typeof FLUX_AUTO_UPDATE !== 'undefined' && FLUX_AUTO_UPDATE === 'true') {
-    triggerUpdateIfNeeded();
 }
