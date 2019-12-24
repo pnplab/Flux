@@ -96,6 +96,12 @@ services:
         #     - datadog
         restart: always
 
+    software-update-service:
+        build: ./docker/software-update-service
+        volumes:
+            # @warning Source code is on volume but not node_modules! Rebuild is required in case of dependency change!
+            - "./docker/software-update-service/src/:/usr/src/app/src/"
+
 #    datadog:
 #        build: ./docker/datadog
 #        environment:

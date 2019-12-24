@@ -22,8 +22,9 @@ type Props = {|
     +index: ComponentType<any>
 |};
 type State = {|
-    activeComponentType: ComponentType<any>,
-    userSettings?: {|
+    +activeComponentType: ComponentType<any>,
+    +isUpdateOptional: ?boolean,
+    +userSettings?: {|
         +studyModality: 'daily' | 'weekly',
         +awareDeviceId: string,
         +awareStudyUrl: string,
@@ -40,6 +41,7 @@ export default class AppController extends PureComponent<Props, State> {
 
         this.state = {
             activeComponentType: this.props.index,
+            isUpdateOptional: undefined,
             userSettings: undefined
         };
     }
@@ -71,6 +73,9 @@ export default class AppController extends PureComponent<Props, State> {
             goTo: this.goTo,
             startAware: this.startAware,
             joinAwareStudy: this.joinAwareStudy,
+
+            setIsUpdateOptional: this.setIsUpdateOptional,
+            isUpdateOptional: this.state.isUpdateOptional,
 
             // Register the app configuration into this single user settings.
             // These data are used to define the study modality (eg. daily or
@@ -131,6 +136,10 @@ export default class AppController extends PureComponent<Props, State> {
         // Thus this method is not to be used. It is used to document the
         // contrasting behavior with the storeSurvey one.
         throw new Error('storeRestingState implemented in java code. not in javascript code.');
+    }
+
+    setIsUpdateOptional = (isUpdateOptional: ?boolean) => {
+        this.setState({ isUpdateOptional });
     }
 
     startAware = async (awareDeviceId: string) => {

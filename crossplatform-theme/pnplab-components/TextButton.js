@@ -47,18 +47,18 @@ const StyledTouchableOpacity = styled(TouchableOpacity)`
 
 const StyledText = styled(Text)`
     /* compensate alignment for icon size + set standard 10 px margin */
-    marginLeft: ${props => props.compensateRightIcon ? 32 : 16};
-    marginRight: ${props => props.compensateLeftIcon ? 32 : 16};
+    margin-left: ${props => props.compensateRightIcon ? 32 : 16};
+    margin-right: ${props => props.compensateLeftIcon ? 32 : 16};
 
     /*
     without uppercase
 
-    fontSize: 14;
-    marginBottom: 2;
+    font-size: 14;
+    margin-bottom: 2;
     */
 
-    fontSize: 11;
-    marginBottom: 1;
+    font-size: 11;
+    margin-bottom: 1;
     text-transform: uppercase;
 
     color: ${props =>
@@ -76,6 +76,7 @@ const StyledIcon = styled(Icon)`
         props.color === 'blue' ? colors.blue :
         colors.default
     };
+    font-size: ${props => props.name === 'cross' ? 16 : 28};
 `;
 /* eslint-enable indent */
 
@@ -106,11 +107,17 @@ const TextButton = ({
                 disabled={disabled}
                 type="Entypo"
                 name="chevron-small-left"
+            /> ||
+            icon === 'cross' &&
+            <StyledIcon
+                disabled={disabled}
+                type="Entypo"
+                name="cross"
             />
         }
         {
             typeof children !== 'undefined' &&
-                <StyledText disabled={disabled} compensateLeftIcon={icon === 'prev'} compensateRightIcon={icon !== 'prev'}>
+                <StyledText disabled={disabled} compensateLeftIcon={icon === 'prev' || icon === 'cross'} compensateRightIcon={icon === 'next' || icon === 'next-out'}>
                     {children}
                 </StyledText>
         }

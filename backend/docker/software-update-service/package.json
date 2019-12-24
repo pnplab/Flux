@@ -1,0 +1,13 @@
+{
+    "name": "software-update-service",
+    "version": "1.0.0",
+    "main": "src/software-update-service.js",
+    "license": "MIT",
+    "dependencies": {
+        "koa": "2.7.0",
+        "koa-router": "7.4.0",
+        "koa-helmet": "4.1.0",
+        "koa-body": "4.1.0",
+        "koa-protect": "1.0.1"
+    }
+}

@@ -49,9 +49,10 @@ export default class AppLoaderController extends PureComponent<Props, State> {
         if (!isUserAlreadySetup) {
             // Find out if a new update is available for unregistered users.
             let isSoftwareUpdateAvailable = await SoftwareUpdateManager.isSoftwareUpdateAvailable(undefined);
+            let isUpdateOptional = await SoftwareUpdateManager.isSoftwareUpdateOptional(undefined);
 
             // Trigger the callback.
-            await this.props.onUserNotYetRegistered(isSoftwareUpdateAvailable);
+            await this.props.onUserNotYetRegistered(isSoftwareUpdateAvailable, isUpdateOptional);
         }
         // User already setup, we can send relevant configuration data and
         // start the app.
@@ -64,9 +65,10 @@ export default class AppLoaderController extends PureComponent<Props, State> {
             // fixes targeted to specfic user devices for instance (or even
             // features, ie. for patients that require schedule-change).
             let isSoftwareUpdateAvailable = await SoftwareUpdateManager.isSoftwareUpdateAvailable(userSettings.awareDeviceId);
+            let isUpdateOptional = await SoftwareUpdateManager.isSoftwareUpdateOptional(userSettings.awareDeviceId);
 
             // Send them to the rest of the app.
-            await this.props.onUserAlreadyRegistered(isSoftwareUpdateAvailable, userSettings);
+            await this.props.onUserAlreadyRegistered(isSoftwareUpdateAvailable, isUpdateOptional, userSettings);
         }
     }
 

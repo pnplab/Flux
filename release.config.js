@@ -76,6 +76,9 @@ module.exports = {
         ],
         [
             '@semantic-release/exec',
+            // @todo keep forceUpdate parameter until all clients have upgraded
+            // to the new software update service model. It is indeed no longer
+            // used.
             {
                 'prepareCmd':
                     `echo '{

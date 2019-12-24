@@ -107,6 +107,11 @@ export default (): React$Node =>
             // Method to switch between displayed components.
             goTo,
 
+            // These methods/variables passes data from AppLoader to
+            // SoftwareUpdate component in order to avoid loading glitches.
+            setIsUpdateOptional,
+            isUpdateOptional,
+
             // These methods sets up and passes user settings inbetween App's
             // components. Notably used by the AppLoader at app initialisation.
             setUserSettings,
@@ -130,7 +135,7 @@ export default (): React$Node =>
         <>
             <AppLoader
                 onUserNotYetRegistered={
-                    async (isSoftwareUpdateAvailable) => {
+                    async (isSoftwareUpdateAvailable, isUpdateOptional) => {
                         // Track user bugs by user id.
                         BugReporter.setDeviceId('unregistered');
 
@@ -141,6 +146,9 @@ export default (): React$Node =>
                         if (isSoftwareUpdateAvailable) {
                             // Log new version is available.
                             console.info('a new software version is available.');
+
+                            // Pass optional state to next component.
+                            setIsUpdateOptional(isUpdateOptional);
 
                             // Launch the software update view so user update the
                             // app.
@@ -155,7 +163,7 @@ export default (): React$Node =>
                     }
                 }
                 onUserAlreadyRegistered={
-                    async (isSoftwareUpdateAvailable, userSettings) => {
+                    async (isSoftwareUpdateAvailable, isUpdateOptional, userSettings) => {
                         // Track user bugs by user id.
                         BugReporter.setDeviceId(userSettings.awareDeviceId);
 
@@ -177,6 +185,9 @@ export default (): React$Node =>
                         if (isSoftwareUpdateAvailable) {
                             // Log new version is available.
                             console.info('a new software version is available.');
+
+                            // Pass optional state to next component.
+                            setIsUpdateOptional(isUpdateOptional);
 
                             // Launch the software update view so user update the
                             // app.
@@ -208,9 +219,14 @@ export default (): React$Node =>
             />
 
             <SoftwareUpdate
+                isUpdateOptional={isUpdateOptional}
+                awareDeviceId={userSettings && userSettings.awareDeviceId}
                 onUpdateBypass={
                     () => {
-                        // ...allow user to bypass update through long presses.
+                        // ...allow user to bypass update through long presses
+                        // in case of unplanned issue or simply for development
+                        // behavior. Optional updates will provide a specific
+                        // button in the future.
 
                         // Log update has been bypassed.
                         BugReporter.notify('update: install bypassed');

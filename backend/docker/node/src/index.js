@@ -1,5 +1,5 @@
 // Http script to check if user data have been received!
-// 
+//
 // Requires following env:
 // - MYSQL_HOST
 // - MYSQL_USER
@@ -11,7 +11,7 @@
 //       connect/disconnect at each HTTP request.
 
 const Koa = require('koa');
-const koaHelmet = require("koa-helmet");
+const koaHelmet = require('koa-helmet');
 const koaBody = require('koa-body');
 const koaProtect = require('koa-protect').koa;
 const Router = require('koa-router');
@@ -19,7 +19,7 @@ const mysql = require('promise-mysql');
 // const StatsD = require('node-dogstatsd').StatsD;
 // const dogstatsd = new StatsD();
 const ddog = require('koa-datadog-middleware');
- 
+
 const app = module.exports = new Koa();
 const router = new Router();
 
@@ -49,10 +49,10 @@ router.get('/check-sync/android/:deviceId', async (ctx, next) => {
 
     // Verify parameters format, mostly to prevent sql injection!
     const deviceId = params.deviceId;
-    if (!/^[a-zA-Z0-9]{3,}$/.test(deviceId)) {
+    if (!/^[_a-zA-Z0-9]{3,}$/.test(deviceId)) {
         console.error('check sync - wrong device id!', deviceId);
         ctx.body = {
-           error: 'bad device id format'
+            error: 'bad device id format'
         };
         ctx.status = 400;
         return;
@@ -97,7 +97,7 @@ router.get('/check-sync/android/:table/:deviceId', async (ctx, next) => {
 
     // Verify parameters format, mostly to prevent sql injection!
     const deviceId = params.deviceId;
-    if (!/^[a-zA-Z0-9]{3,}$/.test(deviceId)) {
+    if (!/^[_a-zA-Z0-9]{3,}$/.test(deviceId)) {
         console.error('check sync - wrong device id!', deviceId);
         ctx.body = {
            error: 'bad device id format'
