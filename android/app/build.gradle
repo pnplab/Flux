@@ -428,7 +428,9 @@ android {
             debuggable false
 
             minifyEnabled enableProguardInReleaseBuilds
-            shrinkResources enableProguardInReleaseBuilds
+            // @warnign shrinkResources shows images as plain black rectangles
+            // cf. https://github.com/facebook/react-native/issues/21790#issuecomment-568832261
+            shrinkResources false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
 			signingConfig signingConfigs.release
 
