@@ -102,6 +102,11 @@ services:
             # @warning Source code is on volume but not node_modules! Rebuild is required in case of dependency change!
             - "./docker/software-update-service/src/:/usr/src/app/src/"
 
+    app-landing-page:
+        build: ./docker/app-landing-page
+        # ...we don't mount src volume. it is dangerous. app is indeed built
+        # during docker build phase.
+
 #    datadog:
 #        build: ./docker/datadog
 #        environment:
