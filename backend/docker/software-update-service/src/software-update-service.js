@@ -4,6 +4,11 @@ const koaBody = require('koa-body');
 const koaProtect = require('koa-protect').koa;
 const Router = require('koa-router');
 
+// We use a fetch wrapper as nodejs doesn't embed fetch and its http(s) API
+// doesn't handle 30x redirects (which are notably required by github rest
+// API).
+const fetch = require('node-fetch');
+
 const app = module.exports = new Koa();
 const router = new Router();
 
@@ -70,6 +75,7 @@ router.get('/software-update-service/get-latest-version-for/android/:releaseChan
             error: 'bad release channel'
         };
         ctx.status = 400;
+        await next();
         return;
     }
 
@@ -84,6 +90,7 @@ router.get('/software-update-service/get-latest-version-for/android/:releaseChan
             error: 'bad base android version code'
         };
         ctx.status = 400;
+        await next();
         return;
     }
 
@@ -102,6 +109,7 @@ router.get('/software-update-service/get-latest-version-for/android/:releaseChan
             error: 'bad device id format'
         };
         ctx.status = 400;
+        await next();
         return;
     }
 
@@ -166,7 +174,12 @@ router.get('/software-update-service/get-latest-version-for/android/:releaseChan
         // android's chrome and checking wikipedia for instance. This should
         // work!
         catch (e) {
-            console.error('Github version file could\'nt be retrieved.');
+            console.error('Github version file couldn\'t be retrieved.');
+            ctx.body = {
+                error: 'github access issue'
+            };
+            ctx.status = 400;
+            await next();
             return;
         }
 
