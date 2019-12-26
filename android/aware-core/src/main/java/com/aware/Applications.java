@@ -396,8 +396,26 @@ public class Applications extends AccessibilityService {
         AUTHORITY = Applications_Provider.getAuthority(this);
 
         if (!Aware.IS_CORE_RUNNING) {
-            Intent aware = new Intent(this, Aware.class);
-            startService(aware);
+            // ** pnplab edit **
+            //
+            // Disabled start of aware.
+            //
+            // I think  this was meant as a safety guard to restart aware
+            // service in case of trouble and all the methods below do not
+            // requires it. Indeed, the start intent call is asynchronous and
+            // the code below doesn't wait for aware to effectively be started
+            // before running on.
+            // Since this makes aware start as soons as accessibility service
+            // permission is given, and prior to effective aware launch, I've
+            // disabled it in order to prevent ANR and foreground service
+            // sensing notification to pop up during permission onboarding
+            // step, so the user effectively happen to see these behavior at
+            // sensing launch and not before.
+            //
+            // Intent aware = new Intent(this, Aware.class);
+            // startService(aware);
+            //
+            // ** pnplab edit **
         }
 
         //Aware.debug(this, "created: " + getClass().getName() + " package: " + getPackageName());
