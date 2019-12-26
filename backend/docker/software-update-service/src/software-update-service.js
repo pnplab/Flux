@@ -39,24 +39,28 @@ const LATEST_DEVELOPMENT_ANDROID_APK_URL = undefined;
 // to see which user bypasses the upgrade or not, download crashes, etc. As now
 // it is set to something like git branch + commit from build trigger instead of
 // git tag from release but changing this is a lot of work).
-const LATEST_TESTING_ANDROID_VERSION_NAME = '1.6.1';
-const LATEST_TESTING_ANDROID_VERSION_CODE = 104382336;
-const LATEST_TESTING_ANDROID_APK_URL = 'https://github.com/pnplab/Flux/releases/download/v1.6.1/Flux.apk';
-const LATEST_PRODUCTION_ANDROID_VERSION_NAME = '1.6.1';
-const LATEST_PRODUCTION_ANDROID_VERSION_CODE = 104382336;
-const LATEST_PRODUCTION_ANDROID_APK_URL = 'https://github.com/pnplab/Flux/releases/download/v1.6.1/Flux.apk';
+
+// @todo use process.env with docker-compose config instead of plain variable
+// in order to be able to merge this config with app-landing-page one.
+const LATEST_TESTING_ANDROID_VERSION_NAME = '1.7.2';
+const LATEST_TESTING_ANDROID_VERSION_CODE = 105517137;
+const LATEST_TESTING_ANDROID_APK_URL = 'https://github.com/pnplab/Flux/releases/download/v1.7.2/Flux.apk';
+const LATEST_PRODUCTION_ANDROID_VERSION_NAME = '1.7.2';
+const LATEST_PRODUCTION_ANDROID_VERSION_CODE = 105517137;
+const LATEST_PRODUCTION_ANDROID_APK_URL = 'https://github.com/pnplab/Flux/releases/download/v1.7.2/Flux.apk';
 
 // Provide install link information for latest version. This is used by the
 // official release website.
-router.get('/software-update-service/get-latest-version-for/android/production', async (ctx, next) => {
-    ctx.body = {
-        androidVersionCode: LATEST_PRODUCTION_ANDROID_VERSION_CODE,
-        androidApkUrl: LATEST_PRODUCTION_ANDROID_APK_URL
-    };
+// @deprecated link is directly embedded inside app-landing-page source code.
+// router.get('/software-update-service/get-latest-version-for/android/production', async (ctx, next) => {
+//     ctx.body = {
+//         androidVersionCode: LATEST_PRODUCTION_ANDROID_VERSION_CODE,
+//         androidApkUrl: LATEST_PRODUCTION_ANDROID_APK_URL
+//     };
 
-    // Tell koa the request can be processed.
-    await next();
-});
+//     // Tell koa the request can be processed.
+//     await next();
+// });
 
 // Provide upgrade information based on current context. This is used by the
 // app auto update mechanism.
