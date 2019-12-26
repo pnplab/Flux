@@ -328,9 +328,13 @@ public class Aware extends Service {
             NotificationManager not_manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             NotificationChannel aware_channel = new NotificationChannel(AWARE_NOTIFICATION_ID, getResources().getString(R.string.app_name), NotificationManager.IMPORTANCE_DEFAULT);
             aware_channel.setDescription(getResources().getString(R.string.aware_description));
-            aware_channel.enableLights(true);
-            aware_channel.setLightColor(Color.BLUE);
-            aware_channel.enableVibration(true);
+            // ** pnplab edit **
+            // disable vibration, lights and badges as this is stressful to
+            // some schizophrenic patients.
+            aware_channel.enableLights(false);
+            aware_channel.enableVibration(false);
+            aware_channel.setShowBadge(false);
+            // ** pnplab edit **
             not_manager.createNotificationChannel(aware_channel);
         }
 
