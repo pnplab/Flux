@@ -7,7 +7,7 @@ import RNFS from 'react-native-fs';
 import BugReporter from './BugReporter';
 import { STUDY_URL } from '../../config';
 
-const RNUpdateAPK = NativeModules.RNUpdateAPK;
+const UpdateManagerNativeModule = NativeModules.SoftwareUpdateManager;
 
 class SoftwareUpdateManager {
 
@@ -301,7 +301,7 @@ class SoftwareUpdateManager {
             // ...not used currently:
             // firstInstallTime,
             // lastUpdateTime,
-        } = RNUpdateAPK;
+        } = UpdateManagerNativeModule;
 
         return {
             path: undefined,
@@ -326,7 +326,7 @@ class SoftwareUpdateManager {
             packageName,
             packageInstaller,
             signatures
-        } = await RNUpdateAPK.getApkInfo(apkPath);
+        } = await UpdateManagerNativeModule.getApkInfo(apkPath);
 
         return {
             path: apkPath,
@@ -338,11 +338,20 @@ class SoftwareUpdateManager {
         };
     }
 
+    // `isInstallFromUnknownSourceEnabled` method is used to know whether a
+    // permission request dialog for unknown installation source will be asked
+    // or not. We use this method to display additional indication to the user.
+    // We could use it to suggest to revoke the settings once the update has
+    // occured as well.
+    isInstallFromUnknownSourceEnabled = async (): Promise<boolean> => {
+        return UpdateManagerNativeModule.isInstallFromUnknownSourceEnabled();
+    }
+
     // @pre-condition Check apk signing is compatible so we can start
     // installation.
     installApk = (fileProviderAuthority: string, apkPath: string) => {
         // @todo feedback.
-        RNUpdateAPK.installApk(
+        UpdateManagerNativeModule.installApk(
             apkPath,
             fileProviderAuthority
         );
@@ -357,7 +366,7 @@ class SoftwareUpdateManager {
         // kitkat). Will reject with exception on error, or return true on success.
         else {
             const installGooglePlayWhenNotNeeded = false;
-            await RNUpdateAPK.patchSSLProvider(installGooglePlayWhenNotNeeded, suggestGooglePlayInstall);
+            await UpdateManagerNativeModule.patchSSLProvider(installGooglePlayWhenNotNeeded, suggestGooglePlayInstall);
         }
     }
 

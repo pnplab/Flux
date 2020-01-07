@@ -122,6 +122,7 @@ public class MainApplication extends Application implements ReactApplication {
                 // Auto linking is not implemented for our own packages.
                 packages.add(new org.pnplab.flux.surveytask.ReactPackage());
                 packages.add(new org.pnplab.flux.aware.ReactPackage());
+                packages.add(new org.pnplab.flux.updatemanager.ReactPackage());
 
                 // Auto linking seems not to be implemented for these
                 // dependencies.

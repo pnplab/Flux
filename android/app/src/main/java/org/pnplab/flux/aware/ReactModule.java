@@ -221,10 +221,16 @@ public class ReactModule extends ReactContextBaseJavaModule {
      * - the tracking to occur when the phone is sleeping.
      *
      * @pre Check if needed with isBatteryOptimisationIgnored.
+     * @pre requires API 23 (can be checked through #isBatteryOptimisationIgnored)
      *
      * @warning due to android limitation, promise is resolved once the intent
      *     request has been triggered, thus the promise will *always* resolve
      *     too soon, before the privilege has been granted!
+     *
+     * @warning ACTION_IGNORE_BACKGROUND_DATA_RESTRICTIONS_SETTINGS from API 24
+     *     not used. Might be required as well ? Although probably not because
+     *     aware make no use of it and I did not find any mention of it outside
+     *     official doc (although I did not explici.
      */
     @ReactMethod
     public void ignoreBatteryOptimisation(Promise promise) {

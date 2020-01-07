@@ -29,6 +29,17 @@
  * @todo check downloaded apk version code (if exists) to avoid redownload if unnecessary.
  * @todo display missing space to user. should retrieve official apk
  *     size first.
+ *
+ * This is commented in js
+ *     source as android related code is within a dependency and thus not in
+ *     git repository.
+ * @note Android Oreo doesn't need to enable unknown source, but instead uses
+ *     a perm cf. https://www.androidcentral.com/unknown-sources
+ * @note Android EXTRA_NOT_UNKNOWN_SOURCE intent parameter to bypass the enable
+ *     unknown source setting is misdocumented and doesn't work cf.
+ *     https://issuetracker.google.com/issues/36963283.
+ * @note Android PackageManager#canRequestPackageInstalls always return false
+ *     on API < Oreo cf. https://stackoverflow.com/questions/47872162/how-to-use-packagemanager-canrequestpackageinstalls-in-android-oreo
  */
 
 import React, { PureComponent } from 'react';
@@ -53,7 +64,8 @@ type Props = {
 type State = {
     +currentStep: Step,
     +hasDownloadBeenTrigger: boolean, // keep state in order to avoid dual click on button.
-    +downloadPercentage: ?number
+    +downloadPercentage: ?number,
+    +isInstallFromUnknownSourceEnabled: ?boolean
 };
 export type Step = 'REQUEST_DOWNLOAD'
     | 'NOT_ENOUGH_SPACE'
@@ -73,8 +85,16 @@ export default class SoftwareUpdateController extends PureComponent<Props, State
         this.state = {
             currentStep: 'REQUEST_DOWNLOAD',
             hasDownloadBeenTrigger: false,
-            downloadPercentage: undefined
+            downloadPercentage: undefined,
+            isInstallFromUnknownSourceEnabled: undefined
         };
+    }
+
+    async componentDidMount() {
+        // Check whether to show how to enable installation from unknown source
+        // or not.
+        let isInstallFromUnknownSourceEnabled = await SoftwareUpdateManager.isInstallFromUnknownSourceEnabled();
+        this.setState({ isInstallFromUnknownSourceEnabled });
     }
 
     render() {
@@ -101,7 +121,7 @@ export default class SoftwareUpdateController extends PureComponent<Props, State
             innerView = <ErrorView />;
             break;
         case 'REQUEST_INSTALL':
-            innerView = <RequestInstallView onPress={this.installUpdate} onLongPress={this.bypassUpdate} />;
+            innerView = <RequestInstallView isInstallFromUnknownSourceEnabled={this.state.isInstallFromUnknownSourceEnabled} onPress={this.installUpdate} onLongPress={this.bypassUpdate} />;
             break;
         default:
             throw new Error('Unexpected step for SoftwareUpdate controller');

@@ -10,9 +10,12 @@ import { R2Container, R2Header, R2Footer, R2Spacer, Title, Text, TextButton } fr
 // import svgFile from './undraw_secure_data_0rwp.svg'; // @note require instead of import doesn't work because it bypasses babel raw string import extension.
 
 type Props = {
+    +isInstallFromUnknownSourceEnabled: boolean,
     +onPress: () => void,
     +onLongPress: () => void
 };
+
+// @todo isInstallFromUnknownSourceEnabled display screenshots from accessibility service setup.
 
 const RequestInstallView = (props: Props) =>
     <R2Container accessibilityLabel="software.update.request-install">
