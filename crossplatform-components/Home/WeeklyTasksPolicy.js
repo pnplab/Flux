@@ -98,33 +98,10 @@ export function WeeklyTasksPolicy(
         if (!isLastSubmittedSurveyInsideOpeningSchedule) {
             return 'SURVEY_TASK';
         }
-        // A survey has already been submitted, let's check if the same holds
-        // true for resting state task in the next method.
-        else if (!hasAtLeastOneRestingStateTaskBeenSubmitted) {
-            return 'RESTING_STATE_TASK';
-        }
-        else if (hasAtLeastOneRestingStateTaskBeenSubmitted) {
-            // Check if that resting state task was done during current opening
-            // time.
-            let lastSubmittedRestingStateTaskMoment = moment(lastSubmittedRestingStateTaskTimestamp);
-            let isLastSubmittedRestingStateTaskInsideOpeningSchedule = lastSubmittedRestingStateTaskMoment.isSameOrAfter(openingHour) && lastSubmittedRestingStateTaskMoment.isBefore(closingHour);
-
-            // The resting state task has still not been done by user, so we
-            // propose it.
-            if (!isLastSubmittedRestingStateTaskInsideOpeningSchedule) {
-                return 'RESTING_STATE_TASK';
-            }
-            // While we're inside the task schedule time, both resting state
-            // task and survey task have already been done. Thus, we
-            // can just show no task available.
-            else {
-                return 'NO_TASK';
-            }
-        }
+        // A survey has already been submitted, there is no survey task for
+        // weekly task.
         else {
-            // Unexpected code flow. Prevent FlowType from showing an error
-            // because of undefined return.
-            throw new Error('Unexpected behavior, policy should have returned something.');
+            return 'NO_TASK';
         }
     }
     else {

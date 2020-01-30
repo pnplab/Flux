@@ -10,12 +10,14 @@ import React, { PureComponent } from 'react';
 
 import type { Question } from '../../crossplatform-model/immutable-db/QuestionType';
 import Questions from '../../crossplatform-model/immutable-db/QuestionData';
+import WeeklyQuestions from '../../crossplatform-model/immutable-db/WeeklyQuestionData';
 
 import SurveyTaskView from './SurveyTaskLeanView';
 
 // Configure types.
 type Props = {
     +onSubmit: (msTimestamp: number, values: { [questionId: string]: number }) => void,
+    +studyModality: 'daily' | 'weekly'
 };
 type State = {
     +missingQuestionIds: Array<string>
@@ -43,7 +45,12 @@ export default class SurveyTaskController extends PureComponent<Props, State> {
             missingQuestionIds: []
         };
 
-        this.questions = Questions.toJS();
+        if (props.studyModality === 'daily') {
+            this.questions = Questions.toJS();
+        }
+        else if (props.studyModality === 'weekly') {
+            this.questions = WeeklyQuestions.toJS();
+        }
         this.values = {};
     }
 

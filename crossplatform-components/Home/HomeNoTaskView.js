@@ -24,7 +24,7 @@ const HomeNoTaskView = (props: Props) =>
             </Title>
             <R2Spacer />
             <Text>
-                Les tâches ne sont actuellement pas disponibles. Elles seront accessible à partir de 18h, jusqu'à 22h.
+                Les tâches ne sont actuellement pas disponibles.
             </Text>
             <R2Spacer />
             <R2Spacer />

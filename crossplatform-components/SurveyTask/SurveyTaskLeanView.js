@@ -22,6 +22,7 @@ type State = {
     +questionValues: { [questionId: string]: number }
 };
 type Props = {
+    +studyModality: 'daily' | 'weekly',
     +data: Array<Question>,
     +missingQuestionIds: Array<string>,
     +onValue: (questionId: string, value: number) => void,
@@ -77,7 +78,7 @@ class SurveyTaskLeanView extends PureComponent<Props, State> {
 
     renderItem = ({ item, separators, index }: { item: 'notice' | Question | 'submit', separators: any }) => (
         item === 'notice' &&
-            <NoticeCard />
+            <NoticeCard studyModality={this.props.studyModality} />
         || item === 'submit' &&
             <SubmitCard onSubmit={this.onSubmit} hasError={this.props.missingQuestionIds.length !== 0} />
         || true &&
@@ -140,9 +141,9 @@ const CardTitle = styled(Text)
         marginTop: 4;
     `;
 
-const NoticeCard = () => 
+const NoticeCard = ({ studyModality }: { studyModality: 'daily' | 'weekly' }) =>
     <Card>
-        <CardTitle>Indiquez la sévérité de vos symptomes pour aujourd'hui uniquement.</CardTitle>
+        <CardTitle>Indiquez la sévérité de vos symptomes pour {studyModality === 'daily' ? 'aujourd\'hui' : 'cette semaine'} uniquement.</CardTitle>
         <NoticeCardIconWrapper>
             <NoticeCardIcon type="Entypo" name="chevron-down" />
         </NoticeCardIconWrapper>

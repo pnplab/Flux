@@ -448,6 +448,7 @@ export default (): React$Node =>
                     />
 
                     <SurveyTask
+                        studyModality={studyModality}
                         onSubmit={
                             (msTimestamp, values) => {
                                 // Store survey values remotely so we can check
@@ -456,7 +457,12 @@ export default (): React$Node =>
                                 storeSurvey(msTimestamp, values);
 
                                 // Go to next onboarding step.
-                                goToStep(RestingStateTaskOnboarding);
+                                if (studyModality === 'daily') {
+                                    goToStep(RestingStateTaskOnboarding);
+                                }
+                                else if (studyModality === 'weekly') {
+                                    goToStep(CheckDataSync);
+                                }
                             }
                         }
                     />
@@ -579,10 +585,16 @@ export default (): React$Node =>
                         // again through Home screen.
                         await setAndStoreUserSettings({ lastSubmittedSurveyTaskTimestamp: msTimestamp });
 
-                        // Switch to home screen as task is finished.
-                        goTo(RestingStateTask);
+                        // Switch to next task once task is finished.
+                        if (userSettings.studyModality === 'daily') {
+                            goTo(RestingStateTask);
+                        }
+                        else if (userSettings.studyModality === 'weekly') {
+                            goTo(Home);
+                        }
                     }
                 }
+                studyModality={userSettings && userSettings.studyModality}
             />
 
             <RestingStateTask
