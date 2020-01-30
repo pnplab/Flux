@@ -148,27 +148,6 @@ public class Rotation extends Aware_Sensor implements SensorEventListener {
             return;
         }
         // Otherwise, reduce queue w/ average filter.
-        else if (event.values.length == 3){
-            // Retrieve number of item in queue in order to calculate average
-            long count = _avgQueue.size();
-
-            // Calculate total.
-            float[] acc = new float[]{0.f, 0.f, 0.f};
-            float[] curr = (float[]) _avgQueue.poll();
-            do {
-                acc[0] += curr[0];
-                acc[1] += curr[1];
-                acc[2] += curr[2];
-                curr = (float[]) _avgQueue.poll();
-            } while (curr != null);
-
-            // Calculate mean.
-            mean = new float[]{
-                acc[0] / count,
-                acc[1] / count,
-                acc[2] / count
-            };
-        }
         else if (event.values.length == 4){
             // Retrieve number of item in queue in order to calculate average
             long count = _avgQueue.size();
@@ -190,6 +169,27 @@ public class Rotation extends Aware_Sensor implements SensorEventListener {
                 acc[1] / count,
                 acc[2] / count,
                 acc[3] / count,
+            };
+        }
+        else {
+            // Retrieve number of item in queue in order to calculate average
+            long count = _avgQueue.size();
+
+            // Calculate total.
+            float[] acc = new float[]{0.f, 0.f, 0.f};
+            float[] curr = (float[]) _avgQueue.poll();
+            do {
+                acc[0] += curr[0];
+                acc[1] += curr[1];
+                acc[2] += curr[2];
+                curr = (float[]) _avgQueue.poll();
+            } while (curr != null);
+
+            // Calculate mean.
+            mean = new float[]{
+                acc[0] / count,
+                acc[1] / count,
+                acc[2] / count
             };
         }
 
