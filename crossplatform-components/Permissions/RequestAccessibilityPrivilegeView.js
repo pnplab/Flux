@@ -42,7 +42,7 @@ const CheckPermissionsView = ({
                     <Text>
                         Nous utilisons uniquement cette permission pour enregistrer
                         le taux d'utilisation des applications (par exemple, le nombre
-                        d'heure passé sur facebook). Nous n'utilisons la permission
+                        d'heures passées sur facebook). Nous n'utilisons la permission
                         dans aucun autre cadre (eg. nous n'enregistrons pas le contenu
                         des applications).
                     </Text>
@@ -59,7 +59,8 @@ const CheckPermissionsView = ({
                         />
                         <Text style={{
                             flex: 0.68,
-                            textAlign: 'left'
+                            textAlign: 'left',
+                            height: '100%',
                         }}>
                             Lorsque le panel de configuration des services
                             d'accessibilité s'affichera, ouvrez Flux.
@@ -77,7 +78,8 @@ const CheckPermissionsView = ({
                         />
                         <Text style={{
                             flex: 0.68,
-                            textAlign: 'left'
+                            textAlign: 'left',
+                            height: '100%'
                         }}>
                             Cliquez ensuite sur le bouton d'activation.
                         </Text>
@@ -94,7 +96,8 @@ const CheckPermissionsView = ({
                         />
                         <Text style={{
                             flex: 0.68,
-                            textAlign: 'left'
+                            textAlign: 'left',
+                            height: '100%'
                         }}>
                             Acceptez enfin la requête de permission.
                             L'application reviendra alors automatiquement.

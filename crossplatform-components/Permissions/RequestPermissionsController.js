@@ -86,7 +86,7 @@ export default class RequestPermissionsController extends PureComponent<Props, S
             name: 'read-phone-state',
             title: 'État du cellulaire.',
             description:
-                `Nous utilisons cette permission pour accéder aux paramètre
+                `Nous utilisons cette permission pour accéder aux paramètres
                 de votre réseau cellulaire.`.replace(/\s{4,}/g, ' '),
             permission: PermissionsAndroid.PERMISSIONS.READ_PHONE_STATE
         },

@@ -30,7 +30,7 @@ const OnboardingSurveyTaskView = ({ onStartTaskClicked, onStepBypassed }: Props)
             <Text>
                 La prochaine étape vous permet d'expérimenter avec le
                 questionnaire que vous compléterez lorsque vous utiliserez
-                l'application durant les heures des tâches est visualisable.
+                l'application durant les horaires des tâches.
             </Text>
         </R3Content>
         <R3Footer>
