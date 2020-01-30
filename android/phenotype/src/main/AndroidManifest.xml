@@ -1,2 +1,124 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-        package="org.pnplab.phenotype"/>
+<!--
+@note
+android:installLocation="internalOnly" set for additional on_boot_completed
+broadcast receiver work guarantee. Indeed, BOOT_COMPLETE is sent to
+applications before external storage is mounted. So if application is installed
+to external storage it won't receive BOOT_COMPLETE broadcast message.
+cf. https://stackoverflow.com/questions/2784441/trying-to-start-a-service-on-boot-on-android#comment8342819_5439320
+cf. https://stackoverflow.com/a/4246141/939741
+-->
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.pnplab.phenotype"
+    android:installLocation="internalOnly"
+>
+    <!--
+    Allow app to prevent device from going to sleep.
+    Also, acquiring a wakelock when starting the service from a broadcast
+    receiver on boot seems to be a common android pattern. Although it has been
+    deprecated in favor of JobServices.
+    -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!--
+    Allows app to register BOOT_COMPLETED broadcast and thus start phenotyping
+    back when device reboots.
+    -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!--
+    Apps that target Android 9 (API level 28) or higher and use foreground
+    services must request the FOREGROUND_SERVICE permission.
+    cf. https://developer.android.com/guide/components/services
+    -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <!--
+    Allows an app to access precise location.
+
+    @note
+    ACCESS_COARSE_LOCATION is not enough for geofencing.
+    cf. https://developer.android.com/training/location/geofencing#RequestGeofences
+    -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <!--
+    Allows an app to access location in the background on Android 10+.
+    cf. https://developer.android.com/reference/android/Manifest.permission.html#ACCESS_BACKGROUND_LOCATION
+    -->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+
+    <application>
+
+        <!--
+        @note android:process set to avoid the main process to start as well
+        unexpectedly when a message is received.
+        -->
+        <receiver
+            android:name="org.pnplab.phenotype.system.entrypoints.PhenotypeBroadcastReceiver"
+            android:process=":phenotype"
+            android:exported="false"
+        >
+            <intent-filter>
+                <!--
+                Standard broadcasted intent when device boots.
+                -->
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+
+                <!--
+                QUICKBOOK_POWERON for additional HTC compatibility.
+
+                cf. https://stackoverflow.com/a/26026471/939741
+
+                Although it seems to be triggered for HTC fast boots which
+                could keep the service cached while the device is off.
+                @todo Test service is off when QUICKBOOT_POWERON is called on HTC devices.
+                cf. https://stackoverflow.com/questions/2784441/trying-to-start-a-service-on-boot-on-android#comment50779775_16542461
+                -->
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+
+        <!--
+        Provider hackily used to share android context across client-side part
+        of our lib. See PhenotypeClientInitProvider comments for more info.
+        -->
+        <provider
+            android:authorities="${phenotypeClientInitProviderAuthority}"
+            android:name="org.pnplab.phenotype.system.entrypoints.PhenotypeClientInitProvider"
+            android:exported="false"
+        />
+
+        <provider
+            android:authorities="${phenotypeBackgroundInitProviderAuthority}"
+            android:name="${phenotypeBackgroundInitProviderClass}"
+            android:process=":phenotype"
+            android:exported="false"
+        />
+
+        <!--
+        android:foregroundServiceType has been added API level 29 (android 10+).
+        And can't be added if sdkCompileVersion is < 29.
+        We tried to use tool:remove trickery with gradle substitution to mix
+        both behaviors but manifest merger refuses to remove same-node
+        attribute.
+        @todo to be tested
+
+        @warning
+        If you're getting an "attribute android:foregroundServiceType not found"
+        error,
+        - set compileSdkVersion in build.gradle file to v29.
+        - make sure root-level gradle file doesn't override that version.
+        - download the Android SDK v29 on your system.
+        -->
+        <service
+            android:description="@string/phenotype_service_description"
+            android:foregroundServiceType="location|dataSync|connectedDevice"
+            android:process=":phenotype"
+            android:name="${phenotypeServiceClass}"
+            android:exported="false"
+        />
+
+    </application>
+
+</manifest>

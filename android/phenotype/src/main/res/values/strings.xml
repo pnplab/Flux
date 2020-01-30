@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">phenotype</string>
+    <string name="phenotype_notification_channel_name">Phénotypage</string>
+    <string name="phenotype_notification_channel_description">Collection des données de phénotypage</string>
+    <string name="phenotype_service_description">Service de collection des données de phénotypage.</string>
+    <string name="phenotype_service_notification_title">Phénotypage</string>
+    <string name="phenotype_service_notification_text">Collection des données de phénotypage active.</string>
+    <!--
+    @warning
+    The defined icon must not have adaptative version as it will crash the
+    status bar (com.android.systemui). Use png only icon!
+    -->
+    <string name="phenotype_service_notification_icon">ic_phenotype_notification_icon</string>
 </resources>

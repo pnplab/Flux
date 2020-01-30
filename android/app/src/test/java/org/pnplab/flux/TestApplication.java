@@ -111,7 +111,7 @@ public class TestApplication extends Application implements ReactApplication {
         permissionManager = new PermissionManager(this);
         processPriorityPromoter = new ProcessPriorityPromoter(this);
 
-        // SoLoader.init(this, /* native exopackage */ false);
+        // SoLoader.initialize(this, /* native exopackage */ false);
 
         String arch = System.getProperty("os.arch");
         Log.i("Flux", "Current arch: " + arch);

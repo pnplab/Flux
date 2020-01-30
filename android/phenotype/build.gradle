@@ -1,10 +1,45 @@
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+
+// apply plugin: 'kotlin-android'
+// apply plugin: 'kotlin-android-extensions'
+
+def setDefaultExt(prop, fallback) {
+    if (!rootProject.ext.has("phenotype")) {
+        rootProject.ext.set("phenotype", [])
+    }
+
+    if (!rootProject.ext.phenotype.containsKey(prop)) {
+        rootProject.ext.phenotype[prop] = fallback
+    }
+}
+
+// Overridable Phenotype entrypoint service class. Must be fully qualified.
+// @todo override initializer !
+
+setDefaultExt("configurationClass", "org.pnplab.phenotype.DefaultPhenotypeConfiguration")
+
+setDefaultExt("backgroundInitProviderClass", "org.pnplab.phenotype.system.entrypoints.DefaultPhenotypeInitProvider")
+setDefaultExt("backgroundInitProviderAuthority", "\${applicationId}.phenotype.PhenotypeBackgroundInitProvider")
+setDefaultExt("serviceClass", "org.pnplab.phenotype.system.entrypoints.DefaultPhenotypeService")
+setDefaultExt("loggerClass", "org.pnplab.phenotype.logger.DefaultLogger")
+setDefaultExt("clientInitProviderAuthority", "\${applicationId}.phenotype.PhenotypeClientInitProvider")
+
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.1"
 
+    // Compile with deprecation warning explained.
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+    }
+
+    // Warns android studio if the library declares unprefixed resource which
+    // could potentially conflict with other libs.
+    // cf. https://blog.octo.com/android-library-development-best-practices-guide/
+    resourcePrefix "phenotype_"
+
+    // @todo define proguard configuration.
+    // consumerProguardFiles 'lib-proguard-rules.txt'
 
     defaultConfig {
         minSdkVersion 19
@@ -14,6 +49,21 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'consumer-rules.pro'
+
+        // Inject default or overriden main class into manifest file (for
+        // service configuration) and library source code (for service launch
+        // and binding).
+        buildConfigField "Class<? extends org.pnplab.phenotype.system.entrypoints.AbstractPhenotypeService>", "PHENOTYPE_SERVICE_CLASS", "${rootProject.ext.phenotype.serviceClass}.class"
+        // buildConfigField "org.pnplab.phenotype.logger.AbstractLogger", "PHENOTYPE_LOGGER", "new ${rootProject.ext.phenotype.loggerClass}()"
+        buildConfigField "String", "PHENOTYPE_NOTIFICATION_CHANNEL_ID", '"PHENOTYPE_NOTTIFICATION_CHANNEL"'
+        manifestPlaceholders.phenotypeServiceClass = "${rootProject.ext.phenotype.serviceClass}"
+        manifestPlaceholders.phenotypeClientInitProviderAuthority = "${rootProject.ext.phenotype.clientInitProviderAuthority}"
+        manifestPlaceholders.phenotypeBackgroundInitProviderAuthority = "${rootProject.ext.phenotype.backgroundInitProviderAuthority}"
+        manifestPlaceholders.phenotypeBackgroundInitProviderClass = "${rootProject.ext.phenotype.backgroundInitProviderClass}"
+
+        // throw new Error("applId ${rootProject.android.defaultConfig.applicationId}")
+        // "${applicationId}.phenotype.PhenotypeClientInitProvider"
+        // "org.pnplab.flux.phenotype.PhenotypeClientInitProvider"
     }
 
     buildTypes {
@@ -27,10 +77,37 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    // implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.1.0'
+
+    // Removes `Didn't find class "android.view.View$OnUnhandledKeyEventListener"`
+    // warnings on android < 28 API. This is an androidx bug.
+    // https://stackoverflow.com/a/57518141/939741
+    // https://stackoverflow.com/questions/51782548/androidxappcompat-iart-error-android-view-viewonunhandledkeyeventlistener/52954286#52954286
+    // https://issuetracker.google.com/issues/120750246
+    // cf. https://github.com/facebook/flipper/issues/146
+    debugImplementation 'com.github.DonaldDu:FixUnhandledEvent:1.0'
     implementation 'androidx.core:core-ktx:1.1.0'
+    implementation 'androidx.multidex:multidex:2.0.1' // for android api < 21 multidex support
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    // Use remoter to generate aidl interfaces used for android service IPC
+    // using java code.
+    // see https://github.com/josesamuel/remoter
+    implementation 'com.josesamuel:remoter-annotations:1.2.5'
+    implementation 'org.parceler:parceler-api:1.1.12'
+    annotationProcessor 'com.josesamuel:remoter:1.2.5'
+
+    // For Java 8 java.util.function android minSdkTarget < 24 compat.
+    // @note we use api keyword instead of implementation in order to export
+    // android-retrostreams transitive dependency and thus export Consumer
+    // class which is shared in our public api.
+    api 'net.sourceforge.streamsupport:android-retrostreams:1.7.1'
+
+    // For Java8 CompletableFuture.
+    // cf. https://github.com/retrostreams/android-retrofuture
+    // compile 'net.sourceforge.streamsupport:android-retrofuture:1.7.1'
 }

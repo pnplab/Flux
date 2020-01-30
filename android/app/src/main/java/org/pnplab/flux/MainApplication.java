@@ -62,7 +62,7 @@ public class MainApplication extends Application implements ReactApplication {
         // and detext anr.
         // cf. https://docs.bugsnag.com/platforms/react-native/react-native/enhanced-native-integration/
         // To set up java config, do not set config in manifest file but in java
-        // bugsnag init code cf. https://github.com/bugsnag/bugsnag-react-native/issues/376#issuecomment-513222395
+        // bugsnag initialize code cf. https://github.com/bugsnag/bugsnag-react-native/issues/376#issuecomment-513222395
         // To upload jave stacktraces, set the manifest api key value anyway and
         // use bugsnag gradle plugin.
         // cf. https://github.com/bugsnag/bugsnag-react-native/issues/376#issuecomment-514568602

@@ -486,14 +486,15 @@ android {
 // }
 
 dependencies {
-    implementation project(':react-native-background-timer')
-    implementation project(':rn-update-apk')
     // @note because JUnit5 is built on Java 8 from the ground up, its
     // instrumentation tests will only run on devices running Android 8.0 (API
     // 26) or newer. Thus we keep `androidx.test.ext:junit` which points out
     // to JUnit4.
     // cf: `https://blog.stylingandroid.com/junit-5-getting-started/`
 
+    implementation project(':phenotype')
+    implementation project(':react-native-background-timer')
+    implementation project(':rn-update-apk')
     implementation project(':bugsnag-react-native')
     // implementation project(':@sentry/react-native')
     implementation project(':react-native-fs')
