@@ -27,8 +27,10 @@ import com.aware.providers.Rotation_Provider.Rotation_Data;
 import com.aware.providers.Rotation_Provider.Rotation_Sensor;
 import com.aware.utils.Aware_Sensor;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
 /**
  * AWARE Rotation module
@@ -52,7 +54,7 @@ public class Rotation extends Aware_Sensor implements SensorEventListener {
     private static PowerManager.WakeLock wakeLock = null;
 
     private static Float[] LAST_VALUES = null;
-    private static long LAST_TS = 0;
+    private static long lastTimestamp = 0;
     private static long LAST_SAVE = 0;
 
     private static int FREQUENCY = -1;
@@ -92,6 +94,10 @@ public class Rotation extends Aware_Sensor implements SensorEventListener {
         //We log current accuracy on the sensor changed event
     }
 
+    // @warning @todo should move out of sync adapters
+    //     https://www.reddit.com/r/androiddev/comments/7e1ayn/is_using_a_syncadapter_still_a_practice_in_2017/
+    Queue _avgQueue = new ArrayDeque();
+    int _worstAccuracy = Integer.MAX_VALUE;
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (SignificantMotion.isSignificantMotionActive && !SignificantMotion.CURRENT_SIGMOTION_STATE) {
@@ -120,8 +126,8 @@ public class Rotation extends Aware_Sensor implements SensorEventListener {
             return;
         }
 
-        long TS = System.currentTimeMillis();
-        if (ENFORCE_FREQUENCY && TS < LAST_TS + FREQUENCY / 1000)
+        long nowTimestamp = System.currentTimeMillis();
+        if (ENFORCE_FREQUENCY && nowTimestamp < lastTimestamp + FREQUENCY / 1000)
             return;
         if (LAST_VALUES != null && THRESHOLD > 0 && Math.abs(event.values[0] - LAST_VALUES[0]) < THRESHOLD
                 && Math.abs(event.values[1] - LAST_VALUES[1]) < THRESHOLD
@@ -131,24 +137,84 @@ public class Rotation extends Aware_Sensor implements SensorEventListener {
 
         LAST_VALUES = new Float[]{event.values[0], event.values[1], event.values[2]};
 
+        // Add current record to queue in order to reduce to average.
+        _avgQueue.add(event.values);
+        _worstAccuracy = event.accuracy < _worstAccuracy ? event.accuracy : _worstAccuracy;
+
+        // If current record has been sent too fast by android and is below the
+        // required frequency, wait till next iteration.
+        float[] mean;
+        if (nowTimestamp < lastTimestamp + FREQUENCY / 1000) {
+            return;
+        }
+        // Otherwise, reduce queue w/ average filter.
+        else if (event.values.length == 3){
+            // Retrieve number of item in queue in order to calculate average
+            long count = _avgQueue.size();
+
+            // Calculate total.
+            float[] acc = new float[]{0.f, 0.f, 0.f};
+            float[] curr = (float[]) _avgQueue.poll();
+            do {
+                acc[0] += curr[0];
+                acc[1] += curr[1];
+                acc[2] += curr[2];
+                curr = (float[]) _avgQueue.poll();
+            } while (curr != null);
+
+            // Calculate mean.
+            mean = new float[]{
+                acc[0] / count,
+                acc[1] / count,
+                acc[2] / count
+            };
+        }
+        else if (event.values.length == 4){
+            // Retrieve number of item in queue in order to calculate average
+            long count = _avgQueue.size();
+
+            // Calculate total.
+            float[] acc = new float[]{0.f, 0.f, 0.f, 0.f};
+            float[] curr = (float[]) _avgQueue.poll();
+            do {
+                acc[0] += curr[0];
+                acc[1] += curr[1];
+                acc[2] += curr[2];
+                acc[3] += curr[3];
+                curr = (float[]) _avgQueue.poll();
+            } while (curr != null);
+
+            // Calculate mean.
+            mean = new float[]{
+                acc[0] / count,
+                acc[1] / count,
+                acc[2] / count,
+                acc[3] / count,
+            };
+        }
+
         ContentValues rowData = new ContentValues();
         rowData.put(Rotation_Data.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
-        rowData.put(Rotation_Data.TIMESTAMP, TS);
-        rowData.put(Rotation_Data.VALUES_0, event.values[0]);
-        rowData.put(Rotation_Data.VALUES_1, event.values[1]);
-        rowData.put(Rotation_Data.VALUES_2, event.values[2]);
-        if (event.values.length == 4) {
-            rowData.put(Rotation_Data.VALUES_3, event.values[3]);
+        rowData.put(Rotation_Data.TIMESTAMP, nowTimestamp);
+        rowData.put(Rotation_Data.VALUES_0, mean[0]);
+        rowData.put(Rotation_Data.VALUES_1, mean[1]);
+        rowData.put(Rotation_Data.VALUES_2, mean[2]);
+        if (mean.length == 4) {
+            rowData.put(Rotation_Data.VALUES_3, mean[3]);
         }
-        rowData.put(Rotation_Data.ACCURACY, event.accuracy);
+        rowData.put(Rotation_Data.ACCURACY, _worstAccuracy);
         rowData.put(Rotation_Data.LABEL, LABEL);
 
         if (awareSensor != null) awareSensor.onRotationChanged(rowData);
 
         data_values.add(rowData);
-        LAST_TS = TS;
+        lastTimestamp = nowTimestamp;
 
-        if (data_values.size() < 250 && TS < LAST_SAVE + 300000) {
+        // Reset queue.
+        _avgQueue.clear();
+        _worstAccuracy = Integer.MAX_VALUE;
+
+        if (data_values.size() < 250 && nowTimestamp < LAST_SAVE + 300000) {
             return;
         }
 
@@ -174,7 +240,7 @@ public class Rotation extends Aware_Sensor implements SensorEventListener {
         }
 
         data_values.clear();
-        LAST_SAVE = TS;
+        LAST_SAVE = nowTimestamp;
     }
 
     private static Rotation.AWARESensorObserver awareSensor;
