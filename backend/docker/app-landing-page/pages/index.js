@@ -1,4 +1,4 @@
-const APK_DOWNLAOD_URL = 'https://github.com/pnplab/Flux/releases/download/v1.7.2/Flux.apk';
+const APK_DOWNLAOD_URL = 'https://github.com/pnplab/Flux/releases/download/v1.8.0/Flux.apk';
 
 /* eslint-disable react/react-in-jsx-scope */
 
