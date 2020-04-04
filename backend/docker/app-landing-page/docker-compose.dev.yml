@@ -1,0 +1,56 @@
+version: "3.1"
+
+services:
+    # Nginx reverse proxy.
+    # @note reverse proxy prepends and redirect requests with /flux to map our
+    #    main nginx config/setup.
+    web:
+        build: ./reverse-proxy
+        ports:
+            - "8888:8888"
+        volumes:
+            - "./reverse-proxy/dev.conf:/etc/nginx/conf.d/000_dev.conf"
+        depends_on:
+            # For nextjs web server
+            - isomorphic-app
+            # For koa download proxy + socketio stream about download state
+            - download-api
+        restart: always
+
+    # Nextjs react server.
+    # @warning please use --build param on top of `docker-compose up` command.
+    isomorphic-app:
+        build: 
+            context: ./isomorphic-app
+            # @note env variables passed during docker image building as next.js
+            #     is building app at that stage. 
+            # @warning these args have been set up into Dockerfile as well.
+            args:
+                USE_REVERSE_PROXIED_LINKS: "true"
+        # @note these are exported to browser-side through next.config.js file.
+        environment: 
+            USE_REVERSE_PROXIED_LINKS: "true"
+        depends_on:
+            - download-api
+        expose:
+            - 3000
+        command: ["yarn", "dev:serve"]
+        volumes:
+        #     @warning Source code is on volume but not node_modules! Rebuild
+        #         is required in case of dependency change!
+            - "./isomorphic-app/public:/usr/src/app/public"
+            - "./isomorphic-app/pages:/usr/src/app/pages"
+            - "./isomorphic-app/components:/usr/src/app/components"
+        restart: always
+
+    # socketio + koa server.
+    download-api:
+        build: ./download-api
+        # volumes:
+        #     @todo move source file to specific dir and use that as a volume
+        #         (can't volume a file). 
+        #     @todo auto restart server on file change.
+        #     - "./download-api/index.js:/usr/src/app/"
+        expose:
+            - 3001
+        restart: always

@@ -11,5 +11,6 @@ docker/letsencrypt/webroot/
 docker/letsencrypt/dhparam-2048.pem
 docker/mysql/data/
 docker/software-update-service/src/node_modules
-docker/app-landing-page/.next
-docker/app-landing-page/node_modules
+docker/app-landing-page/isomorphic-app/.next
+docker/app-landing-page/isomorphic-app/node_modules
+docker/app-landing-page/download-api/node_modules

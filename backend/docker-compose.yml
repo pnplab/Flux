@@ -2,6 +2,7 @@ version: "3.1"
 
 services:
     # @warning do not change the name `web`! it is used in `docker/letsencrypt/renew-certificate.sh`.
+    # @warning for local landing page, use port 8888 and do build locally (cd docker/app-@landing-page/ ; yarn prod:build ; yarn prod:serve)
     web:
         # image: nginx:alpine
         build: ./docker/nginx
@@ -101,11 +102,33 @@ services:
         volumes:
             # @warning Source code is on volume but not node_modules! Rebuild is required in case of dependency change!
             - "./docker/software-update-service/src/:/usr/src/app/src/"
+        restart: always
 
-    app-landing-page:
-        build: ./docker/app-landing-page
-        # ...we don't mount src volume. it is dangerous. app is indeed built
-        # during docker build phase.
+    # Nextjs react server.
+    # @warning please use --build param on top of `docker-compose up` command.
+    app_landing_page-isomorphic_app:
+        build:
+            context: ./docker/app-landing-page/isomorphic-app
+            # @note env variables passed during docker image building as next.js
+            #     is building app at that stage. 
+            # @warning these args have been set up into Dockerfile as well.
+            args:
+                USE_REVERSE_PROXIED_LINKS: "true"
+        # @note these are exported to browser-side through next.config.js file.
+        environment: 
+            USE_REVERSE_PROXIED_LINKS: "true"
+        depends_on:
+            - app_landing_page-download_api
+        expose:
+            - 3000
+        restart: always
+
+    # socketio + koa server.
+    app_landing_page-download_api:
+        build: ./docker/app-landing-page/download-api
+        expose:
+            - 3001
+        restart: always
 
 #    datadog:
 #        build: ./docker/datadog
@@ -121,4 +144,3 @@ services:
 #            # to have to add wwww. subdomain manually!
 #            - "www.pnplab.ca:10.10.10.29"
 #        restart: always
-

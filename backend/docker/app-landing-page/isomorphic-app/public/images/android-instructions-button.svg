@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   height="60"
+   viewBox="0 0 203 60"
+   width="203"
+   version="1.1"
+   id="svg64"
+   sodipodi:docname="android-instructions.svg"
+   inkscape:version="0.92.2 5c3e80d, 2017-08-06">
+  <metadata
+     id="metadata70">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs68" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1440"
+     inkscape:window-height="856"
+     id="namedview66"
+     showgrid="false"
+     inkscape:zoom="1.4187192"
+     inkscape:cx="-10.003903"
+     inkscape:cy="-82.777775"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g62" />
+  <linearGradient
+     id="a"
+     x1="91.536%"
+     x2="-37.559%"
+     y1="37.788%"
+     y2="55.94%">
+    <stop
+       offset="0"
+       stop-color="#00a0ff"
+       id="stop2" />
+    <stop
+       offset=".00657"
+       stop-color="#00a1ff"
+       id="stop4" />
+    <stop
+       offset=".2601"
+       stop-color="#00beff"
+       id="stop6" />
+    <stop
+       offset=".5122"
+       stop-color="#00d2ff"
+       id="stop8" />
+    <stop
+       offset=".7604"
+       stop-color="#00dfff"
+       id="stop10" />
+    <stop
+       offset="1"
+       stop-color="#00e3ff"
+       id="stop12" />
+  </linearGradient>
+  <linearGradient
+     id="b"
+     x1="107.728%"
+     x2="-130.665%"
+     y1="49.428%"
+     y2="49.428%">
+    <stop
+       offset="0"
+       stop-color="#ffe000"
+       id="stop15" />
+    <stop
+       offset=".4087"
+       stop-color="#ffbd00"
+       id="stop17" />
+    <stop
+       offset=".7754"
+       stop-color="#ffa500"
+       id="stop19" />
+    <stop
+       offset="1"
+       stop-color="#ff9c00"
+       id="stop21" />
+  </linearGradient>
+  <linearGradient
+     id="c"
+     x1="71.674%"
+     x2="-9.496%"
+     y1="17.815%"
+     y2="194.393%">
+    <stop
+       offset="0"
+       stop-color="#ff3a44"
+       id="stop24" />
+    <stop
+       offset="1"
+       stop-color="#c31162"
+       id="stop26" />
+  </linearGradient>
+  <linearGradient
+     id="d"
+     x1="9.531%"
+     x2="45.441%"
+     y1="-54.527%"
+     y2="24.69%">
+    <stop
+       offset="0"
+       stop-color="#32a071"
+       id="stop29" />
+    <stop
+       offset=".0685"
+       stop-color="#2da771"
+       id="stop31" />
+    <stop
+       offset=".4762"
+       stop-color="#15cf74"
+       id="stop33" />
+    <stop
+       offset=".8009"
+       stop-color="#06e775"
+       id="stop35" />
+    <stop
+       offset="1"
+       stop-color="#00f076"
+       id="stop37" />
+  </linearGradient>
+  <g
+     fill="none"
+     id="g62">
+    <path
+       d="m195.481481 60h-187.96296248c-4.21037037 0-7.51851852-3.3-7.51851852-7.5v-45c0-4.2 3.30814815-7.5 7.51851852-7.5h187.96296248c4.210371 0 7.518519 3.3 7.518519 7.5v45c0 4.05-3.308148 7.5-7.518519 7.5z"
+       id="path40"
+       fill="#000" />
+    <path
+       d="m195.481481 1.2c3.458519 0 6.315556 2.85 6.315556 6.3v45c0 3.45-2.857037 6.3-6.315556 6.3h-187.96296248c-3.45851852 0-6.31555556-2.85-6.31555556-6.3v-45c0-3.45 2.85703704-6.3 6.31555556-6.3zm0-1.2h-187.96296248c-4.21037037 0-7.51851852 3.3-7.51851852 7.5v45c0 4.2 3.30814815 7.5 7.51851852 7.5h187.96296248c4.210371 0 7.518519-3.3 7.518519-7.5v-45c0-4.05-3.308148-7.5-7.518519-7.5z"
+       fill="#a6a6a6"
+       id="path42" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.33333397px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#f5f5f5;fill-opacity:1;stroke:none"
+       x="101.14366"
+       y="34.836803"
+       id="text3763"><tspan
+         sodipodi:role="line"
+         x="101.14366"
+         y="34.836803"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.33333397px;font-family:Arial;-inkscape-font-specification:'Arial, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;fill:#f5f5f5;fill-opacity:1"
+         id="tspan841">INSTRUCTIONS</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.33333302px;line-height:1.25;font-family:sans;-inkscape-font-specification:'sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none"
+       x="347.49652"
+       y="13.479167"
+       id="text4651"><tspan
+         sodipodi:role="line"
+         x="347.49652"
+         y="21.736979"
+         id="tspan4653" /></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.33333302px;line-height:1.25;font-family:sans;-inkscape-font-specification:'sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none"
+       x="168.46181"
+       y="-40.795139"
+       id="text4667"><tspan
+         sodipodi:role="line"
+         x="168.46181"
+         y="-32.537327"
+         id="tspan4669" /></text>
+  </g>
+</svg>
