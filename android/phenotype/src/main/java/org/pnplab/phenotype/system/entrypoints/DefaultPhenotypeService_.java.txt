@@ -1,0 +1,105 @@
+package org.pnplab.phenotype.system.entrypoints;
+
+public class DefaultPhenotypeService_ {
+    // int numberOfCores = Runtime.getRuntime().availableProcessors();
+    // ThreadPoolExecutor taskExecutor = new ThreadPoolExecutor(numberOfCores, 32, 5000, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(50));
+    // executor.setRejectedExecutionHandler
+    // https://medium.com/@frank.tan/using-a-thread-pool-in-android-e3c88f59d07f
+    // https://medium.com/@frank.tan/using-handlerthread-in-android-46c285936fdd
+    // taskExecutor.prestartAllCoreThreads();
+    // taskExecutor.awaitTermination();
+
+    final AbstractLogger _log = AbstractPhenotypeInitProvider.getLogger();
+
+    Observable<Channel> _connectionObservable;
+    @NonNull Disposable _disposeConnectionObservable;
+    // private Observable<String> _pingObservable;
+
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Override
+    protected void _onStartEngine() {
+        // https://developer.android.com/guide/components/broadcast-exceptions
+        // https://developer.android.com/reference/java/util/concurrent/ThreadPoolExecutor.html
+
+        /*
+        PublishSubject<String> queue = PublishSubject.<String>create();
+        Flowable<String> queueFlow = Flowable.fromObservable(queue, BackpressureStrategy.BUFFER)
+                .delay(2, TimeUnit.SECONDS);
+         */
+
+
+
+        Flowable<Ping.PingTimepoint> dataStream = Ping.get();
+
+        Flowable<Channel> connectionStream = Flowable
+            .fromObservable(RabbitConnection.get(), BackpressureStrategy.LATEST);
+
+
+
+        /*
+        connectionStream.flatMap(channel -> {
+            if (channel == null) {
+                return dataStream
+                        .withLatestFrom(connectionStream, Pair::new)
+                        .compose(FlowableTransformers.bufferWhile(pair -> pair.second == null))
+                        .flatMap(Flowable::fromIterable)
+                        .map(pair -> new Pair(pair.first, connectionStream.lastOrError().blockingGet()));
+            }
+        });
+        */
+
+        /*
+        Flowable<Pair<String, Channel>> recordingStream = dataStream
+                // @warning combineLatest would write last input multiple time to every new output stream
+                // @warning will this wait for trigger ? yes -- but might ignore previous events cf. https://stackoverflow.com/questions/39097699/have-withlatestfrom-wait-until-all-sources-have-produced-one-value#comment80446579_39097699
+                // @warning will be kept with last emitted value due to switch map .never.
+                // --> should write down req.
+                .withLatestFrom(connectionStream, Pair::new);
+        Flowable<Pair<String, Channel>> compose = recordingStream
+                .compose(FlowableTransformers.bufferWhile(pair -> pair.second == null, EvictingQueue.create(1000)))
+                .flatMap(Flowable::fromIterable);
+
+        Flowable<Pair<String, Channel>> voidRecordingStream = recordingStream
+                .filter(pair -> pair.second == null);
+        voidRecordingStream.subscribe(pair -> queue.onNext(pair.first));
+
+
+        Flowable<Pair<String, Channel>> activeRecordingStream = recordingStream
+                .filter(pair -> pair.second != null);
+        // Loop void recording stream.
+
+        Disposable recording =
+                recordingStream
+                .subscribe(pair -> {
+                    String pingValue = pair.first;
+                    Channel channel = pair.second;
+                    channel.basicPublish("", "ping", null, pingValue.getBytes());
+                });
+
+        dataStream.switchMap(input -> {
+            return connectionStream.map(output ->
+                output.write(input)
+            );
+        });
+
+        Ping.get()
+                    .switchMap(pingMessage -> {
+                    return RabbitConnection.get()
+                            .map(channel -> {
+                                if (channel != null) {
+                                    return new Pair<>(channel, pingMessage);
+                                }
+                                else {
+                                    return pingMessage
+                                }
+                            });
+                });
+        */
+    }
+
+    @Override
+    protected void _onStopEngine() {
+        _disposeConnectionObservable.dispose();
+    }
+}
