@@ -168,6 +168,9 @@ public class MainApplication extends Application implements ReactApplication {
                     // still fails. This may simply be a build configuration
                     // issue we can resolve (ie. the muse .so isn't packaged
                     // inside the react-native x86_64 apk). Or something else.
+                    // Also could be related to Android 7.0+ restriction to
+                    // dynamic linking (unlikely).
+                    // cf. https://developer.android.com/about/versions/nougat/android-7.0-changes#ndk
                     try {
                         // Force-link muse.
                         MuseManagerAndroid.getInstance();
