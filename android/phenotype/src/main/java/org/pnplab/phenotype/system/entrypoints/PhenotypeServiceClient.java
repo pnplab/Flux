@@ -132,7 +132,7 @@ final public class PhenotypeServiceClient {
      * > thrown by remote methods.
      * cf. https://developer.android.com/guide/components/bound-services.html#Additional_Notes
      * Android doc claims are wrong. On top of DeadObjectException, some of the
-     * exception in the aidl interface implementation get sometimes also be
+     * exception in the aidl interface implementation stream sometimes also be
      * forwarded depending on their type.
      * cf. https://blog.classycode.com/dealing-with-exceptions-in-aidl-9ba904c6d63
      * The remoter lib we use for AIDL forwards all exceptions and wrap checked
@@ -340,7 +340,7 @@ final public class PhenotypeServiceClient {
                 break;
             }
             default:
-                // Should not happen, except if bindingState happen to get null
+                // Should not happen, except if bindingState happen to stream null
                 // somehow.
                 throw new IllegalStateException("_bindingState value does not exist.");
         }
@@ -539,7 +539,7 @@ final public class PhenotypeServiceClient {
         //
         // @warning
         // Possibly only called on API 26+
-        // And even on API 26, it did not get called on my API 26 phone after
+        // And even on API 26, it did not stream called on my API 26 phone after
         // DeadObjectException though (nor any other disconnection-related
         // callback).
         public void onBindingDied(ComponentName name) {

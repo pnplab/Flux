@@ -36,7 +36,7 @@ public class Log4aPhenotypeLogger extends AbstractLogger {
         FileAppender appender = new FileAppender
                 .Builder(context)
                 .addInterceptor(logData -> {
-                    if (logData.logLevel >= Level.INFO) {
+                    if (logData.logLevel >= Level.VERBOSE) {
                         Log.i(logData.tag, logData.msg);
                     }
                     return true;
@@ -93,8 +93,8 @@ public class Log4aPhenotypeLogger extends AbstractLogger {
 
         // List method calls until given limit.
         Queue<String> callStack = new LinkedList<>();
-        int fromStackItemIndex = 3; // this method callee.
-        int untilStackItemIndex = Math.min(stacktrace.length, fromStackItemIndex + 1); // max 1 call stack item to not be too verbose.
+        int fromStackItemIndex = 4; // this method callee.
+        int untilStackItemIndex = Math.min(stacktrace.length, fromStackItemIndex + 2); // max 1 call stack item to not be too verbose.
         for (int i = fromStackItemIndex; i < untilStackItemIndex; ++i) {
             StackTraceElement stacktraceItem = stacktrace[i];
             String stacktraceItemStr = stacktraceItem.getMethodName() + " (" + _getShortClassName(stacktraceItem.getClassName()) + ")";

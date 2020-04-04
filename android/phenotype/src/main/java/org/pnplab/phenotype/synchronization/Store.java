@@ -1,21 +1,16 @@
 package org.pnplab.phenotype.synchronization;
 
-import com.rabbitmq.client.Channel;
 
-public class StoreStream {
+import java.util.List;
 
-    public StoreStream(Channel channel) {
+public abstract class Store {
+
+    public abstract void write(Object data);
+
+    public void writeBatch(List<Object> dataBatch) {
+        for (Object data: dataBatch) {
+            this.write(data);
+        }
     }
 
-    public StoreStream() {
-        //sqlite
-    }
-
-    public void write() {
-
-    }
-
-    public void writeBatch() {
-
-    }
 }

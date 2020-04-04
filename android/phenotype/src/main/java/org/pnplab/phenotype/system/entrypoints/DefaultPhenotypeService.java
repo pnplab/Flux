@@ -1,20 +1,34 @@
 package org.pnplab.phenotype.system.entrypoints;
 
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
-import android.hardware.TriggerEvent;
-import android.hardware.TriggerEventListener;
-import android.os.Build;
-import android.os.Handler;
-import android.os.HandlerThread;
+import android.content.Context;
 
+import androidx.core.util.Pair;
+
+import com.rabbitmq.client.Channel;
+
+import org.jetbrains.annotations.NotNull;
+import org.pnplab.phenotype.acquisition.listeners.Accelerometer;
 import org.pnplab.phenotype.logger.AbstractLogger;
+import org.pnplab.phenotype.synchronization.Ping;
+import org.pnplab.phenotype.synchronization.RabbitConnection;
+import org.pnplab.phenotype.synchronization.RabbitStore;
+import org.pnplab.phenotype.synchronization.SQLiteStore;
+import org.pnplab.phenotype.synchronization.Store;
+import org.pnplab.phenotype.synchronization.WifiStatus;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.BackpressureOverflowStrategy;
+import io.reactivex.rxjava3.core.BackpressureStrategy;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.disposables.Disposable;
+import java9.util.Optional;
 
 // @todo
 // 1. upload on server to Timeseries Db
@@ -23,130 +37,229 @@ import java.util.List;
 // https://developer.android.com/topic/performance/power/setup-battery-historian
 // https://developer.android.com/topic/performance/power/battery-historian
 public class DefaultPhenotypeService extends AbstractPhenotypeService {
-    // int numberOfCores = Runtime.getRuntime().availableProcessors();
-    // ThreadPoolExecutor taskExecutor = new ThreadPoolExecutor(numberOfCores, 32, 5000, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(50));
-    // executor.setRejectedExecutionHandler
-    // https://medium.com/@frank.tan/using-a-thread-pool-in-android-e3c88f59d07f
-    // https://medium.com/@frank.tan/using-handlerthread-in-android-46c285936fdd
-    // taskExecutor.prestartAllCoreThreads();
-    // taskExecutor.awaitTermination();
 
-    final AbstractLogger _log = AbstractPhenotypeInitProvider.getLogger();
-
-    Thread _engineThread = new Thread(() -> {
-        // Ping service every 5 seconds and report to log.
-        while (!Thread.currentThread().isInterrupted()) {
-            String timestamp = "" + System.currentTimeMillis();
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-                LocalDateTime now = LocalDateTime.now();
-                timestamp += " " + dtf.format(now);
-            }
-
-            _log.v(timestamp + " ping service");
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-
-            }
-        }
-    });
-
+    private final AbstractLogger _log = AbstractPhenotypeInitProvider.getLogger();
 
     @Override
     protected void _onStartEngine() {
-        _engineThread.start();
-        // https://developer.android.com/guide/components/broadcast-exceptions
-        // https://developer.android.com/reference/java/util/concurrent/ThreadPoolExecutor.html
 
-        HandlerThread sensorThread = new HandlerThread("PhenotypeEngine");
-        sensorThread.start();
-        Handler sensorThreadHandler = new Handler(sensorThread.getLooper());
+        _log.d("start");
 
-        SensorManager _sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        // Check internet connection once network connection has been validated.
+        // @todo chain
 
-        {
-            final Sensor _significanMotion = _sensorManager.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION);
+        Context context = getApplicationContext();
+        @NotNull Observable<Boolean> wifiStatus = WifiStatus.stream(context, _log);
 
-            boolean isWakeUp = true; // unknown.. @todo know!
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                isWakeUp = _significanMotion.isWakeUpSensor();
-            }
-            int maxEventCount = _significanMotion.getFifoMaxEventCount();
-            int frequency = 50;
-            int maxReportLatencyUs = (1000000 / frequency) * maxEventCount;
-            _log.i("sm:isWakeUp:" + isWakeUp);
-            _log.i("sm:frequency:" + frequency);
-            _log.i("sm:maxEventCount:" + maxEventCount);
-            _log.i("sm:maxReportLatencyUs:" + maxReportLatencyUs);
+        Observable<Optional<RabbitStore>> rabbitStoreStream = wifiStatus
+                // switchMap or flatMap?
+                // @warning switchMap would dispose current wifi subscription on first result?
+                .<Optional<Channel>>switchMap(isWifiActive -> isWifiActive ?
+                        // Try to provide rabbit mq connection, or empty item
+                        // (to be processed as local storage fallback) in
+                        // case of failure (as well as delayed broken
+                        // connection).
+                        RabbitConnection
+                            .get()
+                            // Split error into empty value + error, as
+                            // - we want the outer stream to have an empty
+                            //   channel event in case of connection failure so
+                            //   it can fallback to local storage for instance.
+                            // - using error + retryWhen doesn't allow to emit
+                            //   that empty event.
+                            // - using startWith wont be retriggered after
+                            //   error recovery.
+                            .onErrorResumeNext(err ->
+                                Observable
+                                    .concat(
+                                        Observable.just(Optional.empty()),
+                                        Observable.error(err)
+                                    )
+                            )
+                            // Retry (the whole chain, not just the last
+                            // operator) on error.
+                            .retryWhen(inputObs -> inputObs
+                                // Calculate current attempt number by
+                                // converting the error objects into their
+                                // index within the stream.
+                                .scan(1, (i, error) -> ++i)
+                                // Return exponential back-off timed source.
+                                .flatMap(
+                                    i ->
+                                        Observable.timer(
+                                            Double.valueOf(Math.pow(2., i)).longValue(),
+                                            TimeUnit.SECONDS
+                                        )
+                                )
+                            )
+                            // Prevent empty observable being retriggered at
+                            // each new attempt when connection is failing.
+                            .distinctUntilChanged() :
+                        // Provide empty item (to be processed as local storage
+                        // fallback) when wifi is/goes off.
+                        Observable.just(Optional.empty())
+                )
+                // Create rabbitmq (or empty) store out of rabbitmq channel.
+                .map(optionalChannel -> optionalChannel.isPresent() ?
+                        Optional.of(new RabbitStore(optionalChannel.get())) :
+                        Optional.<RabbitStore>empty()
+                );
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                int reportingMode = _significanMotion.getReportingMode();
-                if (reportingMode == Sensor.REPORTING_MODE_ONE_SHOT) {
-                    _log.i("sm:reportingMode:oneShot");
-                }
-                else {
-                    _log.i("sm:reportingMode:" + reportingMode);
-                }
-            }
+        /* PING */
 
-            // @question from that.
-            final TriggerEventListener triggerEventListener = new TriggerEventListener() {
-                @Override
-                public void onTrigger(TriggerEvent event) {
-                    String timestamp = "" + System.currentTimeMillis();
-                    long evtTimestamp = event.timestamp;
-                    _log.v("sm " + timestamp + " " + event.timestamp + " " + event.values.length + " " + event.values[0]);
-                    // loop trigger
-                    _sensorManager.requestTriggerSensor(this, _significanMotion);
-                }
-            };
-            boolean requestSucceed = _sensorManager.requestTriggerSensor(triggerEventListener, _significanMotion);
-            _log.i("sm:requestSucceed:" + requestSucceed);
-        }
+        // Generate sqlite store for ping.
+        SQLiteStore pingSQLiteStore = new SQLiteStore(context, Ping.PingTimepoint.class.getSimpleName(), Ping.PingTimepoint.class);
 
-        {
-            Sensor _accelerometer = _sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-            boolean isWakeUp = false; // unknown.. @todo know!
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                // @note _sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER, true) returns null.
-                List<Sensor> dynamicSensorList = _sensorManager.getDynamicSensorList(Sensor.TYPE_ACCELEROMETER);
-                for (Sensor dynamicSensor : dynamicSensorList) {
-                    if (dynamicSensor.isWakeUpSensor()) {
-                        _accelerometer = dynamicSensor;
-                        isWakeUp = true;
-                    }
-                }
-            }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                isWakeUp = _accelerometer.isWakeUpSensor();
-            }
-            int maxEventCount = _accelerometer.getFifoMaxEventCount();
-            int frequency = 50;
-            int maxReportLatencyUs = (1000000 / frequency) * maxEventCount;
-            _log.i("accelerometer:isWakeUp:" + isWakeUp);
-            _log.i("accelerometer:frequency:" + frequency);
-            _log.i("accelerometer:maxEventCount:" + maxEventCount);
-            _log.i("accelerometer:maxReportLatencyUs:" + maxReportLatencyUs);
+        // Continue with empty connection in case rabbitmq connection fails.
+        Observable<Store> storeStream = rabbitStoreStream
+                .map(optionalRabbitStore -> optionalRabbitStore.isPresent() ?
+                        optionalRabbitStore.get() :
+                        pingSQLiteStore
+                );
 
-            _sensorManager.registerListener(new SensorEventListener() {
-                @Override
-                public void onSensorChanged(SensorEvent event) {
-                    String timestamp = "" + System.currentTimeMillis();
-                    _log.v("" + timestamp + " " + event.timestamp + " " + event.values[0] + " " + event.values[1] + " " + event.values[2]);
-                }
+        // Retrieve data stream.
+        Flowable<Ping.PingTimepoint> dataStream = Ping.get();
 
-                @Override
-                public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        // Store datastream.
+        Flowable<Pair<Ping.PingTimepoint, Store>> outputStream = dataStream
+                // @warning withLatestFrom passes-through (ignores) input
+                // flowables backbuffers' strategies.
+                .withLatestFrom(
+                        Flowable.fromObservable(storeStream, BackpressureStrategy.LATEST),
+                        Pair::create
+                )
+                // Specify a backbuffer w/ specific-size ring buffer.
+                //
+                // @warning
+                // capacity is not considered and set to 16 (comments apply to
+                // rxjava 2, we suspect it might have changed in rxjava 3
+                // though).
+                // cf. https://stackoverflow.com/a/38180308/939741
+                // cf. https://github.com/ReactiveX/RxJava/pull/1836
+                //
+                // rxjava 3 mentions "experimental version (not available in
+                // RxJava 1.0)".
+                // cf. https://github.com/ReactiveX/RxJava/wiki/Backpressure
+                .onBackpressureBuffer(32, null, BackpressureOverflowStrategy.DROP_OLDEST);
 
-                }
-            }, _accelerometer, 1000000 / frequency, sensorThreadHandler);
-        }
+        @NonNull Disposable disposable = outputStream // @todo dispose
+                .subscribe(p -> {
+                    Ping.PingTimepoint data = p.first;
+                    Store store = p.second;
+                    // _log.d("subs.store: " + store.getClass().toString() + " <- " + data.time);
+
+                    store.write(data);
+
+                    // 1. write to rabbitmq
+                    // 2. write to sqlite.
+                }, err -> {
+                    _log.e("subs.error: " + err.toString());
+
+                    Writer out = new Writer() {
+                        StringBuffer _strBuffer = new StringBuffer();
+
+                        @Override
+                        public void write(char[] cbuf, int off, int len) throws IOException {
+                            _strBuffer.append(cbuf, off, len);
+                        }
+
+                        @Override
+                        public void flush() throws IOException {
+                        }
+
+                        @Override
+                        public void close() throws IOException {
+                            _log.e(_strBuffer.toString());
+                        }
+                    };
+
+                    PrintWriter p = new PrintWriter(out);
+                    err.printStackTrace(p);
+                    p.flush();
+                    p.close();
+                });
+
+        /* ACCELEROMETER */
+
+        SQLiteStore accelerometerSQLiteStore = new SQLiteStore(context, Accelerometer.AccelerometerTimepoint.class.getSimpleName(), Accelerometer.AccelerometerTimepoint.class);
+
+        Observable<Store> accelerometerStoreStream = rabbitStoreStream
+                .map(optionalRabbitStore -> optionalRabbitStore.isPresent() ?
+                        optionalRabbitStore.get() :
+                        accelerometerSQLiteStore
+                );
+
+
+        // Retrieve data stream.
+        Accelerometer accelerometer = new Accelerometer();
+        Flowable<Accelerometer.AccelerometerTimepoint> accelerometerDataStream = accelerometer
+                .run(context, _log)
+                .filter(event -> event instanceof Accelerometer.AccelerometerTimepoint)
+                .map(event -> (Accelerometer.AccelerometerTimepoint) event);
+
+        // Store datastream.
+        Flowable<Pair<Accelerometer.AccelerometerTimepoint, Store>> accelerometerOutputStream = accelerometerDataStream
+                // @warning withLatestFrom passes-through (ignores) input
+                // flowables backbuffers' strategies.
+                .withLatestFrom(
+                        Flowable.fromObservable(accelerometerStoreStream, BackpressureStrategy.LATEST),
+                        Pair::create
+                )
+                // Specify a backbuffer w/ specific-size ring buffer.
+                //
+                // @warning
+                // capacity is not considered and set to 16 (comments apply to
+                // rxjava 2, we suspect it might have changed in rxjava 3
+                // though).
+                // cf. https://stackoverflow.com/a/38180308/939741
+                // cf. https://github.com/ReactiveX/RxJava/pull/1836
+                //
+                // rxjava 3 mentions "experimental version (not available in
+                // RxJava 1.0)".
+                // cf. https://github.com/ReactiveX/RxJava/wiki/Backpressure
+                .onBackpressureBuffer(256, null, BackpressureOverflowStrategy.DROP_OLDEST);
+
+        @NonNull Disposable accelerometerDisposable = accelerometerOutputStream // @todo dispose
+                .subscribe(p -> {
+                    Accelerometer.AccelerometerTimepoint data = p.first;
+                    Store store = p.second;
+                    // _log.d("subs.store: " + store.getClass().toString() + " <- " + data.timestamp);
+
+                    store.write(data);
+
+                    // 1. write to rabbitmq
+                    // 2. write to sqlite.
+                }, err -> {
+                    _log.e("subs.error: " + err.toString());
+
+                    Writer out = new Writer() {
+                        StringBuffer _strBuffer = new StringBuffer();
+
+                        @Override
+                        public void write(char[] cbuf, int off, int len) throws IOException {
+                            _strBuffer.append(cbuf, off, len);
+                        }
+
+                        @Override
+                        public void flush() throws IOException {
+                        }
+
+                        @Override
+                        public void close() throws IOException {
+                            _log.e(_strBuffer.toString());
+                        }
+                    };
+
+                    PrintWriter p = new PrintWriter(out);
+                    err.printStackTrace(p);
+                    p.flush();
+                    p.close();
+                });
     }
 
     @Override
     protected void _onStopEngine() {
-        _engineThread.interrupt();
+
     }
+
 }

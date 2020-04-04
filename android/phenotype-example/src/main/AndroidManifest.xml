@@ -8,7 +8,17 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:name="org.pnplab.phenotype_example.MainApplication">
+
+        <!--
+        help diagnose facebook flipper (debugging framework) integration issues
+        and other problems.
+        cf. https://fbflipper.com/docs/getting-started.html
+        -->
+        <activity android:name="com.facebook.flipper.android.diagnostics.FlipperDiagnosticActivity"
+                android:exported="true"/>
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

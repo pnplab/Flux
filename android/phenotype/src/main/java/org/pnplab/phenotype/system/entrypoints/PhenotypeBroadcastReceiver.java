@@ -99,7 +99,7 @@ public class PhenotypeBroadcastReceiver extends BroadcastReceiver {
                     });
                 }
             }, error -> {
-                // Release wakelock if service has failed to get connected to.
+                // Release wakelock if service has failed to stream connected to.
                 _log.v("release wakeLock phenotype:BOOT_COMPLETED");
                 wakeLock.release();
             });
@@ -173,7 +173,7 @@ public class PhenotypeBroadcastReceiver extends BroadcastReceiver {
                     });
                 }
             }, error -> {
-                // Release wakelock if service has failed to get connected to.
+                // Release wakelock if service has failed to stream connected to.
                 _log.v("release wakeLock phenotype:QUICKBOOT_POWERON");
                 wakeLock.release();
             });

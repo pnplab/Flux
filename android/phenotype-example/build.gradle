@@ -35,4 +35,13 @@ dependencies {
 
     implementation project(':phenotype')
     implementation 'com.github.pqpo:Log4a:1.5.0'
+
+    // Framework dependency for flipper desktop app to debug android and ios
+    // apps.
+    // cf. https://fbflipper.com/docs/getting-started.html
+    debugImplementation 'com.facebook.flipper:flipper:0.34.0'
+    releaseImplementation 'com.facebook.flipper:flipper-noop:0.34.0'
+    debugImplementation 'com.facebook.flipper:flipper-network-plugin:0.34.0'
+    implementation 'com.facebook.soloader:soloader:0.8.2' // for flipper loading
+    debugImplementation 'com.facebook.soloader:soloader:0.8.2'
 }

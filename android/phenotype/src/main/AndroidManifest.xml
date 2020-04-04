@@ -48,6 +48,19 @@ cf. https://stackoverflow.com/a/4246141/939741
     -->
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
+    <!--
+    Allows internet access, for data synchronisation through RabbitMQ.
+    cf. https://www.cloudamqp.com/blog/2015-07-29-rabbitmq-on-android.html
+    -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!--
+    Monitor wifi state in order to know whether to send data to network
+    directly or to store them locally until wifi is active.
+    -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+
     <application>
 
         <!--

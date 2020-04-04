@@ -21,7 +21,7 @@ package org.pnplab.phenotype.system.entrypoints;
  *
  * @warning
  * *However, Remoter fixes that!*
- * > Interface methods can throw any exceptions. Clients will get the same
+ * > Interface methods can throw any exceptions. Clients will stream the same
  * > exception that is thrown.
  * cf. https://github.com/josesamuel/remoter
  */

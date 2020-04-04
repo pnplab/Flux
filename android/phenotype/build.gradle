@@ -77,24 +77,24 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    // implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.1.0'
 
     // Removes `Didn't find class "android.view.View$OnUnhandledKeyEventListener"`
     // warnings on android < 28 API. This is an androidx bug.
-    // https://stackoverflow.com/a/57518141/939741
-    // https://stackoverflow.com/questions/51782548/androidxappcompat-iart-error-android-view-viewonunhandledkeyeventlistener/52954286#52954286
-    // https://issuetracker.google.com/issues/120750246
+    // cf. https://stackoverflow.com/a/57518141/939741
+    // cf. https://stackoverflow.com/questions/51782548/androidxappcompat-iart-error-android-view-viewonunhandledkeyeventlistener/52954286#52954286
+    // cf. https://issuetracker.google.com/issues/120750246
     // cf. https://github.com/facebook/flipper/issues/146
     debugImplementation 'com.github.DonaldDu:FixUnhandledEvent:1.0'
-    implementation 'androidx.core:core-ktx:1.1.0'
+    // @todo remove these 2 dependencies as they appear to be useless.
+    implementation 'androidx.core:core-ktx:1.2.0'
     implementation 'androidx.multidex:multidex:2.0.1' // for android api < 21 multidex support
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
-    // Use remoter to generate aidl interfaces used for android service IPC
+    // We use remoter to generate aidl interfaces used for android service IPC
     // using java code.
     // see https://github.com/josesamuel/remoter
     implementation 'com.josesamuel:remoter-annotations:1.2.5'
@@ -102,12 +102,148 @@ dependencies {
     annotationProcessor 'com.josesamuel:remoter:1.2.5'
 
     // For Java 8 java.util.function android minSdkTarget < 24 compat.
-    // @note we use api keyword instead of implementation in order to export
+    // @note
+    // We use api keyword instead of implementation in order to export
     // android-retrostreams transitive dependency and thus export Consumer
     // class which is shared in our public api.
+    // @todo replace dependency by internal implementation.
     api 'net.sourceforge.streamsupport:android-retrostreams:1.7.1'
 
     // For Java8 CompletableFuture.
     // cf. https://github.com/retrostreams/android-retrofuture
     // compile 'net.sourceforge.streamsupport:android-retrofuture:1.7.1'
+
+    // We use reactive stream exclusively as an implementation solution to the
+    // sensing data acquisition, its processing, storage and transfer. We do
+    // not want this lib to force opinionated dependency through its interface.
+    // Thus we do not use it as an asynchronous interface abstraction layer.
+    // Also, its use is also technically still optional as it's only used for
+    // implementation concerns in DefaultPhenotypeService.
+    //
+    // Considering that, back-pressured reactive streams address 2 concerns we
+    // specifically have:
+    // - backpessured dataflow under heavy charge.
+    // - dataflow architectural abstraction.
+    //
+    // Without backpressure, potential conflict with other heavy cpu running
+    // processes are not handled. Worst case could lead to overall operating
+    // system slow down or even crash.
+    //
+    // The possibility of swift architectural changes between differed
+    // sensing architectures and real-time sensing ones is induced by the
+    // centralisation of our sensing dataflow combined with the reactive
+    // abstraction.
+    // While our battery concerns make us focus on the differed one, critical
+    // real-time use-cases can be addressed as well, as we keep the flexibility
+    // to play along the extremum of these choices. Indeed, we thus do not
+    // become dependent of the temporality of our pipelines and the junction of
+    // the underlying algorithms we use.
+    //
+    // RxJava implies an overall performance overhead, magnified by the
+    // frequency phone sensors are streaming new events. A potential solution
+    // to reduce the induced overhead is ObjectPool.
+    // cf. https://github.com/Joseph82/RxSensors#notes
+    // This solution should be approached with care as it introduces battery
+    // drain through recurring timers.
+    // cf. https://github.com/ReactiveX/RxJava/issues/4845
+    // Another path to reduce overhead is to batch events before introducing
+    // them to RxJava.
+    // @todo These considerations will have to be monitored.
+    //
+    // @note
+    // Reactor 3 > RxJava 3 (faster and more standard) but only compatible
+    // with Java 8+ and Android 24+ for now.
+    // cf. https://twitter.com/JakeWharton/status/1169821303555014656
+    //
+    // @note
+    // RxAndroid 3 - on top of RxJava 3 - exists in release candidate but we do
+    // not use it. We do not use it since we don't use rely on main/ui thread
+    // as all our stream code is done in external service-process which don't
+    // even have a main thread looper set up by default. RxJava3 is enough for
+    // our needs.
+    // cf. ticket here https://github.com/ReactiveX/RxAndroid/issues/538
+    // cf. available here https://twitter.com/JakeWharton/status/1169821303555014656
+    implementation 'io.reactivex.rxjava3:rxjava:3.0.0'
+
+    // For bufferWhile operator used to buffer stream until there is a
+    // connection available to send the data to.
+    // implementation 'com.github.akarnokd:rxjava3-extensions:3.0.0'
+
+    // implementation 'com.google.guava:guava:28.2-android' // for EvictingQueue (ring buffer) @warning marked as unstable api
+
+    // RabbitMQ provides an abstraction over messaging protocols, including
+    // AMQP and both the low overhead MQTT protocol and the STOMP text protocol
+    // raw or wrapped by web sockets. It supports TLS. It supports
+    // authentification (including from LDAP),
+    // cf. https://www.rabbitmq.com/ssl.html#java-client
+    // It therefore provides the benefit of traditional security methods and
+    // low-latency / low-bandwidth ones, as well as the flexibility to change.
+    // It's also compatible with both ios and android.
+    //
+    // Using RabbitMQ thus provide implementations that can be used for
+    // through-network real-time processing such as remote algorithms
+    // prototyping as well as more traditional differed backend synchronisation
+    // solutions without implying overly restrictive constraints on the
+    // backend.
+    //
+    // cf. https://www.rabbitmq.com/protocols.html
+    // RabbitMQ 5.x requires java 8 runtime, only available on Android 24+. We
+    // thus use the 4.x one.
+    // cf. https://www.rabbitmq.com/java-client.html
+    // cf. https://github.com/rabbitmq/rabbitmq-java-client
+    implementation 'com.rabbitmq:amqp-client:4.11.3'
+
+    // See android market shares by API for canada (eq ~ 2% for android Kitkat
+    // (API 19 & 20) in febr. 2020.
+    // cf. https://gs.statcounter.com/android-version-market-share/mobile-tablet/canada
+    //
+    // Broadcast WIFI_STATE_CHANGED_ACTION was not delivered while NETWORK_STATE_CHANGED_ACTION
+    // was, although it might have been due to manifest permission
+    // mis-configuration.
+    // cf. https://stackoverflow.com/a/6741489/939741
+    // cf. https://stackoverflow.com/a/41277877/93974
+    //
+    // android.net.wifi.STATE_CHANGE seems to work well and trigger once wifi
+    // connection has been activated.
+    // cf. https://stackoverflow.com/questions/5888502/how-to-detect-when-wifi-connection-has-been-established-in-android#comment90361390_22626736
+    //
+    // Broadcast NETWORK_STATE_CHANGED_ACTION is not delivered to manifest
+    // receivers in applications that target API version 26 or later.
+    // cf. https://developer.android.com/reference/android/net/wifi/WifiManager#NETWORK_STATE_CHANGED_ACTION
+    //
+    // AWARE uses WIFI_STATE_CHANGED_ACTION and it seems to work fine.
+    //
+    // Recommended android method of NetworkCallbacks is API21+.
+    // cf. https://developer.android.com/training/monitoring-device-state/connectivity-status-type
+    // Docs then recommend NetworkCapabilities from NetworkCallback.
+    // Difference between NetworkCallback and NetworkCapabilities seems to be
+    // one is receive events for all networks while the other is
+    // network-specific (ie. in case there is multiple 4G or wifi ship
+    // installed). Although I am not sure.
+    // cf. https://developer.android.com/reference/android/net/ConnectivityManager.NetworkCallback
+    //
+    // Broadcast listening android.net.conn.CONNECTIVITY_CHANGE is deprecated.
+    // cf. https://stackoverflow.com/questions/31689513/broadcastreceiver-to-detect-network-is-connected?noredirect=1&lq=1#comment53812628_31689805
+    //
+    // For cross platform network status listener, incl. android < API 21, we
+    // use ReactiveNetwork library. It can monitor both network and internet
+    // connectivity (user can be connected to wifi without having access to
+    // internet). We only monitor for network in our code though.
+    // cf. https://github.com/pwittchen/ReactiveNetwork
+    //
+    // Interesting source also.
+    // https://stackoverflow.com/questions/38242462/internet-check-where-to-place-when-using-mvp-rx-and-retrofit/38281335#38281335
+    //
+    // It uses non-deprecated ConnectivityManager Network Callback for 21+ and
+    // broadcast for < API 21.
+    // cf. http://pwittchen.github.io/ReactiveNetwork/docs/RxJava2.x/#/?id=observing-network-connectivity
+    // cf. https://developer.android.com/reference/android/net/ConnectivityManager.NetworkCallback
+    // @warning broadcast should fail according to android doc due to target
+    //     API > 26, although it seems to work with aware which target API 28
+    // implementation 'com.github.pwittchen:reactivenetwork-rx2:3.0.6'
+
+    // To convert rxjava 2.0 stream to rxjava 3.0 ones, especially for
+    // ReactiveNetwork lib which isn't compatible to rxjava 3 api.
+    // cf. https://github.com/akarnokd/RxJavaBridge#rxjavabridge
+    // implementation "com.github.akarnokd:rxjava3-bridge:3.0.0"
 }

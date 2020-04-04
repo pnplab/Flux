@@ -200,7 +200,7 @@ abstract public class AbstractPhenotypeService extends Service {
      *
      * This method is to be called instead of context#stopService since it is
      * otherwise not possible to flag if the service is active or not. Indeed,
-     * otherwise possible onDestroy callback wouldn't get called at least until
+     * otherwise possible onDestroy callback wouldn't stream called at least until
      * service clients are unbound as well for instance.
      *
      * Throws an exception if service has not fully started for background
@@ -285,7 +285,7 @@ abstract public class AbstractPhenotypeService extends Service {
                 // this context.
                 if (_backgroundState == BackgroundState.stopped) {
                     throw new IllegalStateException("The service is starting " +
-                            "but is stated as stopped.Ensure to start it " +
+                            "but is stated as stopped. Ensure to start it " +
                             "through its #start bound API. Do not use " +
                             "Context#startService. Same goes for stopping it.");
                 }
@@ -301,7 +301,7 @@ abstract public class AbstractPhenotypeService extends Service {
             // android 8+ (26+). the NotificationChannel class is new and not in
             // the support library.
             // cf. https://stackoverflow.com/a/47549638/939741
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (Build.VERSION.SDK_INT >= 26) { // Oreo
                 // Setup the NotificationChannel.
                 String id = BuildConfig.PHENOTYPE_NOTIFICATION_CHANNEL_ID;
                 CharSequence name = getString(R.string.phenotype_notification_channel_name);
@@ -310,12 +310,7 @@ abstract public class AbstractPhenotypeService extends Service {
                 // for foreground services. Min doesn't show up but is not
                 // compatible with foreground services.
                 // cf. https://developer.android.com/guide/components/services#Foreground
-                int importance = -1;
-                if (Build.VERSION.SDK_INT >= 24) {
-                    importance = NotificationManager.IMPORTANCE_DEFAULT;
-                } else {
-                    importance = Notification.PRIORITY_DEFAULT;
-                }
+                int importance = NotificationManager.IMPORTANCE_DEFAULT; // @note API 26 always > 24 for IMPORTANCE_DEFAULT in cond.
 
                 // Create the NotificationChannel.
                 NotificationChannel notificationChannel = new NotificationChannel(id, name, importance);
@@ -430,7 +425,8 @@ abstract public class AbstractPhenotypeService extends Service {
             _backgroundState = BackgroundState.stopped;
 
             // Log exception.
-            _log.e(e.getMessage());
+            _log.e("Exception caught at service startup.");
+            _log.e("" + e.getMessage()); // @note e.getMessage sometimes return null.
 
             // Stop the service from background processing. We use stopSelf
             // instead of context stopService because we don't want delayed
@@ -468,7 +464,7 @@ abstract public class AbstractPhenotypeService extends Service {
 
         _log.t();
 
-        // @warning Be careful, onDestroy might get called multiple times by
+        // @warning Be careful, onDestroy might stream called multiple times by
         // android:
         // Had one case where onDestroy was called twice by android.
         // This might have been related to context#startService called twice
