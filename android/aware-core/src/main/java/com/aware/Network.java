@@ -396,8 +396,8 @@ public class Network extends Aware_Sensor {
                     }
 
                     if (Aware.DEBUG) Log.d(TAG, ACTION_AWARE_WIFI_OFF);
-                    Intent wifiOn = new Intent(ACTION_AWARE_WIFI_OFF);
-                    context.sendBroadcast(wifiOn);
+                    Intent wifiOff = new Intent(ACTION_AWARE_WIFI_OFF);
+                    context.sendBroadcast(wifiOff);
                 }
             }
 
