@@ -540,17 +540,33 @@ public class WifiStatus {
         });
     }
 
-    static public @NonNull Observable<Boolean> stream(final Context context, AbstractLogger log) {
-        // @todo refcount.
-        _log = log;
+    private static Observable<Boolean> _cachedStream = null;
+    public static @NonNull Observable<Boolean> stream(final Context context, AbstractLogger log) {
         log.t();
 
-        if (Build.VERSION.SDK_INT >= 21) {
-            return streamWifiStatusFromNetworkCapabilities(context);
+        // Generate cached stream if it doesn't exist.
+        if (_cachedStream == null) {
+            Observable<Boolean> stream;
+
+            // Pick the right algo version depending on android version.
+            if (Build.VERSION.SDK_INT >= 21) {
+                stream = streamWifiStatusFromNetworkCapabilities(context, log);
+            }
+            else {
+                stream = streamWifiStatusFromBroadcastListener(context, log);
+            }
+
+            // Setup reference counting.
+            stream = stream
+                .replay(1)
+                .refCount();
+
+            // Store new cached stream.
+            _cachedStream = stream;
         }
-        else {
-            return streamWifiStatusFromBroadcastListener(context);
-        }
+
+        // Return stream.
+        return _cachedStream;
     }
 
     /*
