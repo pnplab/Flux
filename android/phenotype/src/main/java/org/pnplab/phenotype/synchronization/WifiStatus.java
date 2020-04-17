@@ -26,8 +26,6 @@ import io.reactivex.rxjava3.core.Observable;
 
 public class WifiStatus {
 
-    private static AbstractLogger _log;
-
     // # General notes about wifi state change acquisition.
     // ApplicationContext over service context recommended to avoid memory
     // leak bug on android 4.2.
@@ -213,8 +211,8 @@ public class WifiStatus {
     // 1. impl.
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    static private @NonNull Observable<Boolean> streamWifiStatusFromNetworkCapabilities(final Context context_) {
-        _log.t();
+    private static @NonNull Observable<Boolean> streamWifiStatusFromNetworkCapabilities(final Context context_, AbstractLogger log) {
+        log.t();
 
         // Listen to network wifi connectivity status on API 21+ and
         // minimise false positive about internet connectivity as well as
@@ -263,11 +261,11 @@ public class WifiStatus {
 
             // Create network status change listener with specified
             // characteristics (wifi, including internet).
-            _log.v("+TRANSPORT_WIFI");
-            _log.v("+TRANSPORT_ETHERNET");
-            _log.v("+NET_CAPABILITY_TRUSTED");
-            _log.v("+NET_CAPABILITY_NOT_RESTRICTED");
-            _log.v("+NET_CAPABILITY_INTERNET");
+            log.v("+TRANSPORT_WIFI");
+            log.v("+TRANSPORT_ETHERNET");
+            log.v("+NET_CAPABILITY_TRUSTED");
+            log.v("+NET_CAPABILITY_NOT_RESTRICTED");
+            log.v("+NET_CAPABILITY_INTERNET");
             NetworkRequest.Builder wifiCallbackRequestBuilder = new NetworkRequest
                     .Builder()
                     // @note TRANSPORT_WIFI_AWARE should not be included as
@@ -287,7 +285,7 @@ public class WifiStatus {
 
             // Add capabilities only available on API 23+.
             if (Build.VERSION.SDK_INT >= 23) {
-                _log.v("+NET_CAPABILITY_VALIDATED");
+                log.v("+NET_CAPABILITY_VALIDATED");
 
                 // @warning only API 23+.
                 // "for a network with NET_CAPABILITY_INTERNET, it means that
@@ -299,8 +297,8 @@ public class WifiStatus {
 
             // Add capabilities only available on API 28+.
             if (Build.VERSION.SDK_INT >= 28) {
-                _log.v("+NET_CAPABILITY_FOREGROUND");
-                _log.v("+NET_CAPABILITY_NOT_SUSPENDED");
+                log.v("+NET_CAPABILITY_FOREGROUND");
+                log.v("+NET_CAPABILITY_NOT_SUSPENDED");
                 wifiCallbackRequestBuilder = wifiCallbackRequestBuilder
                         // @note only API 28+. "Indicates that this network is
                         // available for use by apps, and not a network that is
@@ -332,7 +330,7 @@ public class WifiStatus {
                 @Override
                 public void onAvailable(@NotNull Network network) {
                     super.onAvailable(network);
-                    _log.t();
+                    log.t();
                     if (!emitter.isDisposed()) {
                         emitter.onNext(true);
                     }
@@ -341,7 +339,7 @@ public class WifiStatus {
                 @Override
                 public void onLost(@NotNull Network network) {
                     super.onLost(network);
-                    _log.t();
+                    log.t();
                     if (!emitter.isDisposed()) {
                         emitter.onNext(false);
                     }
@@ -351,42 +349,42 @@ public class WifiStatus {
                 public void onCapabilitiesChanged(@NonNull Network network,
                                                   @NonNull NetworkCapabilities networkCapabilities) {
                     super.onCapabilitiesChanged(network, networkCapabilities);
-                    _log.t();
+                    log.t();
                 }
 
                 @Override
                 public void onBlockedStatusChanged(@NonNull Network network, boolean blocked) {
                     super.onBlockedStatusChanged(network, blocked);
-                    _log.t();
+                    log.t();
                 }
 
                 @Override
                 public void onLinkPropertiesChanged(@NonNull Network network, @NonNull LinkProperties linkProperties) {
                     super.onLinkPropertiesChanged(network, linkProperties);
-                    _log.t();
+                    log.t();
                 }
 
                 @Override
                 public void onLosing(@NonNull Network network, int maxMsToLive) {
                     super.onLosing(network, maxMsToLive);
-                    _log.t();
+                    log.t();
                 }
 
                 @Override
                 public void onUnavailable() {
                     super.onUnavailable();
-                    _log.t();
+                    log.t();
                 }
 
                 /*
                 @Override
                 public void onNetworkSuspended(@NonNull Network network) {
-                    _log.t();
+                    log.t();
                     // super.onUnavailable();
                 }
 
                 public void onNetworkResumed(@NonNull Network network) {
-                    _log.t();
+                    log.t();
                 }
                 */
             };
@@ -397,7 +395,7 @@ public class WifiStatus {
             // Unregister wifi status change listener when stream is no longer
             // listened to.
             emitter.setCancellable(() -> {
-                _log.d("unregisterNetworkCallback");
+                log.d("unregisterNetworkCallback");
                 connectivityManager.unregisterNetworkCallback(wifiStatusListener);
             });
         });
@@ -419,8 +417,8 @@ public class WifiStatus {
         return wifiStatusStreamWithFalseAfterTimeout;
     }
 
-    static private Observable<Boolean> streamWifiStatusFromBroadcastListener(final Context context_) {
-        _log.t();
+    private static Observable<Boolean> streamWifiStatusFromBroadcastListener(final Context context_, AbstractLogger log) {
+        log.t();
 
         // Listen to network wifi connectivity status on API lt21. This doesn't
         // check for internet connectivity.
@@ -446,7 +444,7 @@ public class WifiStatus {
             BroadcastReceiver wifiStatusListener = new BroadcastReceiver() {
                 @Override
                 public void onReceive(final Context context, final Intent intent) {
-                    _log.t();
+                    log.t();
 
                     // Check intent/action string is not null for safety,
                     // although I see no reason why it would ever be the case.
@@ -470,13 +468,13 @@ public class WifiStatus {
                     if (action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
                         NetworkInfo networkInfo = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
 
-                        _log.v("NETWORK_STATE_CHANGED_ACTION");
+                        log.v("NETWORK_STATE_CHANGED_ACTION");
 
                         // Prevent extremely rare crash due to null extra.
                         // @warning extremely rare reported case of null extra.
                         // cf. https://stackoverflow.com/a/5890104/939741
                         if (networkInfo == null) {
-                            _log.v("NETWORK_STATE_CHANGED_ACTION -> empty EXTRA_NETWORK_INFO");
+                            log.v("NETWORK_STATE_CHANGED_ACTION -> empty EXTRA_NETWORK_INFO");
                             if (!emitter.isDisposed()) {
                                 emitter.onError(new IllegalArgumentException("NETWORK_STATE_CHANGED_ACTION has empty EXTRA_NETWORK_INFO"));
                             }
@@ -489,7 +487,7 @@ public class WifiStatus {
                         // type while the other the connection).
                         // cf. https://stackoverflow.com/a/5890104/939741
                         if (networkInfo.isConnected()) {
-                            _log.v("NETWORK_STATE_CHANGED_ACTION -> isConnected");
+                            log.v("NETWORK_STATE_CHANGED_ACTION -> isConnected");
                             if (!emitter.isDisposed()) {
                                 emitter.onNext(true);
                             }
@@ -502,13 +500,13 @@ public class WifiStatus {
                     else if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
                         NetworkInfo networkInfo = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
 
-                        _log.v("CONNECTIVITY_ACTION");
+                        log.v("CONNECTIVITY_ACTION");
 
                         // Prevent extremely rare crash due to null extra.
                         // @warning extremely rare reported case of null extra.
                         // cf. https://stackoverflow.com/a/5890104/939741
                         if (networkInfo == null) {
-                            _log.v("CONNECTIVITY_ACTION -> empty EXTRA_NETWORK_INFO");
+                            log.v("CONNECTIVITY_ACTION -> empty EXTRA_NETWORK_INFO");
                             if (!emitter.isDisposed()) {
                                 emitter.onError(new IllegalArgumentException("CONNECTIVITY_ACTION has empty EXTRA_NETWORK_INFO"));
                             }
@@ -524,7 +522,7 @@ public class WifiStatus {
                         // checking connection consistency between WIFI <-> 3G.
                         // cf. https://stackoverflow.com/questions/34884442/android-checking-network-connectivity-return-not-connected-when-connected-to-wi/45231746#45231746
                         if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI && !networkInfo.isConnected()) {
-                            _log.v("CONNECTIVITY_ACTION -> TYPE_WIFI + NOT isConnected");
+                            log.v("CONNECTIVITY_ACTION -> TYPE_WIFI + NOT isConnected");
                             if (!emitter.isDisposed()) {
                                 emitter.onNext(false);
                             }
