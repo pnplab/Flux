@@ -27,13 +27,29 @@ project.ext {
         logLevel: "debug"
     ]
 
+    // why?
+    // (module/subproject level)
+    // allprojects within sub project
+    //  - alphabetic init order! (depends on project name)
+    //  - dependency - create coupled gradle builds (slow down builds)
+    //  - may override in case of multiple projects depending on phenotype (unsafe)
+    // overridding BUILD* var
+    //  - not possible from external
+    // overriding resources
+    //  - possible but we consider it less safe as it's runtime.
+    // (project(':phenotype').ext...)
+    //  - injection (less clean)
+    // (project level)
+    //  - safe and clear.
+    // How to fix multiple module depending on different settings ?
+    //  - define gradle subprojects.
+
     phenotype = [
-        backgroundInitProviderClass: "org.pnplab.phenotype_example.PhenotypeInitProvider"
         // loggerClass: "org.pnplab.phenotype_example.Log4aPhenotypeLogger"
     ]
 }
 
-buildscript { 
+buildscript {
     ext.kotlin_version = '1.3.50'
 
     ext {

@@ -4,17 +4,14 @@ apply plugin: 'com.android.library'
 // apply plugin: 'kotlin-android-extensions'
 
 def setDefaultExt(prop, fallback) {
-    if (!rootProject.ext.has("phenotype")) {
-        rootProject.ext.set("phenotype", [])
+    if (!parent.ext.has("phenotype")) {
+        parent.ext.set("phenotype", [:])
     }
 
-    if (!rootProject.ext.phenotype.containsKey(prop)) {
-        rootProject.ext.phenotype[prop] = fallback
+    if (!parent.ext.phenotype.containsKey(prop)) {
+       parent.ext.phenotype[prop] = fallback
     }
 }
-
-// Overridable Phenotype entrypoint service class. Must be fully qualified.
-// @todo override initializer !
 
 setDefaultExt("configurationClass", "org.pnplab.phenotype.DefaultPhenotypeConfiguration")
 
@@ -49,17 +46,33 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'consumer-rules.pro'
+        println "XXXX: ${parent.ext.phenotype.serviceClass}"
 
         // Inject default or overriden main class into manifest file (for
         // service configuration) and library source code (for service launch
         // and binding).
-        buildConfigField "Class<? extends org.pnplab.phenotype.system.entrypoints.AbstractPhenotypeService>", "PHENOTYPE_SERVICE_CLASS", "${rootProject.ext.phenotype.serviceClass}.class"
-        // buildConfigField "org.pnplab.phenotype.logger.AbstractLogger", "PHENOTYPE_LOGGER", "new ${rootProject.ext.phenotype.loggerClass}()"
+        // @warning BuildConfig report DEBUG property always set to false for libraries
+        //     cf. https://issuetracker.google.com/issues/36967265
+        // @note we need to retrieve class dynamically as java package can't be
+        //     found statically since it's a dependency injection.
+        buildConfigField "Class<? extends org.pnplab.phenotype.system.entrypoints.AbstractPhenotypeService>",
+                "PHENOTYPE_SERVICE_CLASS",
+                "((java9.util.function.Supplier<Class<? extends org.pnplab.phenotype.system.entrypoints.AbstractPhenotypeService>>)() -> {" +
+                "   try { " +
+                "       return Class" +
+                "           .forName(\"${parent.ext.phenotype.serviceClass}\")" +
+                "           .asSubclass(org.pnplab.phenotype.system.entrypoints.AbstractPhenotypeService.class);" +
+                "   }" +
+                "   catch (Exception exc) {" +
+                "       throw new RuntimeException(exc);" +
+                "   }" +
+                "}).get()";
+        // buildConfigField "org.pnplab.phenotype.logger.AbstractLogger", "PHENOTYPE_LOGGER", "new ${parent.ext.phenotype.loggerClass}()"
         buildConfigField "String", "PHENOTYPE_NOTIFICATION_CHANNEL_ID", '"PHENOTYPE_NOTTIFICATION_CHANNEL"'
-        manifestPlaceholders.phenotypeServiceClass = "${rootProject.ext.phenotype.serviceClass}"
-        manifestPlaceholders.phenotypeClientInitProviderAuthority = "${rootProject.ext.phenotype.clientInitProviderAuthority}"
-        manifestPlaceholders.phenotypeBackgroundInitProviderAuthority = "${rootProject.ext.phenotype.backgroundInitProviderAuthority}"
-        manifestPlaceholders.phenotypeBackgroundInitProviderClass = "${rootProject.ext.phenotype.backgroundInitProviderClass}"
+        manifestPlaceholders.phenotypeServiceClass = "${parent.ext.phenotype.serviceClass}"
+        manifestPlaceholders.phenotypeClientInitProviderAuthority = "${parent.ext.phenotype.clientInitProviderAuthority}"
+        manifestPlaceholders.phenotypeBackgroundInitProviderAuthority = "${parent.ext.phenotype.backgroundInitProviderAuthority}"
+        manifestPlaceholders.phenotypeBackgroundInitProviderClass = "${parent.ext.phenotype.backgroundInitProviderClass}"
 
         // throw new Error("applId ${rootProject.android.defaultConfig.applicationId}")
         // "${applicationId}.phenotype.PhenotypeClientInitProvider"
