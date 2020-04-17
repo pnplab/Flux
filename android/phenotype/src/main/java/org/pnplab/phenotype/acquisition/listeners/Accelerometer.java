@@ -138,7 +138,8 @@ public class Accelerometer {
                 });
 
                 // Register the sensor listener.
-                _sensorManager.registerListener(sensorEventListener, _accelerometer, 1000000 / frequency, handler);
+                boolean requestSucceed = _sensorManager.registerListener(sensorEventListener, _accelerometer, 1000000 / frequency, handler);
+                log.i("accelerometer:requestSucceed:" + requestSucceed);
             }, BackpressureStrategy.BUFFER)
             .publish()
             .refCount();
