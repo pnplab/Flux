@@ -21,7 +21,6 @@ public class SignificantMotion {
         SensorManager _sensorManager = (SensorManager) context.getSystemService(SENSOR_SERVICE); // @todo context -> OUT
         final Sensor _significanMotion = _sensorManager.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION);
 
-        
         boolean isWakeUp = true; // unknown.. @todo know!
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             isWakeUp = _significanMotion.isWakeUpSensor();
@@ -52,6 +51,12 @@ public class SignificantMotion {
                 final TriggerEventListener triggerEventListener = new TriggerEventListener() {
                     @Override
                     public void onTrigger(TriggerEvent event) {
+                        // Bypass event if producer has already been canceled (
+                        // cf. if the subscriber(s) has(/ve) been undisposed).
+                        if (producer.isCancelled()) {
+                            return;
+                        }
+
                         // Forward event into flowable.
                         producer.onNext(event);
 
@@ -62,8 +67,8 @@ public class SignificantMotion {
                         //     management.
                         boolean requestSucceed = _sensorManager.requestTriggerSensor(this, _significanMotion);
 
-                        // End flowable in case of request failure, just
-                        // for cleanity.
+                        // End flowable when the event request loop fails, just
+                        // for cleaness.
                         if (!requestSucceed) {
                             producer.onError(new RuntimeException("requestTriggerSensor for significant motion has failed"));
                         }
