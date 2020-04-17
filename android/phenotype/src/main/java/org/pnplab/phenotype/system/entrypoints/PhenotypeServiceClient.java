@@ -88,7 +88,7 @@ final public class PhenotypeServiceClient {
      *     the service.
      */
     public void startService() {
-        // Calling service#startForBackground flags the service as stopped.
+        // Calling service#startBackgroundMode flags the service as stopped.
         // Indeed, this would not be possible to achieve using regular android
         // lifecycle methods. Thus user shall use binding to stop the service
         // instead.
@@ -107,7 +107,7 @@ final public class PhenotypeServiceClient {
      *     the service.
      */
     public void stopService() {
-        // Calling service#stopForBackground flags the service as stopped.
+        // Calling service#stopBackgroundMode flags the service as stopped.
         // Indeed, this would not be possible to achieve using regular android
         // lifecycle methods. Thus user shall use binding to stop the service
         // instead.
@@ -153,7 +153,7 @@ final public class PhenotypeServiceClient {
      *                unbing method shall thus never be called after this is
      *                triggered!
      */
-    synchronized public void bindService(final BiConsumer<PhenotypeServiceAidlInterface, Runnable> onSuccess, final Consumer<RuntimeException> onError) {
+    synchronized public void bindService(final BiConsumer<AbstractPhenotypeService.ClientAPI, Runnable> onSuccess, final Consumer<RuntimeException> onError) {
         Context context = _context;
 
         // Wrap callbacks in order to always queue them to the main thread's
@@ -184,7 +184,7 @@ final public class PhenotypeServiceClient {
         // @note getMainExecutor is incompatible with API < 28 so we use
         //     ContextCompat to avoid crashes
         Executor mainExecutor = ContextCompat.getMainExecutor(context);
-        BiConsumer<PhenotypeServiceAidlInterface, Runnable> onSuccessOnMainThread = (phenotype, unbind) -> mainExecutor.execute(
+        BiConsumer<AbstractPhenotypeService.ClientAPI, Runnable> onSuccessOnMainThread = (phenotype, unbind) -> mainExecutor.execute(
                 () -> {
                     try {
                         onSuccess.accept(phenotype, unbind);
@@ -357,7 +357,7 @@ final public class PhenotypeServiceClient {
     private BindingState _bindingState = BindingState.unbound;
 
     // Reference to the service Aidl API used while the service is bound.
-    private PhenotypeServiceAidlInterface _serviceAidlInterface = null;
+    private AbstractPhenotypeService.ClientAPI _serviceAidlInterface = null;
 
     // Queue of tuples of bound callbacks created from the #bind method. Each
     // tuple contains unbind callback, onSuccess and onError listener. Calling
@@ -366,7 +366,7 @@ final public class PhenotypeServiceClient {
     // the service is only effectively unbound when this queue is empty and no
     // external dependency is considered to rely on the service anymore.
     private class ConnectionListenerTuple  {
-        BiConsumer<PhenotypeServiceAidlInterface, Runnable> onSuccess;
+        BiConsumer<AbstractPhenotypeService.ClientAPI, Runnable> onSuccess;
         Consumer<RuntimeException> onError;
 
         // Shall not be called more than once. The unbind method is passed as
@@ -375,22 +375,26 @@ final public class PhenotypeServiceClient {
     }
     private List<ConnectionListenerTuple> _callbackList = new ArrayList<>();
 
-    synchronized private void _setAidlServiceInterface(PhenotypeServiceAidlInterface serviceAidlInterface) {
-        // Wrap aidl interface to polyfill android not-working callbacks..
-        PhenotypeServiceAidlInterface proxyInstance = (PhenotypeServiceAidlInterface) Proxy.newProxyInstance(
-            PhenotypeServiceAidlInterface.class.getClassLoader(),
-            new Class[] { PhenotypeServiceAidlInterface.class },
+    synchronized private void _setAidlServiceInterface(AbstractPhenotypeService.ClientAPI serviceAidlInterface) {
+        // Wrap aidl interface to polyfill android not-working callbacks (which
+        // would be failing due to service binder disconnection)..
+        AbstractPhenotypeService.ClientAPI proxyInstance = (AbstractPhenotypeService.ClientAPI) Proxy.newProxyInstance(
+            AbstractPhenotypeService.ClientAPI.class.getClassLoader(),
+            new Class[] { AbstractPhenotypeService.ClientAPI.class },
             (proxy, method, methodArgs) -> {
-                // Wrap aidl interface's method with DeadObjectException catch
-                // because onServiceDisconnected, onBindingDied callbacks
-                // aren't getting called on my phone (android 8).
+                // Wrap aidl interface's method with DeadObjectException
+                // exception catching as a fallback for service connetion
+                // failure because android onServiceDisconnected, onBindingDied
+                // callbacks aren't getting called on my phone (android 8).
                 try {
-                    PhenotypeServiceAidlInterface original = serviceAidlInterface;
+                    AbstractPhenotypeService.ClientAPI original = serviceAidlInterface;
                     return method.invoke(original, methodArgs);
                 }
+                // @note
                 // UndeclaredThrowableException automatically wraps java's
-                // checked exceptions thrown from method.invoke. These should be
-                // caught through InvocationTargetException.
+                // checked exceptions thrown from method.invoke. These must be
+                // caught first through InvocationTargetException in order to
+                // unwrap real exception.
                 catch (InvocationTargetException exc) {
                     // Unbind service and trigger error callback.
                     if (exc.getCause() instanceof DeadObjectException) {
@@ -486,7 +490,7 @@ final public class PhenotypeServiceClient {
 
             // Store service interface for later callbacks. We use a method
             // call for thread safety in order to be able to synchronize it.
-            PhenotypeServiceAidlInterface_Proxy serviceAidlInterface = new PhenotypeServiceAidlInterface_Proxy(service);
+            ClientAPI_Proxy serviceAidlInterface = new ClientAPI_Proxy(service);
             _setAidlServiceInterface(serviceAidlInterface);
 
             // Call pending onSuccess callbacks.

@@ -5,8 +5,7 @@ import android.os.RemoteException;
 
 import org.pnplab.phenotype.logger.AbstractLogger;
 import org.pnplab.phenotype.logger.DefaultLogger;
-import org.pnplab.phenotype.system.entrypoints.AbstractPhenotypeInitProvider;
-import org.pnplab.phenotype.system.entrypoints.PhenotypeServiceAidlInterface;
+import org.pnplab.phenotype.system.entrypoints.AbstractPhenotypeService;
 import org.pnplab.phenotype.system.entrypoints.PhenotypeServiceClient;
 
 import java9.util.function.BiConsumer;
@@ -27,11 +26,11 @@ public class Phenotype {
     }
 
     // onError is optional for synchronous usage.
-    public static void Phenotype(Consumer<Phenotype> onLoaded) {
+    public static void Phenotype(Consumer<AbstractPhenotypeService.ClientAPI> onLoaded) {
         _client.bindService(
                 (aidlInterface, unbind) -> {
                     // Forward callback.
-                    onLoaded.accept(new Phenotype(aidlInterface));
+                    onLoaded.accept(aidlInterface);
 
                     // Unbind.
                     // @note in order for unbind to always be called, one
@@ -48,12 +47,12 @@ public class Phenotype {
         );
     }
 
-    public static void Phenotype(Consumer<Phenotype> onLoaded, Consumer<RuntimeException> onError) {
+    public static void Phenotype(Consumer<AbstractPhenotypeService.ClientAPI> onLoaded, Consumer<RuntimeException> onError) {
         _client.bindService(
                 (aidlInterface, unbind) -> {
                     // Forward callback.
                     try {
-                        onLoaded.accept(new Phenotype(aidlInterface));
+                        onLoaded.accept(aidlInterface);
                     }
                     catch (Exception exc) {
                         if (exc.getCause() instanceof RemoteException) {
@@ -82,11 +81,11 @@ public class Phenotype {
 
     // onError is mandatory for asynchronous usage. Indeed asynchronous code
     // should check whether the connection is still opened or not when using it.
-    public static void Phenotype(BiConsumer<Phenotype, Runnable> onLoaded, Consumer<RuntimeException> onError) {
+    public static void Phenotype(BiConsumer<AbstractPhenotypeService.ClientAPI, Runnable> onLoaded, Consumer<RuntimeException> onError) {
         _client.bindService(
                 (aidlInterface, unbind) -> {
                     // Forward callback.
-                    onLoaded.accept(new Phenotype(aidlInterface), unbind);
+                    onLoaded.accept(aidlInterface, unbind);
 
                     // ...unbind responsibility is left to the user and has
                     // been forwarded through callback.
@@ -98,28 +97,39 @@ public class Phenotype {
         );
     }
 
+    /*
     public boolean isRunning() {
-        return _aidlInterface.isStartingForBackground() || _aidlInterface.isStartedForBackground();
+        return _aidlInterface.isBackgroundModeStarting() || _aidlInterface.isBackgroundModeStarted();
     }
 
     public void start() {
-        _aidlInterface.startForBackground();
+        _aidlInterface.startBackgroundMode();
     }
     public void start(Runnable onServiceStarted) {
-        _aidlInterface.startForBackground(() -> onServiceStarted.run());
+        _aidlInterface.startBackgroundMode(() -> onServiceStarted.run());
     }
     public void start(Runnable onServiceStarted, Consumer<RuntimeException> onServiceStartFailed) {
-        _aidlInterface.startForBackground(() -> onServiceStarted.run(), error -> onServiceStartFailed.accept(error));
+        _aidlInterface.startBackgroundMode(() -> onServiceStarted.run(), error -> onServiceStartFailed.accept(error));
+    }
+
+    public void startPedometerRecording() {
+        _aidlInterface.startPedometerRecording();
     }
 
     public void stop() {
-        _aidlInterface.stopForBackground();
+        _aidlInterface.stopBackgroundMode();
     }
 
     private static PhenotypeServiceClient _client = null;
-    private final PhenotypeServiceAidlInterface _aidlInterface;
+    private final AbstractPhenotypeService.ClientAPI _aidlInterface;
     private Phenotype(PhenotypeServiceAidlInterface aidlInterface) {
         _aidlInterface = aidlInterface;
+    }
+    */
+
+    private static PhenotypeServiceClient _client = null;
+    private Phenotype() {
+        // ... prevent instantiation.
     }
 
 }

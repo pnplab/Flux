@@ -23,6 +23,7 @@ import org.pnplab.phenotype.logger.AbstractLogger;
 import java.util.Timer;
 import java.util.TimerTask;
 import java9.util.function.Consumer;
+import remoter.annotations.Remoter;
 
 /**
  * This is our lib's main android entrypoint.
@@ -33,23 +34,24 @@ import java9.util.function.Consumer;
  * Our lib is extended through this class' inheritance. Considering services
  * can crash and be restarted by the OS, compositional dataflow ran from
  * previously external android activity entrypoints would not be then executed
- * again. Relying on inheritance ensure the dataflow will always be
- * re-executed on restart.
+ * again. We thus rely on the service inheritance ensure the lib's dataflow
+ * can be modified/extended while still always being re-executed on phone
+ * restart.
  * Other options are available, such as storing the dataflow configuration in
  * an external file to be able to restore it later on. However, we find this
  * solution either less flexible or less secure depending on its implementation.
  *
- * Please consider this class main responsibility as a source code entrypoint.
+ * Consider this class main responsibility as a source code entrypoint.
  * cf. http://web.archive.org/web/20180505121013/https://plus.google.com/+DianneHackborn/posts/FXCCYxepsDU
  *
  * We set up the service in a remote process in order to
  * - prevent any memory leak from the user application (and dependencies) to
- * spread to the potentially always-alive service process.
+ *   spread to the potentially always-alive service process.
  * - prevent other app services to benefits from the foreground privileges
- * and battery bypass granted to this service. although not documented, we
- * indeed have strong reason to believe the foreground privileges are granted
- * at process level by android (cf. android source code comments of
- * service.java).
+ *   and battery bypass granted to this service. although not documented, we
+ *   indeed have strong reason to believe the foreground privileges are granted
+ *   at process level by android (cf. android source code comments of
+ *   service.java).
  * - prevent any crash from our lib to impact the usage of the user application.
  *
  * @warning
@@ -57,48 +59,203 @@ import java9.util.function.Consumer;
  * service can't restart after reboot until the phone has been unlocked by the
  * user.
  * cf https://developer.android.com/training/articles/direct-boot
+ *
+ * @todo
+ * read https://android.jlelse.eu/defending-your-app-310428698cfe
+ * read https://android.jlelse.eu/android-application-launch-explained-from-zygote-to-your-activity-oncreate-8a8f036864b
+ * read https://support.mileiq.com/hc/en-us/articles/209974743-Optimize-Drive-Detection-on-Android-Phones
  */
 abstract public class AbstractPhenotypeService extends Service {
+
+    /**
+     * The Client API of the service, as used by the user of the lib, likely
+     * through android activities.
+     *
+     * We use AIDL to allow for cross-process synchronous code execution, which
+     * we find easier for the service user and for debugging. Android's Messenger
+     * alternative is asynchronous by nature.
+     *
+     * @note
+     * An inherited or overloaded version of this interface can be set by the
+     * library user through a method overload of the onBind method (See
+     * underlying onBind comments as well as implementation class ones).
+     *
+     * @warning
+     * The @Remoter annotation will generate ClientAPI_Stub and ClientAPI_Proxy
+     * global classes (outside of this inner class scope). Thus, if redefined
+     * with the same name in a subclass, be aware of the undetected class
+     * import conflict name that may occur, especially since these classes will
+     * only be generated after a first build phase.
+     *
+     * @warning
+     * Using AIDL implies developing our layer code with thread-safety since
+     * the synchronous aidl code is parallelly executed. Asynchronicity should
+     * be taken in consideration as it may impact thread-safeness (see
+     * implementation comments for example).
+     *
+     * see docs here https://github.com/josesamuel/remoter and here
+     * https://developer.android.com/guide/components/aidl
+     */
+    @Remoter
+    public interface ClientAPI {
+        boolean isBackgroundModeStarting();
+        boolean isBackgroundModeStarted();
+        // @warning
+        // call could fail due to async for start/stop* methods when a
+        // start/stop method has just been called beforehand. Consider using
+        // the method's callbacks to avoid this trap.
+        void stopBackgroundMode();
+        void startBackgroundMode();
+        void startBackgroundMode(AIDLRunnable onServiceStarted);
+        void startBackgroundMode(AIDLRunnable onServiceStarted, AIDLConsumer<RuntimeException> onServiceStartFailed);
+    }
+
+    /**
+     * The implementation of our service API. This *adds a layer of thread
+     * safety* while making the link between our service and its API.
+     *
+     * For now, we consider this implementation thread-safe, as
+     * - the sole user of the process is a single lib's user (whether user's
+     *   app, android system launch callback, ...).
+     * - none of the inner asynchronous methods of the lib affects states
+     *   related to the one used by the API.
+     *
+     * @warning
+     * If at any point, inner service asynchronous/delayed methods affect same
+     * states as API does, this will break service thread-safe!
+     * @todo move out.
+     *
+     * @note
+     * *The Remoter lib prevents the bellow notes targeted to android AIDL!*
+     * > Interface methods can throw any exceptions. Clients will stream the same
+     * > exception that is thrown.
+     * cf. https://github.com/josesamuel/remoter
+     *
+     * Exception in implementation for non oneway aidl methods are swallowed by
+     * android and rethrown in client. The exception types allowed seems only to be
+     * SecurityException, BadParcelableException, IllegalArgumentException,
+     * NullPointerException, IllegalStateException, NetworkOnMainThreadException,
+     * UnsupportedOperationException. Otherwise, exception seems to be converted
+     * to RuntimeException with random message.
+     *
+     * > Some runtime exceptions in AIDL service implementations are swallowed in
+     * > the service process, and will not cause a crash of the service, thereby
+     * > bypassing crash reporting.
+     * >
+     * > Despite the documentation stating otherwise, these runtime exceptions are
+     * > propagated back to the client app, and can be the cause of client app
+     * > crashes and also information leakage, perhaps in the form of an
+     * > embarassing exception message such as error handling not implemented yet.
+     * cf. https://blog.classycode.com/dealing-with-exceptions-in-aidl-9ba904c6d63
+     *
+     * @note
+     * This class is set as protected to be easily inherited by the lib user
+     * through the phenotype service subclass. This requires to redefine the
+     * onBind method as well.
+     */
+    protected class ClientImpl implements ClientAPI {
+        // *BackgroundMode means the start of the service is intending to last
+        // after application exit. Although technically the android service as
+        // already been started because it has been bound to in order to retrieve
+        // its interface.
+        @Override
+        synchronized public boolean isBackgroundModeStarting() {
+            return AbstractPhenotypeService.this.isBackgroundModeStarting();
+        }
+
+        @Override
+        synchronized public boolean isBackgroundModeStarted() {
+            return AbstractPhenotypeService.this.isBackgroundModeStarted();
+        }
+
+        @Override
+        synchronized public void stopBackgroundMode() {
+            // @warning will fail if start was called just before due to async.
+            AbstractPhenotypeService.this.stopBackgroundMode();
+        }
+
+        @Override
+        synchronized public void startBackgroundMode() {
+            // @warning will fail if start was called just before due to async.
+            AbstractPhenotypeService.this.startBackgroundMode();
+        }
+
+        @Override
+        synchronized public void startBackgroundMode(AIDLRunnable onServiceStarted) {
+            AbstractPhenotypeService.this.startBackgroundMode(() -> {
+                // @note although synchronize java block are reentrant locks,
+                // no need to make the callback call thread safe here as it
+                // wont change/read any of the service state since it strictly
+                // calls user code.
+                onServiceStarted.run();
+            });
+        }
+
+        @Override
+        synchronized public void startBackgroundMode(AIDLRunnable onServiceStarted, AIDLConsumer<RuntimeException> onServiceStartFailed) {
+            AbstractPhenotypeService.this.startBackgroundMode(() -> onServiceStarted.run(), (error) -> {
+                // @note although synchronize java block are reentrant locks,
+                // no need to make the callback call thread safe here as it
+                // wont change/read any of the service state since it strictly
+                // calls user code, and the exception error argument is both
+                // readonly (mostly) and serialized, thus copied by the
+                // Remoter parceler before being sent through AIDL, and thus
+                // immutable from our service source code perspective.
+                onServiceStartFailed.accept(error);
+            });
+        }
+
+    }
 
     private final AbstractLogger _log = AbstractPhenotypeInitProvider.getLogger();
 
     // Set service as START_STICKY or START_NOT_STICKY.
-    protected final boolean _restartServiceOnCrash = true;
+    private final boolean _restartServiceOnCrash = true;
 
-    // This methods configures the service connection from the main process
-    // using android service binding with AIDL and Remoter.
+    /* This methods returns our android service API to the service's user
+     * (which is likely to be an android activity within the main process)
+     * through android IPC binding with AIDL/Remoter.
+     */
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         _log.t();
 
-        PhenotypeServiceAidlImplementation binderImplementation = new PhenotypeServiceAidlImplementation(this);
-        Binder binder = new PhenotypeServiceAidlInterface_Stub(binderImplementation);
+        ClientAPI binderImplementation = new ClientImpl();
+        Binder binder = new ClientAPI_Stub(binderImplementation);
 
         return binder;
     }
 
-    // Flag if the service is running (through context#onStart / context#onStop).
-    // This flag might be false while the service is ongoing if the service has
-    // been bounded but not started.
-    // @warning calling context#startService or context#stopService breaks this
-    //     flag.
+    /* Flag whether the service is running or not (through context#onStart /
+     * context#onStop). This flag might be misleading while the service is
+     * ongoing if the service has been bound but not started (@todo check this
+     * comment is not outdated).
+     *
+     * @warning
+     * Relying on android context#startService or context#stopService breaks
+     * this flag. User should rely on binding connection and then
+     * startBackgroundMode instead.
+     *
+     * @warning
+     * better keep these variable private for thread safeness.
+     */
     private enum BackgroundState {
         stopped,
         starting,
         started
     }
     private BackgroundState _backgroundState = BackgroundState.stopped;
-    private Runnable _onceStartedCallback = null;
-    private Consumer<RuntimeException> _onceStartFailedCallback = null;
-    public final boolean isStartingForBackground() {
+    private AIDLRunnable _onceStartedCallback = null;
+    private AIDLConsumer<RuntimeException> _onceStartFailedCallback = null;
+    public synchronized final boolean isBackgroundModeStarting() {
         return _backgroundState == BackgroundState.starting;
     }
-    public final boolean isStartedForBackground() {
+    public synchronized final boolean isBackgroundModeStarted() {
         return _backgroundState == BackgroundState.started;
     }
 
-    public final void startForBackground() {
+    public synchronized final void startBackgroundMode() {
         _log.t();
 
         Context context = getApplicationContext();
@@ -127,11 +284,13 @@ abstract public class AbstractPhenotypeService extends Service {
         }
 
         // Throw exception if the service doesn't exists. We prefer exception
-        // over return value (which is the solution used by android) since a
-        // true value is not a clear indication service start as succeeded (but
-        // instead that it is ongoing) and because other type of failure
-        // exceptions might already be thrown. Shouldn't happen as we're
-        // already within the specified class.
+        // over return value (the solution used by android in
+        // #startForegroundService method) since a true value is not a clear
+        // indication service start as succeeded (could instead be that its
+        // starting step is ongoing) and because other type of failure
+        // exceptions might already be thrown. Anyway, the exception shouldn't
+        // be possibly thrown as we're already within the specified class, but
+        // this is written for safety.
         if (componentName == null) {
             throw new IllegalStateException("Started service doesn't exist");
         }
@@ -139,7 +298,7 @@ abstract public class AbstractPhenotypeService extends Service {
         // Flag the service as starting.
         _backgroundState = BackgroundState.starting;
 
-        // If service hasn't started within 5 seconds, flag as the service as
+        // If service hasn't started within 5 seconds, flag the service as
         // stopped. This delay is the maximum delay android allows to call
         // startForeground.
         Timer timer = new Timer();
@@ -155,7 +314,7 @@ abstract public class AbstractPhenotypeService extends Service {
 
                 // Store connection failed callback to call it once we have a
                 // clean state for our class.
-                Consumer<RuntimeException> onceStartFailedCallback = _onceStartFailedCallback;
+                AIDLConsumer<RuntimeException> onceStartFailedCallback = _onceStartFailedCallback;
 
                 // Clear connection succeed or failed callbacks.
                 _onceStartedCallback = null;
@@ -167,7 +326,7 @@ abstract public class AbstractPhenotypeService extends Service {
                 }
 
                 // Call connection failed callback if exists.
-                // @note it might be set from overriden startForBackground
+                // @note it might be set from overriden startBackgroundMode
                 // method.
                 // @warning This is called from external thread !
                 if (onceStartFailedCallback != null) {
@@ -177,25 +336,24 @@ abstract public class AbstractPhenotypeService extends Service {
         }, 5000);
     }
 
-    public final void startForBackground(Runnable onceStartedCallback) {
+    public synchronized final void startBackgroundMode(AIDLRunnable onceStartedCallback) {
         // Start service for background.
-        this.startForBackground();
+        this.startBackgroundMode();
 
         // Register callback until it's started.
         _onceStartedCallback = onceStartedCallback;
     }
 
-    public final void startForBackground(Runnable onceStartedCallback, Consumer<RuntimeException> onceStartFailedCallback) {
+    public synchronized final void startBackgroundMode(AIDLRunnable onceStartedCallback, AIDLConsumer<RuntimeException> onceStartFailedCallback) {
         // Start service for background.
-        this.startForBackground();
+        this.startBackgroundMode();
 
         // Register callback until it's or has failed started.
         _onceStartedCallback = onceStartedCallback;
         _onceStartFailedCallback = onceStartFailedCallback;
     }
 
-    /**
-     * Stop the service for long term background processing. This method keeps
+    /* Stop the service for long term background processing. This method keeps
      * currently bound connections active until they disconnect.
      *
      * This method is to be called instead of context#stopService since it is
@@ -206,7 +364,7 @@ abstract public class AbstractPhenotypeService extends Service {
      * Throws an exception if service has not fully started for background
      * processing.
      */
-    public final void stopForBackground() {
+    public synchronized final void stopBackgroundMode() {
         _log.t();
 
         // Throw an exception if service hasn't fully started for background.
@@ -241,16 +399,25 @@ abstract public class AbstractPhenotypeService extends Service {
         _backgroundState = BackgroundState.stopped;
 
         // Stop the engine.
-        this._onStopEngine();
+        this._onBackgroundModeStopped();
     }
 
-    // Promote the service to foreground priority when created. This prevents
-    // android to kill the service if it was created while the app was in
-    // background. It might also be necessary to allow it to stay alive once
-    // the app has been closed.
+    abstract protected void _onBackgroundModeStarted();
+    abstract protected void _onBackgroundModeStopped();
+
+    /* Promote the service to foreground priority when created. This prevents
+     * android to kill the service if it was created while the app was in
+     * background. It might also be necessary to allow it to stay alive once
+     * the app has been closed.
+     *
+     * @note
+     * Synchronization might for instance be helpful in this case in the rare
+     * edge case where the lib's host application connects to the service while
+     * the former is starting from android boot for instance.
+     */
     @Override
     @SuppressWarnings("deprecation") // removes Notification.PRIORITY_DEFAULT deprecation warning.
-    public final int onStartCommand(Intent intent, int flags, int startId) {
+    public synchronized final int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
         _log.t();
@@ -412,13 +579,13 @@ abstract public class AbstractPhenotypeService extends Service {
 
             // Trigger and clear the callback.
             if (_onceStartedCallback != null) {
-                Runnable onceStartedCallback = _onceStartedCallback;
+                AIDLRunnable onceStartedCallback = _onceStartedCallback;
                 _onceStartedCallback = null;
                 onceStartedCallback.run();
             }
 
             // Start the engine.
-            this._onStartEngine();
+            this._onBackgroundModeStarted();
         }
         catch (Exception e) {
             // Flag the service as stopped.
@@ -448,14 +615,15 @@ abstract public class AbstractPhenotypeService extends Service {
         return _restartServiceOnCrash ? START_STICKY : START_NOT_STICKY;
     }
 
-    abstract protected void _onStartEngine();
-    abstract protected void _onStopEngine();
-
     @Override
     public final void onCreate() {
         super.onCreate();
 
         _log.t();
+
+        // Log inherited class name in order to easily debug lib gradle
+        // configuration from the user.
+        _log.i("created: " + this.getClass().getCanonicalName());
     }
 
     @Override
@@ -464,12 +632,17 @@ abstract public class AbstractPhenotypeService extends Service {
 
         _log.t();
 
-        // @warning Be careful, onDestroy might stream called multiple times by
-        // android:
-        // Had one case where onDestroy was called twice by android.
+        // @warning
+        // Be careful, onDestroy might stream called multiple times by android:
+        // I had one case where onDestroy was called twice by android.
         // This might have been related to context#startService called twice
         // while app debug was reinstalled in between without stopping the
-        // service. However, I was unable to reproduce the scenario.
+        // service. I was however unable to reproduce the scenario.
+
+        // @note
+        // No need to rely on this to set background state as off as this
+        // should be called only at a point service's memory/state will no
+        // longer be available anyway.
     }
 
     @Override
@@ -492,4 +665,5 @@ abstract public class AbstractPhenotypeService extends Service {
 
         _log.t();
     }
+
 }

@@ -12,7 +12,7 @@ import org.pnplab.phenotype.logger.AbstractLogger;
 import static org.pnplab.phenotype.Phenotype.Phenotype;
 
 /**
- * @note We do not use WakefulBroadcastReceiver has it's been deprecated and is
+ * @note We do not use WakefulBroadcastReceiver as it's been deprecated and is
  * not compatible with the startForegroundService method while we believe its
  * behavior can be replaced with manual wakelock registering in all case.
  */
@@ -44,11 +44,11 @@ public class PhenotypeBroadcastReceiver extends BroadcastReceiver {
             // won't receive BOOT_COMPLETE broadcast message.
 
             // Force the device to stay awake until the service has started.
-            // Then release the wakelock and as its now service's
-            // responsibility to manage this kind of privilege. Set a wakelock
-            // timeout to 5s for safety. This equals to the ANR timeout delay
-            // and the maximum delay allowed for a service to go foreground
-            // before being killed by android, thus it's a safe delay.
+            // Then release the wakelock as it's now service's responsibility
+            // to manage this kind of privilege. Set a wakelock timeout to
+            // 5s for safety. This equals to the ANR timeout delay and the
+            // maximum delay allowed for a service to go foreground before
+            // being killed by android, thus it's a safe delay.
             PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
             if (powerManager == null) {
                 // Double check powerManager exists. This should always be the
@@ -70,7 +70,7 @@ public class PhenotypeBroadcastReceiver extends BroadcastReceiver {
             // cf. https://developer.android.com/reference/android/content/Context.html#bindService(android.content.Intent,%20android.content.ServiceConnection,%20int)
             Phenotype.initialize(context.getApplicationContext());
             Phenotype((phenotype, unbind) -> {
-                boolean isRunning = phenotype.isRunning();
+                boolean isRunning = phenotype.isBackgroundModeStarting() || phenotype.isBackgroundModeStarted();
                 if (isRunning) {
                     // Service is already running although we've just started
                     // the device. That should not happen.
@@ -78,7 +78,7 @@ public class PhenotypeBroadcastReceiver extends BroadcastReceiver {
                 }
                 else {
                     _log.i("Starting phenotyping service at boot.");
-                    phenotype.start(() -> {
+                    phenotype.startBackgroundMode(() -> {
                         // Release wakelock once service has started.
                         _log.v("release wakeLock phenotype:BOOT_COMPLETED");
                         wakeLock.release();
@@ -144,7 +144,7 @@ public class PhenotypeBroadcastReceiver extends BroadcastReceiver {
             // cf. https://developer.android.com/reference/android/content/Context.html#bindService(android.content.Intent,%20android.content.ServiceConnection,%20int)
             Phenotype.initialize(context.getApplicationContext());
             Phenotype((phenotype, unbind) -> {
-                boolean isRunning = phenotype.isRunning();
+                boolean isRunning = phenotype.isBackgroundModeStarting() || phenotype.isBackgroundModeStarted();
                 if (isRunning) {
                     // Service is already running although we've just started
                     // the device. That should not happen.
@@ -152,7 +152,7 @@ public class PhenotypeBroadcastReceiver extends BroadcastReceiver {
                 }
                 else {
                     _log.i("Starting phenotyping service at boot.");
-                    phenotype.start(() -> {
+                    phenotype.startBackgroundMode(() -> {
                         // Release wakelock once service has started.
                         _log.v("release wakeLock phenotype:QUICKBOOT_POWERON");
                         wakeLock.release();
