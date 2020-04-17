@@ -54,7 +54,7 @@ public class DefaultLogger extends AbstractLogger {
         // List method calls until given limit.
         Queue<String> callStack = new LinkedList<>();
         int fromStackItemIndex = 3; // this method callee.
-        int untilStackItemIndex = Math.min(stacktrace.length, fromStackItemIndex + 1); // max 1 call stack item to not be too verbose.
+        int untilStackItemIndex = Math.min(stacktrace.length, fromStackItemIndex + 2); // max 2 call stack item to not be too verbose.
         for (int i = fromStackItemIndex; i < untilStackItemIndex; ++i) {
             StackTraceElement stacktraceItem = stacktrace[i];
             String stacktraceItemStr = stacktraceItem.getMethodName() + " (" + _getShortClassName(stacktraceItem.getClassName()) + ")";
