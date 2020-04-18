@@ -46,6 +46,7 @@ project.ext {
 
     phenotype = [
         // loggerClass: "org.pnplab.phenotype_example.Log4aPhenotypeLogger"
+        serviceClass: 'org.pnplab.stressoncovid19.StressPhenotypeService'
     ]
 }
 
