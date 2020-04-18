@@ -1,4 +1,4 @@
-package org.pnplab.phenotype.synchronization;
+package org.pnplab.phenotype.acquisition;
 
 import android.os.Build;
 
@@ -11,15 +11,15 @@ import io.reactivex.rxjava3.core.Flowable;
 
 public class Ping {
 
-    public static class PingTimepoint {
-        public PingTimepoint(String time) {
+    public static class PingTimePoint {
+        public PingTimePoint(String time) {
             this.time = time;
         }
 
         public final String time;
     }
 
-    private static @NonNull Flowable<PingTimepoint> _pingStream = Flowable
+    private static @NonNull Flowable<PingTimePoint> _pingStream = Flowable
             .interval(1, TimeUnit.SECONDS)
             .map(q -> {
                 // Generate current timestamp value.
@@ -34,14 +34,14 @@ public class Ping {
                 }
 
                 // Return value.
-                return new PingTimepoint(timestamp + withDateTime);
+                return new PingTimePoint(timestamp + withDateTime);
             })
             .publish()
             .refCount();
 
     // Reference-counted rabbitmq connection. Does not retrigger at
     // subscription.
-    public static Flowable<PingTimepoint> get() {
+    public static Flowable<PingTimePoint> stream() {
         return _pingStream;
     }
 }

@@ -9,7 +9,7 @@ import com.rabbitmq.client.Channel;
 import org.jetbrains.annotations.NotNull;
 import org.pnplab.phenotype.acquisition.listeners.Accelerometer;
 import org.pnplab.phenotype.logger.AbstractLogger;
-import org.pnplab.phenotype.synchronization.Ping;
+import org.pnplab.phenotype.acquisition.Ping;
 import org.pnplab.phenotype.synchronization.RabbitConnection;
 import org.pnplab.phenotype.synchronization.RabbitStore;
 import org.pnplab.phenotype.synchronization.SQLiteStore;
