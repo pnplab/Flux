@@ -1,0 +1,104 @@
+version: "3.1"
+
+services:
+    grafana:
+        image: grafana/grafana:6.6.0
+        # admin/admin
+        expose:
+            - 3000
+        volumes:
+            # Persist config
+            - grafana-data:/var/lib/grafana
+        ports:
+            - 3000:3000
+        depends_on:
+            - timescaledb
+
+    timescaledb:
+        # @todo compile with  ldap
+        image: timescale/timescaledb:latest-pg11
+        environment:
+            # postgres/postgres/hehe
+            POSTGRES_PASSWORD: "hehe"
+        expose:
+            - 5432
+        ports:
+            - 5432:5432 # @warning unsafe
+    
+    # https://github.com/dmaze/docker-rabbitmq-example/blob/master/docker-compose.yml
+    rabbitmq:
+        image: rabbitmq:3.8.2-management-alpine
+        environment:
+            # guest/guest
+            RABBITMQ_PASSWORD: "hoho" # @warning doesn't appear to work
+        expose:
+            # cf. https://www.rabbitmq.com/troubleshooting-networking.html#verify-server
+            # ?
+            - 5673
+            # The standard AMQP protocol port
+            - 5672
+            # HTTP management UI
+            - 15672
+            # ?
+            - 15671
+        ports:
+            - 15672:15672
+            - 5672:5672
+        # https://mindbyte.nl/2018/04/05/run-rabbitmq-using-docker-compose-with-guest-user.html
+        # volumes:
+        #     - ./rabbitmq-isolated.conf:/etc/rabbitmq/rabbitmq.config
+    consumer:
+        build:
+            context: ./android-consumer
+            dockerfile: Dockerfile
+        command:
+            - /bin/sh
+            - -c
+            - |
+                sleep 30 # wait for rabbitmq (slow) and postgres (fast) to start.
+                yarn start
+        #    working_dir: /usr/src/app
+        # volumes:
+        #    - ./consumer:/usr/src/app
+        environment:
+            - RABBIT_HOST=amqp://rabbitmq
+            - POSTGRES_HOST=postgres
+            - POSTGRES_PASSWORD=admin
+            - POSTGRES_USER=admin
+            - POSTGRES_DB=postgres
+        depends_on:
+            - rabbitmq
+            - timescaledb
+
+    proxy:
+        image: wernight/ngrok
+        ports:
+            - "4040:4040"
+        command:
+            - /bin/sh
+            - -c
+            # - ngrok authtoken 1XKI0zXAupr17SkSPrUg5yp42pU_2Ec98cPeQrzmjjNZRHDDC && 
+            - ngrok http rabbitmq:15672
+        #     curl (docker port backendv2_proxy_1 4040)/api/tunnels
+        volumes:
+            - .:/home/ngrok/.ngrok2/
+        depends_on:
+            - grafana
+            - timescaledb
+            - rabbitmq
+    
+    # consumer:
+    #     environment:
+    #         # The location of the RabbitMQ server.  "amqp" is the protocol;
+    #         # "rabbitmq" is the hostname.  Note that there is not a guarantee
+    #         # that the server will start first!  Telling the pika client library
+    #         # to try multiple times gets around this ordering issue.
+    #         AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=5'
+
+volumes:
+    # Must be named volume instead of local one in order to avoid folder
+    # permission/chown issues on container restart.
+    # cf. https://community.grafana.com/t/new-docker-install-with-persistent-storage-permission-problem/10896/5
+    # Otherwise, local volumes with `chown -R 472 ./grafana-data/` upon docker
+    # container restart has been tested and works fine as well.
+    grafana-data:
