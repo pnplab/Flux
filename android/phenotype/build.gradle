@@ -13,8 +13,6 @@ def setDefaultExt(prop, fallback) {
     }
 }
 
-setDefaultExt("configurationClass", "org.pnplab.phenotype.DefaultPhenotypeConfiguration")
-
 setDefaultExt("backgroundInitProviderClass", "org.pnplab.phenotype.system.entrypoints.DefaultPhenotypeInitProvider")
 setDefaultExt("backgroundInitProviderAuthority", "\${applicationId}.phenotype.PhenotypeBackgroundInitProvider")
 setDefaultExt("serviceClass", "org.pnplab.phenotype.system.entrypoints.DefaultPhenotypeService")
