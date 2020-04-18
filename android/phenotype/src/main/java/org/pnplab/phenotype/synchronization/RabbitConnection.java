@@ -11,7 +11,10 @@ import com.rabbitmq.client.RecoveryListener;
 import com.rabbitmq.client.ShutdownSignalException;
 import com.rabbitmq.client.impl.recovery.AutorecoveringConnection;
 
+import org.pnplab.phenotype.system.entrypoints.AbstractPhenotypeInitProvider;
+
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import io.reactivex.rxjava3.core.Observable;
@@ -48,9 +51,13 @@ public class RabbitConnection {
                 emitter.setCancellable(() -> {
                     // Do nothing if connection is already closed, otherwise
                     // would #close throws AlreadyClosedException. This dual
-                    // disconnection happens due to this stream being disposed
-                    // through a downstream switchmap after "wifi lost events"
-                    // received in our use case.
+                    // disconnection happens due to:
+                    // 1st. Automatic disconnection caught from server (
+                    //      considering addShutdownListener is triggered before
+                    //      the stream cancel is triggered).
+                    // 2nd. The rxjava stream being disposed through a
+                    //      downstream switchmap after "wifi lost events"
+                    //      received in our use case.
                     if (!connection.isOpen()) {
                         return;
                     }
@@ -61,10 +68,14 @@ public class RabbitConnection {
                 });
 
                 // Continue channel creation.
-                // @note will be recreated automatically by rabbitmq in case of
-                // failure recovery).
+                // @note
+                // Will be recreated automatically by rabbitmq in case of
+                // failure recovery, which is not the case in our code).
                 Channel channel = connection.createChannel();
-                channel.queueDeclare("accelerometer", true, false, false, null);
+
+                // @note
+                // Before publishing data, queue have to be declared in the
+                // channel. This responsibility is delegated to store for now.
 
                 // Forward disconnection events.
                 connection.addShutdownListener((ShutdownSignalException cause) -> {
@@ -94,8 +105,9 @@ public class RabbitConnection {
                     });
                 }
 
-                // Forward suspension events (due to resources (cpu, i/o, ...)
-                // overwhelmed for instance).
+                // Forward suspension events (due to server resources (cpu, i/o,
+                // ...) overwhelmed for instance).
+                // cf. https://www.rabbitmq.com/connection-blocked.html#notifications
                 connection.addBlockedListener(new BlockedListener() {
                     @Override
                     public void handleBlocked(String reason) throws IOException {
@@ -146,11 +158,63 @@ public class RabbitConnection {
         .replay(1)
         .refCount();
 
-    // We should keep onError semantic for easy retry.
-    // We should map error to .
-
     // Reference-counted rabbitmq connection. Retriggers at subscribe.
-    public static Observable<Optional<Channel>> get() {
+    public static Observable<Optional<Channel>> stream() {
         return _connectionStream;
+    }
+
+    // Try to provide rabbit mq connection, or empty item in case of failure
+    // (as well as delayed broken connection).
+    private static Observable<Optional<Channel>> _connectionStreamWithRetry = _connectionStream
+        // Split error into empty value + error, as
+        // - we want the outer stream to have an empty
+        //   _channel event in case of connection failure so
+        //   it can fallback to local storage for instance.
+        // - using error + retryWhen doesn't allow to emit
+        //   that empty event.
+        // - using startWith wont be retriggered after
+        //   error recovery.
+        .onErrorResumeNext(err ->
+            Observable
+                .concat(
+                    Observable.just(Optional.empty()),
+                    Observable.error(err)
+                )
+        )
+        // Retry (the whole chain, not just the last operator) on error.
+        .retryWhen(inputObs ->
+            inputObs
+                // Calculate current attempt number by
+                // converting the error objects into their
+                // index within the stream.
+                .scan(1, (i, error) -> ++i)
+                // Return exponential back-off timed source with max 15
+                // minutes.
+                .flatMap(
+                    i ->
+                        Observable.timer(
+                            Math.max(Double.valueOf(Math.pow(2., i)).longValue(), 60 * 15),
+                            TimeUnit.SECONDS
+                        )
+                )
+        )
+        .doOnEach(event -> {
+            AbstractPhenotypeInitProvider.getLogger().v(event.toString());
+        })
+        // Prevent empty observable being retriggered at
+        // each new attempt when connection is failing.
+        .distinctUntilChanged()
+        // Reference count subscriptions, such as we avoid multiple
+        // reconnection (this is only a slight optimization, since this
+        // optimisation is already achieved at _connectionStream level).
+        // @todo check how both retryWhen and multithreading works in multi
+        //  threading env.
+        .replay(1)
+        .refCount();
+
+    // Reference-counted rabbitmq connection w/ exponential-backoff retry
+    // algorithm (max 15min). Retriggers at subscribe.
+    public static Observable<Optional<Channel>> streamAndRetryOnFailure() {
+        return _connectionStreamWithRetry;
     }
 }
