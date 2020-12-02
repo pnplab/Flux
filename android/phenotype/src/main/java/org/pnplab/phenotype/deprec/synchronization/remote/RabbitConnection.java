@@ -1,4 +1,4 @@
-package org.pnplab.phenotype.synchronization.remote;
+package org.pnplab.phenotype.deprec.synchronization.remote;
 
 import android.os.NetworkOnMainThreadException;
 import android.util.Log;
@@ -14,6 +14,9 @@ import java.util.concurrent.TimeoutException;
 
 import io.reactivex.rxjava3.core.Observable;
 import java9.util.Optional;
+                // ts related comments -- mode out!
+                // https://issuetracker.google.com/issues/36916900#comment18
+                // https://issuetracker.google.com/issues/36972829
 
 public class RabbitConnection {
 
@@ -46,8 +49,6 @@ public class RabbitConnection {
         .<Optional<Connection>>create(emitter -> {
             try {
                 // Connect to rabbitmq server.
-                // https://issuetracker.google.com/issues/36916900#comment18
-                // https://issuetracker.google.com/issues/36972829
                 ConnectionFactory factory = new ConnectionFactory();
                 factory.setHost("192.99.152.104");
                 factory.setPort(5672);

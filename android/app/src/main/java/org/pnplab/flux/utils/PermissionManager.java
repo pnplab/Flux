@@ -68,7 +68,7 @@ public class PermissionManager implements IPermissionManager, AutoCloseable {
 
     // Request new permission and provide an optional callback for it.
     public void requestPermission(@NonNull String permission, FunctionIn1<PermissionResult> onResult) {
-        // Store callback until permission result is received.
+        // WritableStore callback until permission result is received.
         if (onResult != null) {
             // Check there is a slot left for the callback. This should always be the case except
             // through severe volontary stress test of the current method, but for safety...
@@ -76,7 +76,7 @@ public class PermissionManager implements IPermissionManager, AutoCloseable {
                 throw new IndexOutOfBoundsException("There is more than 256 request dialog response awaiting");
             }
 
-            // Store the method.
+            // WritableStore the method.
             permissionCallbacks.put(currentRequestCode, onResult);
         }
 

@@ -1,4 +1,4 @@
-package org.pnplab.phenotype.api;
+package org.pnplab.phenotype.dataflow;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -12,7 +12,7 @@ import androidx.core.content.ContextCompat;
 import org.pnplab.phenotype.BuildConfig;
 import org.pnplab.phenotype.core.AbstractService;
 import org.pnplab.phenotype.logger.AbstractLogger;
-import org.pnplab.phenotype.deprec.entrypoints.ClientAPI_Proxy;
+import org.pnplab.phenotype.core.ClientAPI_Proxy;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;

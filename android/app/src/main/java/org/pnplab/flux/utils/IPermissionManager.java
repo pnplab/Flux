@@ -74,7 +74,7 @@ public interface IPermissionManager {
         PERMISSION_GRANTED(PackageManager.PERMISSION_GRANTED),
         PERMISSION_DENIED(PackageManager.PERMISSION_DENIED);
 
-        // Store it's package manager value for easy comparison in the
+        // WritableStore it's package manager value for easy comparison in the
         // on/forwardRequestPermissionsResult method.
         public final int packageManagerVal;
 

@@ -1,4 +1,4 @@
-package org.pnplab.phenotype.core.proxy;
+package org.pnplab.phenotype.core;
 
 import remoter.annotations.Oneway;
 import remoter.annotations.Remoter;

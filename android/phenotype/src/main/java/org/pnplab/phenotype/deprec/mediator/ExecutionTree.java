@@ -1,12 +1,6 @@
-package org.pnplab.phenotype.system.mediator;
+package org.pnplab.phenotype.deprec.mediator;
 
 import android.content.Context;
-
-import org.pnplab.phenotype.system.entrypoints_depr.API;
-import org.pnplab.phenotype.system.entrypoints_depr.AccessibilityService;
-import org.pnplab.phenotype.system.entrypoints_depr.AppInitContentProvider;
-import org.pnplab.phenotype.system.entrypoints_depr.BootCompletedBroadcastReceiver;
-import org.pnplab.phenotype.system.entrypoints_depr.WakelockStickyForegroundService;
 
 // This class serves as a way to centralise dataflow.
 // possible use:

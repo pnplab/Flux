@@ -1,4 +1,4 @@
-package org.pnplab.phenotype.synchronization.dataflow;
+package org.pnplab.phenotype.deprec.synchronization.dataflow;
 
 import android.content.Context;
 

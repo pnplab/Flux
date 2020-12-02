@@ -1,4 +1,4 @@
-package org.pnplab.phenotype.generators;
+package org.pnplab.phenotype.producer;
 
 // requires google play.
 // cf. https://developer.android.com/training/location/retrieve-current

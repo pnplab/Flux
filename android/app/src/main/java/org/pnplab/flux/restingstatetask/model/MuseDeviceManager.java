@@ -41,7 +41,7 @@ public class MuseDeviceManager extends MuseConnectionListener implements IMuseDe
         _museThread = new MuseDeviceExecutionThread(new WeakReference<>(_managedDevice));
         _museThread.start();
 
-        // Store callback in order to be able to call it whenever muse connection status changes.
+        // WritableStore callback in order to be able to call it whenever muse connection status changes.
         _onConnectionStatusChangedFn = onConnectionStatusChanged;
     }
 

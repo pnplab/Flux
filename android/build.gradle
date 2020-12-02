@@ -45,7 +45,8 @@ project.ext {
     //  - define gradle subprojects.
 
     phenotype = [
-        // loggerClass: "org.pnplab.phenotype_example.Log4aPhenotypeLogger"
+        initClass: "org.pnplab.stressoncovid19.PhenotypeInitProvider",
+        loggerClass: "org.pnplab.stressoncovid19.MyLogger",
         serviceClass: 'org.pnplab.stressoncovid19.StressPhenotypeService'
     ]
 }
@@ -73,7 +74,7 @@ buildscript {
         // however yarn is unable to build it
         // `npm_config_build_from_source=true yarn add realm#6211333a635d3fd202cb4b50e9b291a4c8ed8e3d`
         // -- both with node 10 and 12.
-        classpath 'com.android.tools.build:gradle:3.4.2'
+        classpath 'com.android.tools.build:gradle:4.1.1'
         classpath 'com.google.gms:google-services:4.2.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jacoco:org.jacoco.core:0.8.2" // code coverage plugin impl. by android studio

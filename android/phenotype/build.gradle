@@ -13,11 +13,12 @@ def setDefaultExt(prop, fallback) {
     }
 }
 
-setDefaultExt("backgroundInitProviderClass", "org.pnplab.phenotype.system.entrypoints.DefaultPhenotypeInitProvider")
-setDefaultExt("backgroundInitProviderAuthority", "\${applicationId}.phenotype.PhenotypeBackgroundInitProvider")
-setDefaultExt("serviceClass", "org.pnplab.phenotype.system.entrypoints.DefaultPhenotypeService")
+// @todo clientInitProviderAuthority initClass.
+setDefaultExt("initClass", "org.pnplab.phenotype.example.ServiceInitProvider")
+setDefaultExt("initProviderAuthority", "\${applicationId}.phenotype.PhenotypeBackgroundInitProvider")
+setDefaultExt("serviceClass", "org.pnplab.phenotype.example.Service")
 setDefaultExt("loggerClass", "org.pnplab.phenotype.logger.DefaultLogger")
-setDefaultExt("clientInitProviderAuthority", "\${applicationId}.phenotype.PhenotypeClientInitProvider")
+setDefaultExt("clientInitProviderAuthority", "\${applicationId}.phenotype.ClientInitProvider")
 
 android {
     compileSdkVersion 29
@@ -53,13 +54,13 @@ android {
         //     cf. https://issuetracker.google.com/issues/36967265
         // @note we need to retrieve class dynamically as java package can't be
         //     found statically since it's a dependency injection.
-        buildConfigField "Class<? extends org.pnplab.phenotype.system.entrypoints.AbstractPhenotypeService>",
+        buildConfigField "Class<? extends org.pnplab.phenotype.core.AbstractService>",
                 "PHENOTYPE_SERVICE_CLASS",
-                "((java9.util.function.Supplier<Class<? extends org.pnplab.phenotype.system.entrypoints.AbstractPhenotypeService>>)() -> {" +
+                "((java9.util.function.Supplier<Class<? extends org.pnplab.phenotype.core.AbstractService>>)() -> {" +
                 "   try { " +
                 "       return Class" +
                 "           .forName(\"${parent.ext.phenotype.serviceClass}\")" +
-                "           .asSubclass(org.pnplab.phenotype.system.entrypoints.AbstractPhenotypeService.class);" +
+                "           .asSubclass(org.pnplab.phenotype.core.AbstractService.class);" +
                 "   }" +
                 "   catch (Exception exc) {" +
                 "       throw new RuntimeException(exc);" +
@@ -69,12 +70,12 @@ android {
         buildConfigField "String", "PHENOTYPE_NOTIFICATION_CHANNEL_ID", '"PHENOTYPE_NOTTIFICATION_CHANNEL"'
         manifestPlaceholders.phenotypeServiceClass = "${parent.ext.phenotype.serviceClass}"
         manifestPlaceholders.phenotypeClientInitProviderAuthority = "${parent.ext.phenotype.clientInitProviderAuthority}"
-        manifestPlaceholders.phenotypeBackgroundInitProviderAuthority = "${parent.ext.phenotype.backgroundInitProviderAuthority}"
-        manifestPlaceholders.phenotypeBackgroundInitProviderClass = "${parent.ext.phenotype.backgroundInitProviderClass}"
+        manifestPlaceholders.phenotypeBackgroundInitProviderAuthority = "${parent.ext.phenotype.initProviderAuthority}"
+        manifestPlaceholders.phenotypeBackgroundInitProviderClass = "${parent.ext.phenotype.initClass}"
 
         // throw new Error("applId ${rootProject.android.defaultConfig.applicationId}")
-        // "${applicationId}.phenotype.PhenotypeClientInitProvider"
-        // "org.pnplab.flux.phenotype.PhenotypeClientInitProvider"
+        // "${applicationId}.phenotype.ClientInitProvider"
+        // "org.pnplab.flux.phenotype.ClientInitProvider"
     }
 
     buildTypes {
@@ -129,7 +130,7 @@ dependencies {
     // not want this lib to force opinionated dependency through its interface.
     // Thus we do not use it as an asynchronous interface abstraction layer.
     // Also, its use is also technically still optional as it's only used for
-    // implementation concerns in DefaultPhenotypeService.
+    // implementation concerns in Service.
     //
     // Considering that, back-pressured reactive streams address 2 concerns we
     // specifically have:
@@ -180,6 +181,17 @@ dependencies {
     // connection available to send the data to.
     // implementation 'com.github.akarnokd:rxjava3-extensions:3.0.0'
 
+    // Provides HandlerScheduler class. An rxJava scheduler interface (the
+    // class abstraction required to set the thread where code is executed
+    // through rxjava insubscribeOn/observeOn). This scheduler provides task to
+    // an Android HandlerThread instead of a Thread. To specify where to run a
+    // specific listener (ie. which thread), some android methods, such as
+    // android SensorManage#registerListener, require to set an Handler as an
+    // argument instead of a Thread. HandlerThreads contain an Android Looper
+    // by default which runs the task. Standard Thread don't contain that
+    // looper.
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+
     // implementation 'com.google.guava:guava:28.2-android' // for EvictingQueue (ring buffer) @warning marked as unstable api
 
     // RabbitMQ provides an abstraction over messaging protocols, including
@@ -202,7 +214,12 @@ dependencies {
     // thus use the 4.x one.
     // cf. https://www.rabbitmq.com/java-client.html
     // cf. https://github.com/rabbitmq/rabbitmq-java-client
-    implementation 'com.rabbitmq:amqp-client:4.11.3'
+    //
+    // @note
+    // api instead implementation keyword is used in order to be able to share
+    // rabbitmq Connection class in case PhenotypeService is inherited by our
+    // library's user and he rely on our rabbitmq connection/store classes.
+    api 'com.rabbitmq:amqp-client:4.11.3'
 
     // See android market shares by API for canada (eq ~ 2% for android Kitkat
     // (API 19 & 20) in febr. 2020.

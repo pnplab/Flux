@@ -53,7 +53,7 @@ public class PrepareTaskScreen {
     // @pre Requires ACCESS_COARSE_LOCATION or ACCESS_FINE_LOCATION permissions !
     // @todo listen to muse deconnection and reconnection (for now it only listen to the first connection)
     public void onPreparationViewOpened() {
-        // Store the function implementation in a lambda first so we can run it either synchronously or
+        // WritableStore the function implementation in a lambda first so we can run it either synchronously or
         // asynchronously if permission request is needed first.
         Runnable _onPreparationViewOpenedImpl = () -> {
             // Start auto connection if bluetooth is enabled.

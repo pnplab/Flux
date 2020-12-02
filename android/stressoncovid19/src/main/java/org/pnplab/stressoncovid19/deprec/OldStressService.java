@@ -16,22 +16,22 @@ import com.intentfilter.androidpermissions.models.DeniedPermissions;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 
-import org.pnplab.phenotype.acquisition.Ping;
-import org.pnplab.phenotype.acquisition.listeners.Accelerometer;
-import org.pnplab.phenotype.acquisition.listeners.BatteryPercentage;
-import org.pnplab.phenotype.acquisition.listeners.GPSLocation;
-import org.pnplab.phenotype.acquisition.listeners.Pedometer;
-import org.pnplab.phenotype.acquisition.listeners.SignificantMotion;
+import org.pnplab.phenotype.producer.Ping;
+import org.pnplab.phenotype.producer.Accelerometer;
+import org.pnplab.phenotype.producer.BatteryPercentage;
+import org.pnplab.phenotype.producer.GPSLocation;
+import org.pnplab.phenotype.producer.Pedometer;
+import org.pnplab.phenotype.producer.SignificantMotion;
 import org.pnplab.phenotype.logger.AbstractLogger;
-import org.pnplab.phenotype.synchronization.dataflow.Dispatcher;
-import org.pnplab.phenotype.synchronization.remote.RabbitStore;
-import org.pnplab.phenotype.synchronization.remote.RabbitChannel;
-import org.pnplab.phenotype.synchronization.remote.RabbitConnection;
-import org.pnplab.phenotype.synchronization.local.SQLiteStore;
-import org.pnplab.phenotype.synchronization.dataflow.WritableStore;
-import org.pnplab.phenotype.synchronization.dataflow.WifiStatus;
-import org.pnplab.phenotype.system.core.AbstractPhenotypeService;
-import org.pnplab.stressoncovid19.PhenotypeInitProvider;
+import org.pnplab.phenotype.deprec.synchronization.dataflow.Dispatcher;
+import org.pnplab.phenotype.deprec.synchronization.remote.RabbitStore;
+import org.pnplab.phenotype.deprec.synchronization.remote.RabbitChannel;
+import org.pnplab.phenotype.deprec.synchronization.remote.RabbitConnection;
+import org.pnplab.phenotype.deprec.synchronization.local.SQLiteStore;
+import org.pnplab.phenotype.deprec.synchronization.dataflow.WritableStore;
+import org.pnplab.phenotype.deprec.synchronization.dataflow.WifiStatus;
+import org.pnplab.phenotype.core.AbstractService;
+import org.pnplab.stressoncovid19.InitProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,18 +54,18 @@ import java9.util.Optional;
 //  (should we abstract output data structures from transfer/storage
 //  structures, but create convertor between them, such as identity in case
 //  struct doesn't change).
-public class OldStressPhenotypeService extends AbstractPhenotypeService {
+public class OldStressService extends AbstractService {
 
-    private final AbstractLogger _log = PhenotypeInitProvider.getLogger();
+    private final AbstractLogger _log = InitProvider.getLogger();
     private final CompositeDisposable _disposables = new CompositeDisposable();
 
     /*
     @Remoter
-    public interface StressClientAPI extends AbstractPhenotypeService.ClientAPI {
+    public interface StressClientAPI extends AbstractService.ClientAPI {
 
     }
 
-    protected class StressClientImpl extends AbstractPhenotypeService.ClientImpl implements StressClientAPI {
+    protected class StressClientImpl extends AbstractService.ClientImpl implements StressClientAPI {
 
     }
     */

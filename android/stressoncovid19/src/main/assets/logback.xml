@@ -1,0 +1,53 @@
+<configuration>
+    <appender name="logcat" class="ch.qos.logback.classic.android.LogcatAppender">
+        <tagEncoder>
+            <pattern>%logger{12}</pattern>
+        </tagEncoder>
+        <encoder>
+            <pattern>[%thread] %msg</pattern>
+        </encoder>
+    </appender>
+
+    <!--
+    inherited SQLiteAppender in order to add programmatic config.
+    SQLiteAppender's EXT_DIR helper rely on android deprecated
+    #getExternalStorageDirectory method, thus, this has to be configured
+    manually.
+    -->
+    <appender name="sqlite" class="org.pnplab.stressoncovid19.deprec.MyLoggerAppender">
+        <tagEncoder>
+            <pattern>%logger{12}</pattern>
+        </tagEncoder>
+        <encoder>
+            <pattern>[%thread] %msg</pattern>
+        </encoder>
+    </appender>
+
+    <!--
+    Enhannce logging speed by queuing with non-blocking store.
+    "by default, AsyncAppender will drop events of level TRACE, DEBUG and INFO
+    if its queue is 80% full"
+    cf. http://logback.qos.ch/manual/appenders.html
+    -->
+    <appender name="async" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- store logs data into sqlite appender asynchronously -->
+        <appender-ref ref="sqlite" />
+        <queueSize>1024</queueSize>
+        <includeCallerData>true</includeCallerData>
+        <!--
+        neverBlock == true does drop the message when the queue is full
+        @warning
+        Would be better to have a circular queue.
+        -->
+        <neverBlock>true</neverBlock>
+    </appender>
+
+    <root level="TRACE">
+        <appender-ref ref="async" />
+        <appender-ref ref="logcat" />
+    </root>
+
+    <shutdownHook/>
+
+</configuration>
+

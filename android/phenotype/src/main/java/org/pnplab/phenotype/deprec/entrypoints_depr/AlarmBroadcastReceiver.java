@@ -1,4 +1,4 @@
-package org.pnplab.phenotype.system.entrypoints_depr;
+package org.pnplab.phenotype.deprec.entrypoints_depr;
 
 public class AlarmBroadcastReceiver {
 }

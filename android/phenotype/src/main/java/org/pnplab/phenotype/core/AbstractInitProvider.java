@@ -1,4 +1,4 @@
-package org.pnplab.phenotype.system.core;
+package org.pnplab.phenotype.core;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -14,7 +14,7 @@ import androidx.annotation.Nullable;
 import org.pnplab.phenotype.Phenotype;
 import org.pnplab.phenotype.logger.AbstractLogger;
 
-abstract public class AbstractPhenotypeInitProvider extends ContentProvider {
+abstract public class AbstractInitProvider extends ContentProvider {
 
     // WritableStore the android context statically so we can share it to other
     // android's component.
@@ -29,8 +29,8 @@ abstract public class AbstractPhenotypeInitProvider extends ContentProvider {
         // initialised, but for safety, we double check it.
         if (_context == null) {
             throw new IllegalStateException(
-                "PhenotypeClientInitProvider's context is null. " +
-                "PhenotypeClientInitProvider#getApplicationContext should be " +
+                "ClientInitProvider's context is null. " +
+                "ClientInitProvider#getApplicationContext should be " +
                 "used after ContentProviders initialisation."
             );
         }
@@ -47,42 +47,42 @@ abstract public class AbstractPhenotypeInitProvider extends ContentProvider {
         return new AbstractLogger() {
             @Override
             public void initialize(Context context) {
-                AbstractPhenotypeInitProvider._logger.initialize(context);
+                AbstractInitProvider._logger.initialize(context);
             }
 
             @Override
             public void i(String msg) {
-                AbstractPhenotypeInitProvider._logger.i(msg);
+                AbstractInitProvider._logger.i(msg);
             }
 
             @Override
             public void e(String msg) {
-                AbstractPhenotypeInitProvider._logger.e(msg);
+                AbstractInitProvider._logger.e(msg);
             }
 
             @Override
             public void w(String msg) {
-                AbstractPhenotypeInitProvider._logger.w(msg);
+                AbstractInitProvider._logger.w(msg);
             }
 
             @Override
             public void d(String msg) {
-                AbstractPhenotypeInitProvider._logger.d(msg);
+                AbstractInitProvider._logger.d(msg);
             }
 
             @Override
             public void v(String msg) {
-                AbstractPhenotypeInitProvider._logger.v(msg);
+                AbstractInitProvider._logger.v(msg);
             }
 
             @Override
             public void wtf(String msg) {
-                AbstractPhenotypeInitProvider._logger.wtf(msg);
+                AbstractInitProvider._logger.wtf(msg);
             }
 
             @Override
             public void t() {
-                AbstractPhenotypeInitProvider._logger.t();
+                AbstractInitProvider._logger.t();
             }
         };
     }
@@ -98,8 +98,8 @@ abstract public class AbstractPhenotypeInitProvider extends ContentProvider {
         _context = getContext().getApplicationContext();
 
         // Initialize logger.
-        AbstractPhenotypeInitProvider.setLogger(_provideLogger(_context));
-        _log = AbstractPhenotypeInitProvider.getLogger();
+        AbstractInitProvider.setLogger(_provideLogger(_context));
+        _log = AbstractInitProvider.getLogger();
 
         // Trace this callback.
         _log.t();
@@ -120,7 +120,7 @@ abstract public class AbstractPhenotypeInitProvider extends ContentProvider {
 
         // Check ProviderInfo is not null.
         if (info == null) {
-            throw new IllegalStateException("PhenotypeClientInitProvider#attachInfo's ProviderInfo should be provided");
+            throw new IllegalStateException("ClientInitProvider#attachInfo's ProviderInfo should be provided");
         }
 
         // Ensure applicationId has been configured in gradle by the lib user.

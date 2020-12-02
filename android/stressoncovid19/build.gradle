@@ -25,7 +25,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
@@ -39,6 +39,24 @@ dependencies {
 
     implementation 'io.reactivex.rxjava3:rxjava:3.0.0'
 
+    // Provides HandlerScheduler class. An rxJava scheduler interface (the
+    // class abstraction required to set the thread where code is executed
+    // through rxjava insubscribeOn/observeOn). This scheduler provides task to
+    // an Android HandlerThread instead of a Thread. To specify where to run a
+    // specific listener (ie. which thread), some android methods, such as
+    // android SensorManage#registerListener, require to set an Handler as an
+    // argument instead of a Thread. HandlerThreads contain an Android Looper
+    // by default which runs the task. Standard Thread don't contain that
+    // looper.
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+
+    // Requests permissions from service with a notification + empty activity.
+    // @note Multi threading bug recently fixed on 2.0.54 (early march 2020),
+    //       to be checked. We probably don't have the trouble use case in our
+    //       code though. No active tickets.
+    // cf. https://github.com/nishkarsh/android-permissions/
+    implementation 'com.intentfilter:android-permissions:2.0.54'
+
     // Framework dependency for flipper desktop app to debug android and ios
     // apps.
     // cf. https://fbflipper.com/docs/getting-started.html
@@ -47,4 +65,8 @@ dependencies {
     debugImplementation 'com.facebook.flipper:flipper-network-plugin:0.34.0'
     implementation 'com.facebook.soloader:soloader:0.8.2' // for flipper loading
     debugImplementation 'com.facebook.soloader:soloader:0.8.2'
+
+    // Logging.
+    implementation 'org.slf4j:slf4j-api:1.7.26'
+    implementation 'com.github.tony19:logback-android:2.0.0' // sqlite store.
 }

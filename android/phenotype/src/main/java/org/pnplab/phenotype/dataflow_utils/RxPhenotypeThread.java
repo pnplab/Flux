@@ -1,4 +1,4 @@
-package org.pnplab.phenotype.dataflow;
+package org.pnplab.phenotype.dataflow_utils;
 
 import android.annotation.SuppressLint;
 
@@ -8,8 +8,8 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.disposables.Disposable;
 
-// RxAndroid.Scheduler for single thread, whose lifecycle is bound to the
-// RxJava's stream.
+// RxAndroid.Scheduler adapted to generate a single thread whose lifecycle is
+// bound to the RxJava's stream.
 public class RxPhenotypeThread extends Scheduler {
         private final String _threadName;
         private Scheduler _childScheduler;

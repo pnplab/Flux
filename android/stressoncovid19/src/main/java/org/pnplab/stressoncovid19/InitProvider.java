@@ -3,14 +3,14 @@ package org.pnplab.stressoncovid19;
 import android.content.Context;
 
 import org.pnplab.phenotype.logger.AbstractLogger;
-import org.pnplab.phenotype.system.core.AbstractPhenotypeInitProvider;
+import org.pnplab.phenotype.core.AbstractInitProvider;
 
-public class PhenotypeInitProvider extends AbstractPhenotypeInitProvider {
+public class InitProvider extends AbstractInitProvider {
 
     private static MyLogger _log;
 
     public static AbstractLogger getLogger() {
-        return PhenotypeInitProvider._log;
+        return InitProvider._log;
     }
 
     @Override
@@ -18,7 +18,7 @@ public class PhenotypeInitProvider extends AbstractPhenotypeInitProvider {
         MyLogger logger = new MyLogger();
         logger.initialize(context);
 
-        PhenotypeInitProvider._log = logger;
+        InitProvider._log = logger;
         return logger;
     }
 

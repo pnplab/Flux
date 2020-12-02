@@ -86,7 +86,7 @@ public class MuseAutoConnection {
             // Prevent multiple consequent connection attempts on the same device.
             _museDeviceListObserver.unlistenDeviceListChange();
 
-            // Store current state so we can apply the appropriate listener cleanups if the
+            // WritableStore current state so we can apply the appropriate listener cleanups if the
             // user cancelOrDisconnect the auto connection mechanism.
             _state = State.DEVICE_FOUND;
 

@@ -1,4 +1,4 @@
-package org.pnplab.phenotype.synchronization.local;
+package org.pnplab.phenotype.deprec.synchronization.local;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -7,9 +7,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
 
-import org.pnplab.phenotype.synchronization.dataflow.OrderedReflectionHelper;
-import org.pnplab.phenotype.synchronization.dataflow.ReadableStore;
-import org.pnplab.phenotype.synchronization.dataflow.WritableStore;
+import org.pnplab.phenotype.utils.OrderedClassReflectionHelper;
+import org.pnplab.phenotype.deprec.synchronization.dataflow.ReadableStore;
+import org.pnplab.phenotype.deprec.synchronization.dataflow.WritableStore;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -64,7 +64,7 @@ public class SQLiteStore<T> implements WritableStore, ReadableStore<T> {
         orderedFieldNames.add(primaryKey);
         orderedFieldNames.addAll(Arrays.asList(otherFields));
 
-        OrderedReflectionHelper orderedReflectionHelper = new OrderedReflectionHelper<T>(dataClass, orderedFieldNames.toArray(new String[0]));
+        OrderedClassReflectionHelper orderedReflectionHelper = new OrderedClassReflectionHelper<T>(dataClass, orderedFieldNames.toArray(new String[0]));
         orderedReflectionHelper.validateOrThrow();
 
         this._classFields = orderedReflectionHelper.getFields();

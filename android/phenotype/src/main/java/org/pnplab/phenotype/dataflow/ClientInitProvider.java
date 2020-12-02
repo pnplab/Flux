@@ -1,4 +1,4 @@
-package org.pnplab.phenotype.api;
+package org.pnplab.phenotype.dataflow;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;

@@ -1,4 +1,4 @@
-package org.pnplab.phenotype.synchronization.remote;
+package org.pnplab.phenotype.deprec.synchronization.remote;
 
 import android.util.Log;
 

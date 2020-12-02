@@ -1,4 +1,4 @@
-package org.pnplab.phenotype.system.core;
+package org.pnplab.phenotype.core;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -19,7 +19,7 @@ import androidx.core.app.NotificationCompat;
 import org.pnplab.phenotype.BuildConfig;
 import org.pnplab.phenotype.R;
 import org.pnplab.phenotype.logger.AbstractLogger;
-import org.pnplab.phenotype.system.entrypoints.ClientAPI_Stub;
+// import org.pnplab.phenotype.entrypoints.ClientAPI_Stub;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -66,7 +66,7 @@ import remoter.annotations.Remoter;
  * read https://android.jlelse.eu/android-application-launch-explained-from-zygote-to-your-activity-oncreate-8a8f036864b
  * read https://support.mileiq.com/hc/en-us/articles/209974743-Optimize-Drive-Detection-on-Android-Phones
  */
-abstract public class AbstractPhenotypeService extends Service {
+abstract public class AbstractService extends Service {
 
     /**
      * The Client API of the service, as used by the user of the lib, likely
@@ -161,29 +161,29 @@ abstract public class AbstractPhenotypeService extends Service {
         // its interface.
         @Override
         synchronized public boolean isBackgroundModeStarting() {
-            return AbstractPhenotypeService.this.isBackgroundModeStarting();
+            return AbstractService.this.isBackgroundModeStarting();
         }
 
         @Override
         synchronized public boolean isBackgroundModeStarted() {
-            return AbstractPhenotypeService.this.isBackgroundModeStarted();
+            return AbstractService.this.isBackgroundModeStarted();
         }
 
         @Override
         synchronized public void stopBackgroundMode() {
             // @warning will fail if start was called just before due to async.
-            AbstractPhenotypeService.this.stopBackgroundMode();
+            AbstractService.this.stopBackgroundMode();
         }
 
         @Override
         synchronized public void startBackgroundMode() {
             // @warning will fail if start was called just before due to async.
-            AbstractPhenotypeService.this.startBackgroundMode();
+            AbstractService.this.startBackgroundMode();
         }
 
         @Override
         synchronized public void startBackgroundMode(AIDLRunnable onServiceStarted) {
-            AbstractPhenotypeService.this.startBackgroundMode(() -> {
+            AbstractService.this.startBackgroundMode(() -> {
                 // @note although synchronize java block are reentrant locks,
                 // no need to make the callback call thread safe here as it
                 // wont change/read any of the service state since it strictly
@@ -194,7 +194,7 @@ abstract public class AbstractPhenotypeService extends Service {
 
         @Override
         synchronized public void startBackgroundMode(AIDLRunnable onServiceStarted, AIDLConsumer<RuntimeException> onServiceStartFailed) {
-            AbstractPhenotypeService.this.startBackgroundMode(() -> onServiceStarted.run(), (error) -> {
+            AbstractService.this.startBackgroundMode(() -> onServiceStarted.run(), (error) -> {
                 // @note although synchronize java block are reentrant locks,
                 // no need to make the callback call thread safe here as it
                 // wont change/read any of the service state since it strictly
@@ -208,7 +208,7 @@ abstract public class AbstractPhenotypeService extends Service {
 
     }
 
-    private final AbstractLogger _log = AbstractPhenotypeInitProvider.getLogger();
+    private final AbstractLogger _log = AbstractInitProvider.getLogger();
 
     // Set service as START_STICKY or START_NOT_STICKY.
     private final boolean _restartServiceOnCrash = true;
@@ -269,7 +269,7 @@ abstract public class AbstractPhenotypeService extends Service {
         // Retrieve the class of the service to start.
         // @note we use getClass to ensure this is the child version of this
         //     class that is started.
-        Class<? extends AbstractPhenotypeService> phenotypeServiceClass = getClass();
+        Class<? extends AbstractService> phenotypeServiceClass = getClass();
         Intent intent = new Intent(context, phenotypeServiceClass);
 
         // Start the service.
@@ -391,7 +391,7 @@ abstract public class AbstractPhenotypeService extends Service {
         // @note we use getClass to ensure this is the child version of this
         //     class that is stopped.
         Context context = getApplicationContext();
-        Class<? extends AbstractPhenotypeService> serviceClass = getClass();
+        Class<? extends AbstractService> serviceClass = getClass();
 
         Intent intent = new Intent(context, serviceClass);
         boolean wasStarted = context.stopService(intent);

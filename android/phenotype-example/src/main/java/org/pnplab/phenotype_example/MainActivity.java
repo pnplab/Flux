@@ -21,20 +21,23 @@ public class MainActivity extends AppCompatActivity {
             // display start button if !isRunning
             // run on click.
             Log.i("pheno", "phenotype: service interface retrieved.");
-            boolean isRunning = phenotype.isRunning();
+            boolean isRunning = phenotype.isBackgroundModeStarted() || phenotype.isBackgroundModeStarting();
 
             if (isRunning) {
                 Log.i("pheno", "phenotype: service is already running.");
             }
             else {
                 Log.i("pheno", "phenotype: service is starting.");
-                phenotype.start(() -> {
-                    Log.i("pheno", "phenotype: service has started.");
-                    // phenotype.stop();
-                }, error -> {
-                    Log.i("pheno", "phenotype: failed to start the service.");
-                    Log.e("pheno", error.getMessage());
-                });
+                phenotype.startBackgroundMode(
+                    () -> {
+                        Log.i("pheno", "phenotype: service has started.");
+                        // phenotype.stop();
+                    },
+                    error -> {
+                        Log.i("pheno", "phenotype: failed to start the service.");
+                        Log.e("pheno", error.getMessage());
+                    }
+                );
             }
         }, error -> {
             Log.i("pheno", "phenotype: failed to retrieve the service interface and status.");

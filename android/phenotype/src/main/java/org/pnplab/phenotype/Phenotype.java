@@ -5,8 +5,8 @@ import android.os.RemoteException;
 
 import org.pnplab.phenotype.logger.AbstractLogger;
 import org.pnplab.phenotype.logger.DefaultLogger;
-import org.pnplab.phenotype.system.entrypoints.AbstractPhenotypeService;
-import org.pnplab.phenotype.system.entrypoints.PhenotypeServiceClient;
+import org.pnplab.phenotype.core.AbstractService;
+import org.pnplab.phenotype.dataflow.ClientServiceAPI;
 
 import java9.util.function.BiConsumer;
 import java9.util.function.Consumer;
@@ -19,14 +19,14 @@ import java9.util.function.Consumer;
 public class Phenotype {
 
     public static void initialize(Context context) {
-        // AbstractLogger logger = AbstractPhenotypeInitProvider.getLogger();
+        // AbstractLogger logger = AbstractInitProvider.getLogger();
         // logger.initialize(context);
         AbstractLogger logger = new DefaultLogger();
-        _client = new PhenotypeServiceClient(context, logger);
+        _client = new ClientServiceAPI(context, logger);
     }
 
     // onError is optional for synchronous usage.
-    public static void Phenotype(Consumer<AbstractPhenotypeService.ClientAPI> onLoaded) {
+    public static void Phenotype(Consumer<AbstractService.ClientAPI> onLoaded) {
         _client.bindService(
                 (aidlInterface, unbind) -> {
                     // Forward callback.
@@ -47,7 +47,7 @@ public class Phenotype {
         );
     }
 
-    public static void Phenotype(Consumer<AbstractPhenotypeService.ClientAPI> onLoaded, Consumer<RuntimeException> onError) {
+    public static void Phenotype(Consumer<AbstractService.ClientAPI> onLoaded, Consumer<RuntimeException> onError) {
         _client.bindService(
                 (aidlInterface, unbind) -> {
                     // Forward callback.
@@ -81,7 +81,7 @@ public class Phenotype {
 
     // onError is mandatory for asynchronous usage. Indeed asynchronous code
     // should check whether the connection is still opened or not when using it.
-    public static void Phenotype(BiConsumer<AbstractPhenotypeService.ClientAPI, Runnable> onLoaded, Consumer<RuntimeException> onError) {
+    public static void Phenotype(BiConsumer<AbstractService.ClientAPI, Runnable> onLoaded, Consumer<RuntimeException> onError) {
         _client.bindService(
                 (aidlInterface, unbind) -> {
                     // Forward callback.
@@ -120,14 +120,14 @@ public class Phenotype {
         _aidlInterface.stopBackgroundMode();
     }
 
-    private static PhenotypeServiceClient _client = null;
-    private final AbstractPhenotypeService.ClientAPI _aidlInterface;
+    private static ClientServiceAPI _client = null;
+    private final AbstractService.ClientAPI _aidlInterface;
     private Phenotype(PhenotypeServiceAidlInterface aidlInterface) {
         _aidlInterface = aidlInterface;
     }
     */
 
-    private static PhenotypeServiceClient _client = null;
+    private static ClientServiceAPI _client = null;
     private Phenotype() {
         // ... prevent instantiation.
     }

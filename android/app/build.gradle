@@ -100,7 +100,7 @@ apply from: "../../node_modules/react-native/react.gradle"
  *   - An APK that only works on ARM devices
  *   - An APK that only works on x86 devices
  * The advantage is the size of the APK is reduced by about 4MB.
- * Upload all the APKs to the Play Store and people will download
+ * Upload all the APKs to the Play WritableStore and people will download
  * the correct one based on the CPU architecture of their device.
  */
 // @warning `true` value breaks robolectric -- see https://github.com/robolectric/robolectric/issues/4942
@@ -197,20 +197,20 @@ task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'crea
             '**/*Module*.*'
     ]
     // generated classes
-    classDirectories = fileTree(
+    getClassDirectories().setFrom(fileTree(
             dir: "$buildDir/intermediates/classes/debug",
             excludes: excludes
     ) + fileTree(
             dir: "$buildDir/tmp/kotlin-classes/debug",
             excludes: excludes
-    )
+    ))
 
     // sources
-    sourceDirectories = files([
+    getSourceDirectories().setFrom(files([
             android.sourceSets.main.java.srcDirs,
             "$project.projectDir/src/main/java"
-    ])
-    executionData = fileTree(dir: project.buildDir, includes: ['jacoco/testDebugUnitTest.exec'])
+    ]))
+    getExecutionData().setFrom(fileTree(dir: project.buildDir, includes: ['jacoco/testDebugUnitTest.exec']))
 }
 
 android {

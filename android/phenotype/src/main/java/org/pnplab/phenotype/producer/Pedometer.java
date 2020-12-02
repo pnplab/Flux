@@ -1,4 +1,4 @@
-package org.pnplab.phenotype.generators;
+package org.pnplab.phenotype.producer;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;

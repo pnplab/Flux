@@ -1,4 +1,4 @@
-package org.pnplab.phenotype.system.mediator;
+package org.pnplab.phenotype.deprec.mediator;
 
 public class MediatorStorage {
 }

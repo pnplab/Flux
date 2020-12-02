@@ -2,8 +2,8 @@ version: "3.1"
 
 services:
     grafana:
-        image: grafana/grafana:6.6.0
         # admin/admin
+        image: grafana/grafana:7.0.0-beta1
         expose:
             - 3000
         volumes:
@@ -13,10 +13,34 @@ services:
             - 3000:3000
         depends_on:
             - timescaledb
+        # Provide env setting for backend grafana image renderer plugin.
+        # cf. https://grafana.com/grafana/plugins/grafana-image-renderer
+        environment:
+            GF_RENDERING_SERVER_URL: http://grafana-renderer:8081/render
+            GF_RENDERING_CALLBACK_URL: http://grafana:3000/
+            GF_LOG_FILTERS: rendering:debug
+            # Install additional plugins.
+            # cf. https://grafana.com/grafana/plugins/snuids-radar-panel/installation
+            # cf. https://grafana.com/grafana/plugins/alexandra-trackmap-panel
+            # cf. https://grafana.com/docs/grafana/latest/installation/docker/#installing-plugins-from-other-sources
+            GF_INSTALL_PLUGINS: "snuids-radar-panel 1.4.4,alexandra-trackmap-panel 1.2.4, raintank-worldping-app 1.2.7" #,grafana-image-renderer 1.0.12
+
+    # Install image rendering plugin to send graphs images to alert - includes
+    # phantomjs - requires lot of ram.
+    # @warning timezone seems fixed - not adapted to user.
+    grafana-renderer:
+        image: grafana/grafana-image-renderer:latest
+        ports:
+            - 8081
+        environment: 
+            BROWSER_TZ: America/Toronto
 
     timescaledb:
-        # @todo compile with  ldap
-        image: timescale/timescaledb:latest-pg11
+        # @todo compile with ldap
+        image: timescale/timescaledb:1.7.0-pg12
+        volumes:
+            # Persist data
+            - timescale-data:/var/lib/postgresql/data
         environment:
             # postgres/postgres/hehe
             POSTGRES_PASSWORD: "hehe"
@@ -26,6 +50,7 @@ services:
             - 5432:5432 # @warning unsafe
     
     # https://github.com/dmaze/docker-rabbitmq-example/blob/master/docker-compose.yml
+    # @note used by user-api
     rabbitmq:
         image: rabbitmq:3.8.2-management-alpine
         environment:
@@ -47,6 +72,7 @@ services:
         # https://mindbyte.nl/2018/04/05/run-rabbitmq-using-docker-compose-with-guest-user.html
         # volumes:
         #     - ./rabbitmq-isolated.conf:/etc/rabbitmq/rabbitmq.config
+
     consumer:
         build:
             context: ./android-consumer
@@ -55,7 +81,7 @@ services:
             - /bin/sh
             - -c
             - |
-                sleep 30 # wait for rabbitmq (slow) and postgres (fast) to start.
+                sleep 45 # wait for rabbitmq (slow) and postgres (slow/fast depending on time) to start.
                 yarn start
         #    working_dir: /usr/src/app
         # volumes:
@@ -69,6 +95,13 @@ services:
         depends_on:
             - rabbitmq
             - timescaledb
+
+    user-api:
+        build:
+            context: ./user-api
+            dockerfile: Dockerfile
+        ports:
+            - 3001:3001
 
     proxy:
         image: wernight/ngrok
@@ -102,3 +135,4 @@ volumes:
     # Otherwise, local volumes with `chown -R 472 ./grafana-data/` upon docker
     # container restart has been tested and works fine as well.
     grafana-data:
+    timescale-data:

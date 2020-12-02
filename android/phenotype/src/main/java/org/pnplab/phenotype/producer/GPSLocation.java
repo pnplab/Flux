@@ -1,4 +1,4 @@
-package org.pnplab.phenotype.generators;
+package org.pnplab.phenotype.producer;
 
 import android.Manifest;
 import android.content.Context;

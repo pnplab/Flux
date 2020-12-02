@@ -3,9 +3,9 @@ package org.pnplab.phenotype_example;
 import android.content.Context;
 
 import org.pnplab.phenotype.logger.AbstractLogger;
-import org.pnplab.phenotype.system.core.AbstractPhenotypeInitProvider;
+import org.pnplab.phenotype.core.AbstractInitProvider;
 
-public class PhenotypeInitProvider extends AbstractPhenotypeInitProvider {
+public class InitProvider extends AbstractInitProvider {
 
     @Override
     protected AbstractLogger _provideLogger(Context context) {

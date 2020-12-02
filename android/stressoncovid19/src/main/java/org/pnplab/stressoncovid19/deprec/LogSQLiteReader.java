@@ -1,11 +1,11 @@
-package org.pnplab.stressoncovid19;
+package org.pnplab.stressoncovid19.deprec;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
 
-import org.pnplab.phenotype.synchronization.dataflow.OrderedReflectionHelper;
+import org.pnplab.phenotype.utils.OrderedClassReflectionHelper;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -65,7 +65,7 @@ public class LogSQLiteReader {
         orderedFieldNames.add("log");
         orderedFieldNames.add("level");
 
-        OrderedReflectionHelper orderedReflectionHelper = new OrderedReflectionHelper<LogSQLiteReader>(this._dataClass, orderedFieldNames.toArray(new String[0]));
+        OrderedClassReflectionHelper orderedReflectionHelper = new OrderedClassReflectionHelper<LogSQLiteReader>(this._dataClass, orderedFieldNames.toArray(new String[0]));
         orderedReflectionHelper.validateOrThrow();
 
         this._classFields = orderedReflectionHelper.getFields();

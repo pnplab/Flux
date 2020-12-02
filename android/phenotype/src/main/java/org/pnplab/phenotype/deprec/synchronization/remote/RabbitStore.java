@@ -1,8 +1,8 @@
-package org.pnplab.phenotype.synchronization.remote;
+package org.pnplab.phenotype.deprec.synchronization.remote;
 
 import com.rabbitmq.client.Channel;
 
-import org.pnplab.phenotype.synchronization.dataflow.WritableStore;
+import org.pnplab.phenotype.deprec.synchronization.dataflow.WritableStore;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -81,7 +81,7 @@ public class RabbitStore implements WritableStore {
         this._channel = channel;
         this._tableName = tableName;
 
-        // @todo use OrderedReflectionHelper
+        // @todo use OrderedClassReflectionHelper
 
         // Setup data class field names and order.
         //
@@ -354,7 +354,7 @@ public class RabbitStore implements WritableStore {
     public void write(Object data) {
         ByteBuffer buffer;
 
-        // Use pre-allocated buffer if it has already been generated (because
+        // Use pre-allocated buffer if it has already been generated (when
         // it has a static, predicted size).
         //
         // @note

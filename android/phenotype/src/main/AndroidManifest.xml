@@ -39,12 +39,26 @@ cf. https://stackoverflow.com/a/4246141/939741
     @note
     ACCESS_COARSE_LOCATION is not enough for geofencing.
     cf. https://developer.android.com/training/location/geofencing#RequestGeofences
+
+    Required for GPS data.
+    cf. https://developer.android.com/training/location/request-updates
+
+    COARSE_LOCATION: "can use Wi-Fi, mobile cell data, or both to determine the
+    device's location. The API returns the location with an accuracy
+    approximately equivalent to a city block."
+    FINE_LOCATION: "can determine as precise a location as possible from the
+    available location providers, including the GPS as well as Wi-Fi and
+    mobile cell data"
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <!--
-    Allows an app to access location in the background on Android 10+.
+    Allows an app to access location in the background on Android 10+/Q+/API29+.
+
     cf. https://developer.android.com/reference/android/Manifest.permission.html#ACCESS_BACKGROUND_LOCATION
+
+    Required for GPS data.
+    cf. https://developer.android.com/training/location/request-updates#request-background-location
     -->
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
@@ -68,7 +82,7 @@ cf. https://stackoverflow.com/a/4246141/939741
         unexpectedly when a message is received.
         -->
         <receiver
-            android:name="org.pnplab.phenotype.system.entrypoints.PhenotypeBroadcastReceiver"
+            android:name=".dataflow.BroadcastReceiver"
             android:process=":phenotype"
             android:exported="false"
         >
@@ -94,11 +108,11 @@ cf. https://stackoverflow.com/a/4246141/939741
 
         <!--
         Provider hackily used to share android context across client-side part
-        of our lib. See PhenotypeClientInitProvider comments for more info.
+        of our lib. See ClientInitProvider comments for more info.
         -->
         <provider
             android:authorities="${phenotypeClientInitProviderAuthority}"
-            android:name="org.pnplab.phenotype.system.entrypoints.PhenotypeClientInitProvider"
+            android:name=".dataflow.ClientInitProvider"
             android:exported="false"
         />
 

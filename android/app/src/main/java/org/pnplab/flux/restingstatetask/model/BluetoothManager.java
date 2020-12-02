@@ -26,7 +26,7 @@ public class BluetoothManager {
     public void listenBluetoothStateChange(Context context, Function onChange) {
         assert _onBluetoothStateChanged == null;
 
-        // Store listener method reference.
+        // WritableStore listener method reference.
         _onBluetoothStateChanged = onChange;
 
         // Listen to bluetooth change broadcasts.

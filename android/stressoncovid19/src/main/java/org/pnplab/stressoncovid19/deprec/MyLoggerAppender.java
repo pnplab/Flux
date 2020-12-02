@@ -1,4 +1,4 @@
-package org.pnplab.stressoncovid19;
+package org.pnplab.stressoncovid19.deprec;
 
 import android.content.ContextWrapper;
 import android.os.Environment;

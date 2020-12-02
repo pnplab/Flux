@@ -1,10 +1,11 @@
-package org.pnplab.phenotype.core;
+package org.pnplab.phenotype.dataflow;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.PowerManager;
 
 import org.pnplab.phenotype.Phenotype;
+import org.pnplab.phenotype.core.AbstractInitProvider;
 import org.pnplab.phenotype.logger.AbstractLogger;
 
 import static org.pnplab.phenotype.Phenotype.Phenotype;

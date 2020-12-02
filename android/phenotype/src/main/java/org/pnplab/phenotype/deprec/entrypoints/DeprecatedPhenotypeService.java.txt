@@ -24,7 +24,7 @@ import com.rabbitmq.client.ShutdownSignalException;
 import com.rabbitmq.client.impl.recovery.AutorecoveringConnection;
 
 import org.pnplab.phenotype.logger.AbstractLogger;
-import org.pnplab.phenotype.synchronization.remote.RabbitConnection;
+import org.pnplab.phenotype.deprec.synchronization.remote.RabbitConnection;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

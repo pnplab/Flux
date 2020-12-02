@@ -1,10 +1,7 @@
-package org.pnplab.phenotype.generators;
+package org.pnplab.phenotype.producer;
 
-import android.os.Build;
 import android.os.SystemClock;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.annotations.NonNull;

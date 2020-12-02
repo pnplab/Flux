@@ -1,4 +1,4 @@
-package org.pnplab.phenotype.dataflow;
+package org.pnplab.phenotype.dataflow_utils;
 
 import org.pnplab.phenotype.rabbitmq.RabbitAdapter;
 import org.pnplab.phenotype.sqlite.SQLiteAdapter;
